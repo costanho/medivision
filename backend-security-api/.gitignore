@@ -1,0 +1,74 @@
+# IDE & Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+*.iws
+*.ipr
+
+# Build
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+dist/
+
+# Gradle
+.gradle/
+gradle/
+
+# Maven
+.mvn/
+mvn-wrapper.properties
+
+# Spring Boot
+application-*.properties
+application-*.yml
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database & Logs
+*.log
+logs/
+*.sql
+!init.sql
+!seed-data.sql
+!init_restore.sql
+
+# Node dependencies (if using Node for frontend)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Docker
+docker-compose.override.yml
+
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Coverage
+coverage/
+jacoco.xml
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+
+# IDE caches
+.classpath
+.project
+.settings/

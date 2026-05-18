@@ -1,0 +1,148 @@
+version: '3.8'
+
+# ====================================================================
+# CareNexus Auth Service - Docker Compose
+# ====================================================================
+# This file defines the services needed for the Auth Service:
+# - PostgreSQL database (for authentication data)
+# - Redis (for caching, optional)
+# - Kafka (for event publishing)
+# - Auth Service (Spring Boot application)
+# ====================================================================
+
+services:
+  # ================================================================
+  # PostgreSQL Database for Auth Service
+  # ================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: carenexus-postgres
+    environment:
+      POSTGRES_DB: carenexus_auth
+      POSTGRES_USER: carenexus_user
+      POSTGRES_PASSWORD: carenexus_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carenexus_user -d carenexus_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carenexus-network
+
+  # ================================================================
+  # Redis Cache (for future use)
+  # ================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: carenexus-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carenexus-network
+
+  # ================================================================
+  # Kafka Message Broker (for event publishing)
+  # ================================================================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: carenexus-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carenexus-network
+
+  # ================================================================
+  # Zookeeper (required by Kafka)
+  # ================================================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: carenexus-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carenexus-network
+
+  # ================================================================
+  # Auth Service (Spring Boot Application)
+  # ================================================================
+  auth-service:
+    build: .
+    container_name: carenexus-auth-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://carenexus-postgres:5432/carenexus_auth
+      SPRING_DATASOURCE_USERNAME: carenexus_user
+      SPRING_DATASOURCE_PASSWORD: carenexus_password
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JWT_SECRET: eH1BAeY4zWf8JMx5bFuAJCPHJExod5rbGISOiL+qh/o=
+      JWT_ACCESS_EXPIRATION: 86400000
+      JWT_REFRESH_EXPIRATION: 604800000
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/api/actuator/health/liveness"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - carenexus-network
+
+# ================================================================
+# Volumes (for persistent data)
+# ================================================================
+volumes:
+  postgres_data:
+    driver: local
+
+# ================================================================
+# Networks
+# ================================================================
+networks:
+  carenexus-network:
+    driver: bridge

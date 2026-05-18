@@ -1,0 +1,136 @@
+spring:
+  application:
+    name: carenexus-auth-service
+
+  # ================================================================
+  # SERVER CONFIGURATION
+  # ================================================================
+  server:
+    port: 8082
+    servlet:
+      context-path: /api
+
+  # ================================================================
+  # DATASOURCE (PostgreSQL Auth Database - Docker)
+  # ================================================================
+  datasource:
+    url: jdbc:postgresql://localhost:5433/carenexus_auth
+    username: carenexus_user
+    password: carenexus_password
+    driver-class-name: org.postgresql.Driver
+
+  # ================================================================
+  # JPA / HIBERNATE CONFIGURATION
+  # ================================================================
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 10
+        order_inserts: true
+        order_updates: true
+
+  # ================================================================
+  # JACKSON - JSON SERIALIZATION
+  # ================================================================
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  # ================================================================
+  # KAFKA CONFIGURATION (Disabled for development)
+  # ================================================================
+  kafka:
+    bootstrap-servers: localhost:9092
+    admin:
+      properties:
+        bootstrap.servers: localhost:9092
+      auto:
+        create:
+          topics:
+            enable: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: auth-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+  # ================================================================
+  # REDIS CONFIGURATION (Foundation for future caching)
+  # ================================================================
+  redis:
+    host: redis
+    port: 6379
+    timeout: 2000
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+  # ================================================================
+  # JPA AUDITING
+  # ================================================================
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
+
+# ================================================================
+# JWT SECURITY CONFIGURATION
+# ================================================================
+jwt:
+  secret: your-secret-key-change-this-in-production-environment-variable-override
+  access-expiration: 86400000  # 24 hours in milliseconds
+  refresh-expiration: 604800000  # 7 days in milliseconds
+
+# ================================================================
+# LOGGING CONFIGURATION
+# ================================================================
+logging:
+  level:
+    root: INFO
+    com.carenexus: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# ================================================================
+# ACTUATOR CONFIGURATION (Health checks for Docker)
+# ================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+# ================================================================
+# SERVER CONFIGURATION
+# ================================================================
+server:
+  port: 8082
+  compression:
+    enabled: true
+    min-response-size: 1024
