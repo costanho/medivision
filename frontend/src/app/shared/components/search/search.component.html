@@ -1,0 +1,103 @@
+<!-- Search Container -->
+<div class="search-container">
+  
+  <!-- Search Input -->
+  <div class="search-input-wrapper">
+    <span class="search-icon">🔍</span>
+    <input
+      #searchInput
+      type="text"
+      [placeholder]="placeholder"
+      [(ngModel)]="searchQuery"
+      (input)="onSearch(searchQuery)"
+      (focus)="showHistory()"
+      (blur)="setTimeout(() => hideHistory(), 200)"
+      class="search-input"
+      aria-label="Search conversations">
+    
+    <!-- Clear button -->
+    <button
+      *ngIf="searchQuery"
+      (click)="clearSearch()"
+      class="clear-btn"
+      aria-label="Clear search">
+      ✕
+    </button>
+  </div>
+
+  <!-- History Panel -->
+  <div *ngIf="showHistoryPanel && (history$ | async) as history" class="history-panel">
+    <div *ngIf="history.length > 0; else noHistory">
+      <div class="history-header">
+        <span class="history-title">Recent Searches</span>
+        <button (click)="clearAllHistory()" class="clear-history-btn" aria-label="Clear all history">
+          Clear All
+        </button>
+      </div>
+      
+      <div class="history-list">
+        <button
+          *ngFor="let item of history | slice:0:maxHistory"
+          (click)="useHistory(item)"
+          class="history-item">
+          <span class="history-icon">⏱</span>
+          <span class="history-text">{{ item }}</span>
+          <button
+            (click)="removeFromHistory(item, $event)"
+            class="remove-btn"
+            aria-label="Remove from history">
+            ✕
+          </button>
+        </button>
+      </div>
+    </div>
+
+    <ng-template #noHistory>
+      <div class="empty-history">
+        <p>No search history</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Search Results -->
+  <div *ngIf="searchQuery && (results$ | async) as results" class="search-results">
+    <div *ngIf="(isSearching$ | async); else resultsContent" class="loading">
+      <span class="spinner">⌛</span>
+      <span>Searching...</span>
+    </div>
+
+    <ng-template #resultsContent>
+      <div *ngIf="results.length > 0; else noResults" class="results-list">
+        <div *ngFor="let result of results" (click)="selectResult(result)" class="result-item">
+          <div class="result-header">
+            <span class="result-name">{{ result.item.name }}</span>
+            <span class="result-score" [title]="'Match score: ' + (result.score | number: '1.0-0')">
+              {{ result.score | number: '1.0-0' }}%
+            </span>
+          </div>
+
+          <div *ngIf="result.matchedFields && result.matchedFields.length > 0" class="result-fields">
+            <span class="field-tag" *ngFor="let field of result.matchedFields">
+              {{ field }}
+            </span>
+          </div>
+
+          <div *ngIf="result.highlight && result.highlight.length > 0" class="result-highlight">
+            <span class="highlight-label">...</span>
+            <span class="highlight-text">{{ getHighlightContext(result.highlight) }}</span>
+            <span class="highlight-label">...</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noResults>
+        <div class="empty-results">
+          <span class="empty-icon">🔍</span>
+          <p>No conversations found</p>
+          <p class="empty-hint">Try different keywords</p>
+        </div>
+      </ng-template>
+    </ng-template>
+  </div>
+
+</div>

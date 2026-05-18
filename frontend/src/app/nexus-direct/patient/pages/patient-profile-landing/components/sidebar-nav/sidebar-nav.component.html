@@ -1,0 +1,139 @@
+<!-- Mobile/Tablet Menu Button (shown only on small screens) -->
+<button class="mobile-menu-btn"
+        *ngIf="isMobile || isTablet"
+        (click)="toggleSidebarMobile()"
+        [class.open]="sidebarOpen"
+        aria-label="Toggle sidebar menu">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- Sidebar Overlay (Mobile only) -->
+<div class="sidebar-overlay"
+     *ngIf="(isMobile || isTablet) && sidebarOpen"
+     (click)="closeSidebarMobile()"></div>
+
+<!-- Main Sidebar -->
+<aside class="sidebar-left"
+       [class.is-desktop]="!isMobile && !isTablet"
+       [class.is-mobile]="isMobile"
+       [class.is-tablet]="isTablet"
+       [class.is-small-phone]="isSmallPhone"
+       [class.collapsed]="sidebarCollapsed"
+       [class.mobile-open]="sidebarOpen && (isMobile || isTablet)">
+
+  <!-- Back Button -->
+  <button class="back-btn" (click)="goBack()">
+    <i class="fas fa-arrow-left"></i>
+    <span class="back-label">Back</span>
+  </button>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <!-- Main Navigation -->
+    <div class="nav-section">
+      <div class="nav-item active">
+        <i class="fas fa-user nav-icon"></i>
+        <span class="nav-label">Profile</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-stethoscope nav-icon"></i>
+        <span class="nav-label">Find Doctors</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-calendar-check nav-icon"></i>
+        <span class="nav-label">Appointments</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-comments nav-icon"></i>
+        <span class="nav-label">Messages</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-file-medical nav-icon"></i>
+        <span class="nav-label">Medical Records</span>
+      </div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <!-- Services Section -->
+    <div class="nav-section">
+      <div class="nav-label-header">Services</div>
+
+      <!-- CareNexus Expandable Menu -->
+      <div class="nav-item expandable" [class.expanded]="isCareNexusExpanded" (click)="toggleCareNexus()">
+        <i class="fas fa-hospital-user nav-icon"></i>
+        <span class="nav-label">CareNexus</span>
+        <span class="expand-icon" [class.open]="isCareNexusExpanded">▶</span>
+      </div>
+
+      <!-- CareNexus Sub-items -->
+      <div class="nav-submenu" [class.visible]="isCareNexusExpanded">
+        <div class="nav-item sub-item" (click)="selectServiceById('carenexus-direct')">
+          <i class="fas fa-handshake nav-icon"></i>
+          <span class="nav-label">Direct</span>
+        </div>
+        <div class="nav-item sub-item" (click)="selectServiceById('carenexus-proxy')">
+          <i class="fas fa-people-group nav-icon"></i>
+          <span class="nav-label">Proxy</span>
+        </div>
+        <div class="nav-item sub-item" (click)="selectServiceById('carenexus-urgent')">
+          <i class="fas fa-ambulance nav-icon"></i>
+          <span class="nav-label">Urgent</span>
+        </div>
+        <div class="nav-item sub-item" (click)="selectServiceById('carenexus-companion')">
+          <i class="fas fa-robot nav-icon"></i>
+          <span class="nav-label">Companion</span>
+        </div>
+        <div class="nav-item sub-item" (click)="selectServiceById('carenexus-claims')">
+          <i class="fas fa-clipboard nav-icon"></i>
+          <span class="nav-label">Claims</span>
+        </div>
+        <div class="nav-item sub-item" (click)="selectServiceById('carenexus-learn')">
+          <i class="fas fa-book nav-icon"></i>
+          <span class="nav-label">Learn</span>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <i class="fas fa-ambulance nav-icon"></i>
+        <span class="nav-label">Emergency Services</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-people-group nav-icon"></i>
+        <span class="nav-label">Family Care</span>
+      </div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <!-- Settings Section -->
+    <div class="nav-section">
+      <div class="nav-item">
+        <i class="fas fa-cog nav-icon"></i>
+        <span class="nav-label">Settings</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-lock nav-icon"></i>
+        <span class="nav-label">Privacy & Security</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-question-circle nav-icon"></i>
+        <span class="nav-label">Help & Support</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Chat Button -->
+  <button class="chat-btn">
+    <i class="fas fa-comments"></i>
+    <span class="chat-label">Chat with us</span>
+  </button>
+
+  <!-- Logout Button -->
+  <button class="logout-btn" (click)="logout()">
+    <i class="fas fa-sign-out-alt"></i>
+    <span class="logout-label">Logout</span>
+  </button>
+</aside>

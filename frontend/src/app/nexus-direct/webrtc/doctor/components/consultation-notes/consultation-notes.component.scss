@@ -1,0 +1,391 @@
+$primary: #6200EA;
+$error: #F44336;
+$success: #4CAF50;
+$text-light: #fff;
+$text-secondary: #aaa;
+$bg-dark: #212121;
+$bg-darker: #1a1a1a;
+$border-color: rgba(255, 255, 255, 0.12);
+
+.consultation-notes {
+  display: flex;
+  flex-direction: column;
+  background: $bg-dark;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  border: 1px solid $border-color;
+
+  .notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid $border-color;
+    background: rgba(98, 0, 234, 0.05);
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: $text-light;
+      }
+
+      .save-status {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-weight: 500;
+        background: rgba(98, 0, 234, 0.15);
+        color: $primary;
+
+        &.saving {
+          background: rgba(255, 193, 7, 0.15);
+          color: #FFC107;
+        }
+
+        &.saved {
+          background: rgba(76, 175, 80, 0.15);
+          color: $success;
+        }
+
+        &.error {
+          background: rgba(244, 67, 54, 0.15);
+          color: $error;
+        }
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 4px;
+
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: $text-light;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not(:disabled) {
+          background: rgba(98, 0, 234, 0.2);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  .templates-panel {
+    padding: 8px 16px;
+    border-bottom: 1px solid $border-color;
+    background: rgba(98, 0, 234, 0.03);
+
+    .templates-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      .template-btn {
+        padding: 4px 8px;
+        border: 1px solid $border-color;
+        background: transparent;
+        color: $text-secondary;
+        border-radius: 4px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: rgba(98, 0, 234, 0.1);
+          color: $primary;
+          border-color: $primary;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  .note-editor {
+    flex: 1;
+    padding: 16px;
+    background: $bg-darker;
+    border: none;
+    color: $text-light;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  .tags-section {
+    padding: 12px 16px;
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+    background: rgba(98, 0, 234, 0.02);
+
+    .tags-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+
+      .tag-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .tags-list {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+
+        .tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 8px;
+          background: rgba(98, 0, 234, 0.2);
+          color: $primary;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 500;
+
+          &.added {
+            background: rgba(76, 175, 80, 0.2);
+            color: $success;
+          }
+
+          .tag-remove {
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1;
+            transition: all 0.2s ease;
+
+            &:hover {
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+    }
+
+    .quick-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      .quick-tag-btn {
+        padding: 4px 8px;
+        border: 1px solid rgba(98, 0, 234, 0.3);
+        background: transparent;
+        color: $text-secondary;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: rgba(98, 0, 234, 0.1);
+          color: $primary;
+          border-color: $primary;
+        }
+
+        &.active {
+          background: rgba(76, 175, 80, 0.2);
+          color: $success;
+          border-color: $success;
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  .notes-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid $border-color;
+    background: rgba(0, 0, 0, 0.2);
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      font-size: 11px;
+      color: $text-secondary;
+
+      .stat {
+        white-space: nowrap;
+      }
+
+      .separator {
+        color: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 8px;
+
+      .btn-text,
+      .btn-primary {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+
+      .btn-text {
+        background: transparent;
+        color: $text-secondary;
+        border: 1px solid $border-color;
+
+        &:hover:not(:disabled) {
+          background: rgba(244, 67, 54, 0.1);
+          color: $error;
+          border-color: $error;
+        }
+      }
+
+      .btn-primary {
+        background: $primary;
+        color: $text-light;
+        border: 1px solid $primary;
+
+        &:hover:not(:disabled) {
+          background: #7C3AED;
+          box-shadow: 0 0 12px rgba(98, 0, 234, 0.4);
+        }
+      }
+    }
+  }
+}
+
+// Mobile responsive
+@media (max-width: 480px) {
+  .consultation-notes {
+    .notes-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      .header-title {
+        width: 100%;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+
+    .note-editor {
+      font-size: 14px;
+    }
+
+    .tags-section {
+      .tags-input {
+        .tag-label {
+          width: 100%;
+        }
+      }
+
+      .quick-tags {
+        gap: 4px;
+
+        .quick-tag-btn {
+          padding: 3px 6px;
+          font-size: 9px;
+        }
+      }
+    }
+
+    .notes-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      .footer-actions {
+        width: 100%;
+
+        .btn-text,
+        .btn-primary {
+          flex: 1;
+        }
+      }
+    }
+  }
+}
+
+// Scrollbar styling
+.consultation-notes .note-editor {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(98, 0, 234, 0.3);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(98, 0, 234, 0.5);
+    }
+  }
+}

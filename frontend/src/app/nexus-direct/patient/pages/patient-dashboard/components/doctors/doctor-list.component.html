@@ -1,0 +1,94 @@
+<div class="scrollable-wrapper">
+<div class="doctor-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1><i class="fas fa-stethoscope"></i> Find a Doctor</h1>
+    <p class="subtitle">Browse our network of qualified healthcare professionals</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-filter-section">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search by doctor name..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch($event.target.value)"
+        class="search-input"
+      />
+      <span class="search-icon"><i class="fas fa-search"></i></span>
+    </div>
+
+    <div class="filter-box">
+      <label>Specialization:</label>
+      <select
+        [(ngModel)]="selectedSpecialization"
+        (ngModelChange)="onSpecializationChange($event)"
+        class="filter-select"
+      >
+        <option value="">All Specializations</option>
+        <option *ngFor="let spec of specializations" [value]="spec">{{ spec }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading doctors...</p>
+  </div>
+
+  <!-- Doctors Grid -->
+  <div *ngIf="!loading && doctors.length > 0" class="doctors-grid">
+    <div *ngFor="let doctor of doctors" class="doctor-card">
+      <div class="doctor-avatar"><i class="fas fa-user-md"></i></div>
+      <div class="doctor-details">
+        <h3>{{ doctor.name }}</h3>
+        <p class="specialization">{{ doctor.specialization }}</p>
+        <p class="license">License: {{ doctor.licenseNumber }}</p>
+        <div *ngIf="doctor.consultationFee" class="fee">
+          <strong>${{ doctor.consultationFee }}</strong> / consultation
+        </div>
+        <p *ngIf="doctor.bio" class="bio">{{ doctor.bio | slice:0:100 }}...</p>
+      </div>
+      <div class="doctor-actions">
+        <a [routerLink]="['/patient/nexus-direct/dashboard/doctor', doctor.id]" class="btn-view">View Profile</a>
+        <a [routerLink]="['/patient/nexus-direct/dashboard/schedule-appointment', doctor.id]" class="btn-book">Book Appointment</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && doctors.length === 0" class="empty-state">
+    <div class="empty-icon"><i class="fas fa-hospital"></i></div>
+    <h2>No doctors found</h2>
+    <p>Try adjusting your search or filter criteria</p>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="pagination">
+    <button
+      (click)="previousPage()"
+      [disabled]="currentPage === 0"
+      class="btn-pagination"
+    >
+      <i class="fas fa-chevron-left"></i> Previous
+    </button>
+    <span class="page-info">
+      Page {{ currentPage + 1 }} of {{ totalPages }}
+    </span>
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages - 1"
+      class="btn-pagination"
+    >
+      Next <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>
+</div>

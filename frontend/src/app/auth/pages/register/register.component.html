@@ -1,0 +1,286 @@
+<div class="scrollable-wrapper">
+  <div class="register-container">
+    <div class="register-card">
+      <!-- Header -->
+      <div class="register-header">
+        <div class="logo-container">
+          <img src="assets/images/carenexus-logo.svg" alt="CareNexus Logo" class="logo-image">
+          <span class="logo-text">CareNexus</span>
+        </div>
+        <p>Create Your Account</p>
+      </div>
+
+      <!-- Scrollable Form Container -->
+      <div class="scrollable-form-container">
+        <!-- Error Message -->
+        <div *ngIf="error" class="error-message">
+          {{ error }}
+        </div>
+
+        <!-- Register Form -->
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+
+          <!-- First Name Field -->
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input
+              type="text"
+              id="firstName"
+              formControlName="firstName"
+              placeholder="John"
+              class="form-control"
+              [class.is-invalid]="submitted && f['firstName'].errors"
+            />
+            <div *ngIf="submitted && f['firstName'].errors" class="error-text">
+              <div *ngIf="f['firstName'].errors['required']">First name is required</div>
+              <div *ngIf="f['firstName'].errors['minlength']">Name must be at least 2 characters</div>
+            </div>
+          </div>
+
+          <!-- Surname Field -->
+          <div class="form-group">
+            <label for="surname">Surname *</label>
+            <input
+              type="text"
+              id="surname"
+              formControlName="surname"
+              placeholder="Doe"
+              class="form-control"
+              [class.is-invalid]="submitted && f['surname'].errors"
+            />
+            <div *ngIf="submitted && f['surname'].errors" class="error-text">
+              <div *ngIf="f['surname'].errors['required']">Surname is required</div>
+              <div *ngIf="f['surname'].errors['minlength']">Surname must be at least 2 characters</div>
+            </div>
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="john@example.com"
+              class="form-control"
+              [class.is-invalid]="submitted && f['email'].errors"
+            />
+            <div *ngIf="submitted && f['email'].errors" class="error-text">
+              <div *ngIf="f['email'].errors['required']">Email is required</div>
+              <div *ngIf="f['email'].errors['invalidEmail']">Please enter a valid email address</div>
+            </div>
+          </div>
+
+          <!-- Date of Birth Field -->
+          <div class="form-group">
+            <label for="dateOfBirth">Date of Birth *</label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              formControlName="dateOfBirth"
+              class="form-control"
+              [class.is-invalid]="submitted && f['dateOfBirth'].errors"
+            />
+            <div *ngIf="submitted && f['dateOfBirth'].errors" class="error-text">
+              <div *ngIf="f['dateOfBirth'].errors['required']">Date of birth is required</div>
+            </div>
+          </div>
+
+          <!-- Gender Field -->
+          <div class="form-group">
+            <label for="gender">Gender *</label>
+            <select
+              id="gender"
+              formControlName="gender"
+              class="form-control"
+              [class.is-invalid]="submitted && f['gender'].errors"
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            <div *ngIf="submitted && f['gender'].errors" class="error-text">
+              <div *ngIf="f['gender'].errors['required']">Gender is required</div>
+            </div>
+          </div>
+
+          <!-- Phone Number Field (Combined) -->
+          <div class="form-group">
+            <label>Mobile Phone Number *</label>
+            <div class="phone-input-wrapper">
+              <select
+                formControlName="phoneCountryCode"
+                class="form-control country-code-select"
+                [class.is-invalid]="submitted && (f['phoneCountryCode'].errors || f['phoneNumber'].errors)"
+              >
+                <option *ngFor="let cc of countryCodes" [value]="cc.code">
+                  {{ cc.code }} - {{ cc.country }}
+                </option>
+              </select>
+              <input
+                type="tel"
+                formControlName="phoneNumber"
+                placeholder="712345678"
+                class="form-control phone-number-input"
+                [class.is-invalid]="submitted && (f['phoneNumber'].errors || f['phoneCountryCode'].errors)"
+              />
+            </div>
+            <div *ngIf="submitted && f['phoneNumber'].errors" class="error-text">
+              <div *ngIf="f['phoneNumber'].errors['required']">Phone number is required</div>
+              <div *ngIf="f['phoneNumber'].errors['pattern']">Phone number must be 7-14 digits</div>
+            </div>
+          </div>
+
+          <!-- Document Type Selection -->
+          <div class="form-group">
+            <label>Identity Document *</label>
+            <div class="document-type-options">
+              <label class="radio-option">
+                <input
+                  type="radio"
+                  formControlName="documentType"
+                  value="nationalId"
+                />
+                <span>National ID</span>
+              </label>
+              <label class="radio-option">
+                <input
+                  type="radio"
+                  formControlName="documentType"
+                  value="passport"
+                />
+                <span>Passport</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- National ID Number Field -->
+          <div class="form-group" *ngIf="f['documentType'].value === 'nationalId'">
+            <label for="nationalIdNumber">National ID Number *</label>
+            <input
+              type="text"
+              id="nationalIdNumber"
+              formControlName="nationalIdNumber"
+              placeholder="Enter your national ID"
+              class="form-control"
+              [class.is-invalid]="submitted && f['nationalIdNumber'].errors"
+            />
+            <div *ngIf="submitted && f['nationalIdNumber'].errors" class="error-text">
+              <div *ngIf="f['nationalIdNumber'].errors['required']">National ID is required</div>
+            </div>
+          </div>
+
+          <!-- Passport Number Field -->
+          <div class="form-group" *ngIf="f['documentType'].value === 'passport'">
+            <label for="passportNumber">Passport Number *</label>
+            <input
+              type="text"
+              id="passportNumber"
+              formControlName="passportNumber"
+              placeholder="Enter your passport number"
+              class="form-control"
+              [class.is-invalid]="submitted && f['passportNumber'].errors"
+            />
+            <div *ngIf="submitted && f['passportNumber'].errors" class="error-text">
+              <div *ngIf="f['passportNumber'].errors['required']">Passport is required</div>
+            </div>
+          </div>
+
+          <!-- Country Field -->
+          <div class="form-group">
+            <label for="country">Country</label>
+            <select
+              id="country"
+              formControlName="country"
+              class="form-control"
+            >
+              <option *ngFor="let country of countries" [value]="country">
+                {{ country }}
+              </option>
+            </select>
+          </div>
+
+          <!-- City Field -->
+          <div class="form-group">
+            <label for="city">City</label>
+            <input
+              type="text"
+              id="city"
+              formControlName="city"
+              placeholder="Harare"
+              class="form-control"
+            />
+          </div>
+
+          <!-- Password Field -->
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              placeholder="Enter your password"
+              class="form-control"
+              [class.is-invalid]="submitted && f['password'].errors"
+            />
+            <div *ngIf="submitted && f['password'].errors" class="error-text">
+              <div *ngIf="f['password'].errors['required']">Password is required</div>
+              <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+            </div>
+          </div>
+
+          <!-- Repeat Password Field -->
+          <div class="form-group">
+            <label for="repeatPassword">Confirm Password *</label>
+            <input
+              type="password"
+              id="repeatPassword"
+              formControlName="repeatPassword"
+              placeholder="Confirm your password"
+              class="form-control"
+              [class.is-invalid]="submitted && (f['repeatPassword'].errors || registerForm.errors?.['passwordMismatch'])"
+            />
+            <div *ngIf="submitted && getPasswordErrorMessage()" class="error-text">
+              {{ getPasswordErrorMessage() }}
+            </div>
+            <div *ngIf="submitted && f['repeatPassword'].errors" class="error-text">
+              <div *ngIf="f['repeatPassword'].errors['required']">Please confirm your password</div>
+              <div *ngIf="f['repeatPassword'].errors['minlength']">Password must be at least 6 characters</div>
+            </div>
+          </div>
+
+          <!-- Role Field -->
+          <div class="form-group">
+            <label for="role">Account Type *</label>
+            <select
+              id="role"
+              formControlName="role"
+              class="form-control"
+              [class.is-invalid]="submitted && f['role'].errors"
+            >
+              <option value="PATIENT">Patient</option>
+              <option value="DOCTOR">Doctor</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="loading"
+          >
+            <span *ngIf="!loading">Create Account</span>
+            <span *ngIf="loading">Creating Account...</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="register-footer">
+        <p>Already have an account? <a routerLink="/login">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+</div>

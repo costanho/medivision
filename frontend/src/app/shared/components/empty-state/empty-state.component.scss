@@ -1,0 +1,241 @@
+/**
+ * Empty State Component Styles
+ */
+
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  min-height: 300px;
+  position: relative;
+  text-align: center;
+  color: #6b7280;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  transition: all 0.3s ease;
+
+  @media (max-width: 480px) {
+    padding: 2rem 1rem;
+    min-height: 250px;
+  }
+}
+
+/* Size variants */
+.empty-state-container.size-sm {
+  padding: 2rem 1rem;
+  min-height: 200px;
+
+  .empty-state-icon {
+    font-size: 2rem;
+  }
+
+  .empty-state-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state-description {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.empty-state-container.size-lg {
+  padding: 4rem 2rem;
+  min-height: 400px;
+
+  .empty-state-icon {
+    font-size: 5rem;
+  }
+
+  .empty-state-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state-description {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+}
+
+/* Decorative background */
+.empty-state-decoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+
+  @media (max-width: 480px) {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+/* Content wrapper */
+.empty-state-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 500px;
+}
+
+/* Icon */
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  animation: float 3s ease-in-out infinite;
+
+  @media (max-width: 480px) {
+    font-size: 2.5rem;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Title */
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+
+  @media (max-width: 480px) {
+    font-size: 1.1rem;
+  }
+}
+
+/* Description */
+.empty-state-description {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  max-width: 100%;
+  word-wrap: break-word;
+
+  @media (max-width: 480px) {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Action buttons */
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+  width: 100%;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.empty-state-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+.empty-state-btn.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.empty-state-btn.btn-secondary {
+  background: #e5e7eb;
+  color: #1f2937;
+
+  &:hover {
+    background: #d1d5db;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .empty-state-container {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    color: #9ca3af;
+  }
+
+  .empty-state-decoration {
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+  }
+
+  .empty-state-title {
+    color: #f3f4f6;
+  }
+
+  .empty-state-description {
+    color: #d1d5db;
+  }
+
+  .empty-state-btn.btn-secondary {
+    background: #374151;
+    color: #f3f4f6;
+
+    &:hover {
+      background: #4b5563;
+    }
+  }
+}

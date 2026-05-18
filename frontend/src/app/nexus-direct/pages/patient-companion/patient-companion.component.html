@@ -1,0 +1,32 @@
+<app-service-header></app-service-header>
+
+<div class="companion-header">
+  <div class="header-content">
+    <h1>Nexus Companion - AI Health Assistant</h1>
+    <p>Your personal AI-powered healthcare guide, available 24/7</p>
+  </div>
+</div>
+
+<div class="companion-container">
+  <div class="features-grid">
+    <div *ngFor="let feature of features" class="feature-card">
+      <div class="feature-icon">{{ feature.icon }}</div>
+      <h3>{{ feature.title }}</h3>
+      <p>{{ feature.description }}</p>
+      <button class="btn-feature">Explore</button>
+    </div>
+  </div>
+
+  <div class="chat-section">
+    <h2>Ask Your AI Health Assistant</h2>
+    <div class="chat-area">
+      <div class="chat-message bot">
+        <p>👋 Hello! I'm your AI health companion. How can I help you today?</p>
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" placeholder="Ask me anything about your health...">
+      <button>Send</button>
+    </div>
+  </div>
+</div>

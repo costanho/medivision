@@ -1,0 +1,389 @@
+<div class="scrollable-wrapper">
+  <div class="reports-container">
+    <!-- Header -->
+    <div class="reports-header">
+      <div class="header-content">
+        <h1><i class="fas fa-file-medical"></i> Medical Reports</h1>
+        <p class="subtitle">Create and manage patient medical reports</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="openCreateModal()">
+          <i class="fas fa-plus"></i> New Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Error & Success Messages -->
+    <div *ngIf="error" class="alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ error }}</span>
+      <button class="close-btn" (click)="clearError()">×</button>
+    </div>
+
+    <div *ngIf="successMessage" class="alert-success">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading reports...</p>
+    </div>
+
+    <div *ngIf="!loading">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon total">
+            <i class="fas fa-file-medical"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ stats.totalReports }}</div>
+            <div class="stat-label">Total Reports</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon draft">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ stats.draftReports }}</div>
+            <div class="stat-label">Draft Reports</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon submitted">
+            <i class="fas fa-paper-plane"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ stats.submittedReports }}</div>
+            <div class="stat-label">Submitted</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon approved">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ stats.approvedReports }}</div>
+            <div class="stat-label">Approved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="filter-group">
+          <label for="status-filter">Status:</label>
+          <select id="status-filter" [(ngModel)]="filterStatus" class="filter-select">
+            <option value="all">All Status</option>
+            <option value="draft">Draft</option>
+            <option value="submitted">Submitted</option>
+            <option value="approved">Approved</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="type-filter">Type:</label>
+          <select id="type-filter" [(ngModel)]="filterType" class="filter-select">
+            <option value="all">All Types</option>
+            <option value="consultation">Consultation</option>
+            <option value="appointment">Appointment</option>
+            <option value="diagnosis">Diagnosis</option>
+            <option value="treatment">Treatment</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Reports List -->
+      <div class="reports-list">
+        <div *ngIf="getFilteredReports().length === 0" class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>No reports found</p>
+        </div>
+
+        <div *ngFor="let report of getFilteredReports()" class="report-card">
+          <div class="report-header">
+            <div class="report-title-section">
+              <div class="report-icon">
+                <i [ngClass]="getTypeIcon(report.reportType)"></i>
+              </div>
+              <div class="report-info">
+                <h3>{{ report.title }}</h3>
+                <p class="patient-name">
+                  <i class="fas fa-user"></i> {{ report.patientName }}
+                </p>
+              </div>
+            </div>
+            <div class="report-meta">
+              <span class="date">
+                <i class="fas fa-calendar"></i> {{ report.date }}
+              </span>
+              <span class="badge" [ngClass]="getStatusBadgeClass(report.status)">
+                <i [ngClass]="getStatusIcon(report.status)"></i>
+                {{ report.status | titlecase }}
+              </span>
+            </div>
+          </div>
+
+          <div class="report-preview">
+            <div class="preview-section">
+              <label>Findings:</label>
+              <p>{{ report.findings | slice:0:100 }}{{ report.findings.length > 100 ? '...' : '' }}</p>
+            </div>
+            <div class="preview-section">
+              <label>Recommendations:</label>
+              <p>{{ report.recommendations | slice:0:100 }}{{ report.recommendations.length > 100 ? '...' : '' }}</p>
+            </div>
+          </div>
+
+          <div class="report-footer">
+            <button
+              class="btn-link"
+              (click)="openReportDetail(report)">
+              <i class="fas fa-eye"></i> View Details
+            </button>
+            <div class="action-buttons">
+              <button
+                *ngIf="report.status === 'draft'"
+                class="btn-sm btn-primary"
+                (click)="editReport(report)">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button
+                *ngIf="report.status === 'draft'"
+                class="btn-sm btn-success"
+                (click)="submitReport(report.id)">
+                <i class="fas fa-paper-plane"></i> Submit
+              </button>
+              <button
+                *ngIf="report.status === 'submitted'"
+                class="btn-sm btn-primary"
+                (click)="approveReport(report.id)">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button
+                class="btn-sm btn-secondary"
+                (click)="downloadReport(report)">
+                <i class="fas fa-download"></i> Download
+              </button>
+              <button
+                *ngIf="report.status !== 'archived'"
+                class="btn-sm btn-warning"
+                (click)="archiveReport(report.id)">
+                <i class="fas fa-archive"></i> Archive
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-controls">
+        <button
+          class="btn-secondary"
+          (click)="getPreviousPage()"
+          [disabled]="currentPage === 1">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <span class="pagination-info">
+          Page {{ currentPage }} of {{ Math.ceil(totalItems / pageSize) }}
+        </span>
+        <button
+          class="btn-secondary"
+          (click)="getNextPage()"
+          [disabled]="currentPage * pageSize >= totalItems">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div *ngIf="showDetailModal && selectedReport" class="modal-overlay" (click)="closeReportDetail()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Report Details</h2>
+      <button class="close-btn" (click)="closeReportDetail()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-section">
+        <h3>Report Information</h3>
+        <div class="detail-item">
+          <label>Title:</label>
+          <p>{{ selectedReport.title }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Type:</label>
+          <p>
+            <i [ngClass]="getTypeIcon(selectedReport.reportType)"></i>
+            {{ selectedReport.reportType | titlecase }}
+          </p>
+        </div>
+        <div class="detail-item">
+          <label>Date:</label>
+          <p>{{ selectedReport.date }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Status:</label>
+          <span class="badge" [ngClass]="getStatusBadgeClass(selectedReport.status)">
+            <i [ngClass]="getStatusIcon(selectedReport.status)"></i>
+            {{ selectedReport.status | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Patient Information</h3>
+        <div class="detail-item">
+          <label>Name:</label>
+          <p>{{ selectedReport.patientName }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Email:</label>
+          <p>{{ selectedReport.patientEmail }}</p>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Clinical Details</h3>
+        <div class="detail-item">
+          <label>Findings:</label>
+          <p>{{ selectedReport.findings }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Recommendations:</label>
+          <p>{{ selectedReport.recommendations }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Content:</label>
+          <p>{{ selectedReport.content }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        *ngIf="selectedReport.status === 'draft'"
+        class="btn-primary"
+        (click)="editReport(selectedReport)">
+        <i class="fas fa-edit"></i> Edit
+      </button>
+      <button
+        *ngIf="selectedReport.status === 'draft'"
+        class="btn-success"
+        (click)="submitReport(selectedReport.id)">
+        <i class="fas fa-paper-plane"></i> Submit
+      </button>
+      <button
+        *ngIf="selectedReport.status === 'submitted'"
+        class="btn-primary"
+        (click)="approveReport(selectedReport.id)">
+        <i class="fas fa-check"></i> Approve
+      </button>
+      <button
+        class="btn-secondary"
+        (click)="downloadReport(selectedReport)">
+        <i class="fas fa-download"></i> Download
+      </button>
+      <button
+        *ngIf="selectedReport.status !== 'archived'"
+        class="btn-warning"
+        (click)="archiveReport(selectedReport.id)">
+        <i class="fas fa-archive"></i> Archive
+      </button>
+      <button class="btn-secondary" (click)="closeReportDetail()">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingReport ? 'Edit Report' : 'Create New Report' }}</h2>
+      <button class="close-btn" (click)="closeCreateModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <form class="report-form">
+        <div class="form-group">
+          <label for="report-title">Report Title *</label>
+          <input
+            id="report-title"
+            type="text"
+            [(ngModel)]="newReportTitle"
+            name="title"
+            class="form-control"
+            placeholder="e.g., Cardiac Consultation Report"
+            required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="report-type">Report Type *</label>
+            <select id="report-type" [(ngModel)]="newReportType" name="type" class="form-control">
+              <option value="consultation">Consultation</option>
+              <option value="appointment">Appointment</option>
+              <option value="diagnosis">Diagnosis</option>
+              <option value="treatment">Treatment</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="report-patient">Patient Name *</label>
+            <input
+              id="report-patient"
+              type="text"
+              [(ngModel)]="newReportPatient"
+              name="patient"
+              class="form-control"
+              placeholder="Patient name"
+              required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="report-findings">Findings *</label>
+          <textarea
+            id="report-findings"
+            [(ngModel)]="newReportFindings"
+            name="findings"
+            class="form-control"
+            rows="4"
+            placeholder="Clinical findings and observations"
+            required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="report-recommendations">Recommendations</label>
+          <textarea
+            id="report-recommendations"
+            [(ngModel)]="newReportRecommendations"
+            name="recommendations"
+            class="form-control"
+            rows="4"
+            placeholder="Treatment recommendations and follow-up instructions"></textarea>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary" (click)="editingReport ? saveReport() : createReport()">
+        <i class="fas fa-save"></i> {{ editingReport ? 'Update' : 'Create' }} Report
+      </button>
+      <button class="btn-secondary" (click)="closeCreateModal()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+    </div>
+  </div>
+</div>

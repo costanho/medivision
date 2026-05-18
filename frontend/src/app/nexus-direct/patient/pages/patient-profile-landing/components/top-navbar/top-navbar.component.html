@@ -1,0 +1,46 @@
+<!-- TOP NAVIGATION BAR -->
+<nav class="top-navbar">
+  <div class="navbar-left">
+    <button class="menu-btn" (click)="toggleMobileMenu()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="navbar-brand">
+      <img src="assets/images/carenexus-logo.svg" alt="CareNexus Logo" class="brand-logo-img">
+      <span class="brand-text">CareNexus</span>
+    </div>
+  </div>
+
+  <div class="navbar-center">
+    <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" placeholder="Type in to Search...">
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <div class="notification-badges">
+      <button class="icon-btn notification" (click)="navigateToAppointments()" title="Go to Appointments">
+        <span class="badge">{{ appointmentBadge }}</span>
+        <i class="fas fa-calendar"></i>
+        <span class="label">Appointment</span>
+      </button>
+      <button class="icon-btn" (click)="navigateToMessages()" title="Go to Messages">
+        <span class="badge">{{ messageBadge }}</span>
+        <i class="fas fa-envelope"></i>
+        <span class="label">Messages</span>
+      </button>
+    </div>
+    <div class="user-profile-header">
+      <div class="user-avatar" [style.background-color]="getAvatarColor()">
+        {{ getInitials() }}
+      </div>
+      <div class="user-info">
+        <p class="user-name">{{ currentUser?.fullName }}</p>
+        <button class="logout-btn-inline" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

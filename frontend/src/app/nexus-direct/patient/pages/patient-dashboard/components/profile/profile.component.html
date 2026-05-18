@@ -1,0 +1,756 @@
+<div class="scrollable-wrapper">
+  <div class="profile-container">
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="header-content">
+        <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+        <p class="subtitle">Manage your personal and medical information</p>
+      </div>
+    </div>
+
+    <!-- Error & Success Messages -->
+    <div *ngIf="error" class="alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ error }}</span>
+      <button class="close-btn" (click)="clearError()">×</button>
+    </div>
+
+    <div *ngIf="success" class="alert-success">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ success }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading profile...</p>
+    </div>
+
+    <div *ngIf="!loading && patient">
+      <!-- Navigation Tabs -->
+      <div class="profile-nav-tabs" [class.editing-disabled]="editMode">
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'personal'"
+          (click)="switchTab('personal')"
+          [disabled]="editMode">
+          <i class="fas fa-user-circle"></i> Personal Information
+        </button>
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'more'"
+          (click)="switchTab('more')"
+          [disabled]="editMode">
+          <i class="fas fa-heartbeat"></i> Medical Information
+        </button>
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'security'"
+          (click)="switchTab('security')"
+          [disabled]="editMode">
+          <i class="fas fa-lock"></i> Security & Passwords
+        </button>
+      </div>
+
+      <!-- Edit Form - Security & Passwords (Change Password) -->
+      <div *ngIf="editMode && activeTab === 'security'" class="edit-form-container">
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="profile-form">
+          <!-- Change Password Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-key"></i> Change Password</h3>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="currentPassword">Current Password *</label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  formControlName="currentPassword"
+                  class="form-control"
+                  [class.is-invalid]="submitted && passwordForm.get('currentPassword')?.errors"
+                  (change)="onFormChange()"
+                  placeholder="Enter your current password">
+                <div *ngIf="submitted && passwordForm.get('currentPassword')?.errors" class="error-text">
+                  <div *ngIf="passwordForm.get('currentPassword')?.errors?.['required']">Current password is required</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="newPassword">New Password *</label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  formControlName="newPassword"
+                  class="form-control"
+                  [class.is-invalid]="submitted && passwordForm.get('newPassword')?.errors"
+                  (change)="onFormChange()"
+                  placeholder="Enter your new password">
+                <div *ngIf="submitted && passwordForm.get('newPassword')?.errors" class="error-text">
+                  <div *ngIf="passwordForm.get('newPassword')?.errors?.['required']">New password is required</div>
+                  <div *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 8 characters</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="confirmPassword">Confirm Password *</label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  formControlName="confirmPassword"
+                  class="form-control"
+                  [class.is-invalid]="submitted && passwordForm.get('confirmPassword')?.errors"
+                  (change)="onFormChange()"
+                  placeholder="Confirm your new password">
+                <div *ngIf="submitted && passwordForm.get('confirmPassword')?.errors" class="error-text">
+                  <div *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']">Password confirmation is required</div>
+                  <div *ngIf="passwordForm.get('confirmPassword')?.errors?.['mismatch']">Passwords do not match</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn-primary save-btn"
+              [disabled]="savingProfile"
+              [class.saving]="savingProfile">
+              <span class="btn-icon">✓</span>
+              <span class="btn-text">{{ savingProfile ? 'Updating' : 'Update Password' }}</span>
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="toggleEditMode()"
+              [disabled]="savingProfile"
+              title="Cancel and return to view mode">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Profile Picture Section -->
+      <div *ngIf="!(editMode && activeTab === 'security')" class="profile-picture-section">
+        <div class="picture-container">
+          <div class="profile-image-placeholder">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+        <div class="picture-info">
+          <h2>{{ patient?.firstName }} {{ patient?.lastName }}</h2>
+          <p class="email">{{ authUser?.email }}</p>
+          <p class="info">
+            <i class="fas fa-birthday-cake"></i>
+            {{ patient?.dateOfBirth || 'Age not provided' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Edit Form (Personal & Medical Information) -->
+      <div *ngIf="editMode && (activeTab === 'personal' || activeTab === 'more')" class="edit-form-container">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+          <!-- Personal Information Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-user-circle"></i> Personal Information</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input
+                  id="firstName"
+                  type="text"
+                  formControlName="firstName"
+                  class="form-control"
+                  [class.is-invalid]="submitted && f['firstName'].errors"
+                  (change)="onFormChange()"
+                  placeholder="Enter first name">
+                <div *ngIf="submitted && f['firstName'].errors" class="error-text">
+                  <div *ngIf="f['firstName'].errors['required']">First name is required</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  formControlName="lastName"
+                  class="form-control"
+                  [class.is-invalid]="submitted && f['lastName'].errors"
+                  (change)="onFormChange()"
+                  placeholder="Enter last name">
+                <div *ngIf="submitted && f['lastName'].errors" class="error-text">
+                  <div *ngIf="f['lastName'].errors['required']">Last name is required</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  class="form-control"
+                  [class.is-invalid]="submitted && f['email'].errors"
+                  (change)="onFormChange()"
+                  placeholder="Enter email"
+                  readonly>
+              </div>
+
+              <div class="form-group">
+                <label for="mobilePhone">Phone Number</label>
+                <input
+                  id="mobilePhone"
+                  type="tel"
+                  formControlName="mobilePhone"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter phone number">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input
+                  id="dateOfBirth"
+                  type="date"
+                  formControlName="dateOfBirth"
+                  class="form-control"
+                  (change)="onFormChange()">
+              </div>
+
+              <div class="form-group">
+                <label for="gender">Gender</label>
+                <select formControlName="gender" class="form-control" (change)="onFormChange()">
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nationalIdNumber">National ID Number</label>
+                <input
+                  id="nationalIdNumber"
+                  type="text"
+                  formControlName="nationalIdNumber"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="National ID number">
+              </div>
+
+              <div class="form-group">
+                <label for="passportNumber">Passport Number</label>
+                <input
+                  id="passportNumber"
+                  type="text"
+                  formControlName="passportNumber"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Passport number">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="streetAddress">Street Address</label>
+                <input
+                  id="streetAddress"
+                  type="text"
+                  formControlName="streetAddress"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter street address">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City</label>
+                <input
+                  id="city"
+                  type="text"
+                  formControlName="city"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter city">
+              </div>
+
+              <div class="form-group">
+                <label for="state">State/Province</label>
+                <input
+                  id="state"
+                  type="text"
+                  formControlName="state"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter state">
+              </div>
+
+              <div class="form-group">
+                <label for="country">Country</label>
+                <input
+                  id="country"
+                  type="text"
+                  formControlName="country"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter country">
+              </div>
+
+              <div class="form-group">
+                <label for="zipCode">Zip Code</label>
+                <input
+                  id="zipCode"
+                  type="text"
+                  formControlName="zipCode"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter zip code">
+              </div>
+            </div>
+          </div>
+
+          <!-- Medical Information Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-heartbeat"></i> Medical Information</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bloodType">Blood Type</label>
+                <select formControlName="bloodType" class="form-control" (change)="onFormChange()">
+                  <option value="">Select Blood Type</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="height">Height (cm)</label>
+                <input
+                  id="height"
+                  type="number"
+                  formControlName="height"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Height in cm">
+              </div>
+
+              <div class="form-group">
+                <label for="weight">Weight (kg)</label>
+                <input
+                  id="weight"
+                  type="number"
+                  formControlName="weight"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Weight in kg">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="medicalConditions">Medical Conditions</label>
+                <textarea
+                  id="medicalConditions"
+                  formControlName="medicalConditions"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter medical conditions (comma-separated)"
+                  rows="3"></textarea>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="allergies">Allergies</label>
+                <textarea
+                  id="allergies"
+                  formControlName="allergies"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter allergies (comma-separated)"
+                  rows="3"></textarea>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="currentMedications">Current Medications</label>
+                <textarea
+                  id="currentMedications"
+                  formControlName="currentMedications"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter current medications (comma-separated)"
+                  rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Contact Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-phone"></i> Emergency Contact</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="emergencyContactName">Contact Name</label>
+                <input
+                  id="emergencyContactName"
+                  type="text"
+                  formControlName="emergencyContactName"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter contact name">
+              </div>
+
+              <div class="form-group">
+                <label for="emergencyContactPhone">Contact Phone</label>
+                <input
+                  id="emergencyContactPhone"
+                  type="tel"
+                  formControlName="emergencyContactPhone"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Enter contact phone">
+              </div>
+
+              <div class="form-group">
+                <label for="emergencyContactRelation">Relationship</label>
+                <input
+                  id="emergencyContactRelation"
+                  type="text"
+                  formControlName="emergencyContactRelation"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="e.g., Spouse, Parent, Sibling">
+              </div>
+            </div>
+          </div>
+
+          <!-- Insurance Information Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-shield-alt"></i> Insurance Information</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="insuranceProvider">Provider</label>
+                <input
+                  id="insuranceProvider"
+                  type="text"
+                  formControlName="insuranceProvider"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Insurance provider name">
+              </div>
+
+              <div class="form-group">
+                <label for="insurancePolicy">Policy Number</label>
+                <input
+                  id="insurancePolicy"
+                  type="text"
+                  formControlName="insurancePolicy"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Policy number">
+              </div>
+
+              <div class="form-group">
+                <label for="insuranceGroupId">Group ID</label>
+                <input
+                  id="insuranceGroupId"
+                  type="text"
+                  formControlName="insuranceGroupId"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Group ID">
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Information Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-file-alt"></i> Additional Information</h3>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="notes">Notes</label>
+                <textarea
+                  id="notes"
+                  formControlName="notes"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Additional notes or medical information"
+                  rows="4"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn-primary save-btn"
+              [disabled]="savingProfile"
+              [class.saving]="savingProfile">
+              <span class="btn-icon">✓</span>
+              <span class="btn-text">{{ savingProfile ? 'Saving' : 'Save' }}</span>
+               <i class="fas fa-times"></i> Save
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="toggleEditMode()"
+              [disabled]="savingProfile"
+              title="Cancel and return to view mode">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- View Mode - Personal Information Tab -->
+      <div *ngIf="!editMode && activeTab === 'personal'" class="tab-content">
+        <div class="profile-view">
+          <!-- Contact Information Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-phone"></i> Contact Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Email</label>
+                <p>{{ authUser?.email || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Phone</label>
+                <p>{{ patient?.phone || patient?.mobilePhone || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Information Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-user-circle"></i> Personal Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Date of Birth</label>
+                <p>{{ patient?.dateOfBirth || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Gender</label>
+                <p>{{ patient?.gender || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>National ID Number</label>
+                <p>{{ patient?.nationalIdNumber || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Passport Number</label>
+                <p>{{ patient?.passportNumber || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Address</label>
+                <p>{{ patient?.streetAddress || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>City</label>
+                <p>{{ patient?.city || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>State</label>
+                <p>{{ patient?.state || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Zip Code</label>
+                <p>{{ patient?.zipCode || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Country</label>
+                <p>{{ patient?.country || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <button class="btn-primary" (click)="toggleEditMode()" [disabled]="loading">
+              <i class="fas fa-edit"></i> Edit Profile
+            </button>
+            <button class="btn-secondary" (click)="goBackToDashboard()">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Mode - Medical Information Tab -->
+      <div *ngIf="!editMode && activeTab === 'more'" class="tab-content">
+        <div class="profile-view">
+          <!-- Medical Data Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-heartbeat"></i> Medical Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Blood Type</label>
+                <p>{{ patient?.bloodType || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Height (cm)</label>
+                <p>{{ patient?.height || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Weight (kg)</label>
+                <p>{{ patient?.weight || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Medical Conditions</label>
+                <p>{{ patient?.medicalConditions || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Allergies</label>
+                <p>{{ patient?.allergies || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Current Medications</label>
+                <p>{{ patient?.currentMedications || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Contact Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-phone"></i> Emergency Contact</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Contact Name</label>
+                <p>{{ patient?.emergencyContactName || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Contact Phone</label>
+                <p>{{ patient?.emergencyContactPhone || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Relationship</label>
+                <p>{{ patient?.emergencyContactRelation || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insurance Information Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-shield-alt"></i> Insurance Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Provider</label>
+                <p>{{ patient?.insuranceProvider || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Policy Number</label>
+                <p>{{ patient?.insurancePolicy || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Group ID</label>
+                <p>{{ patient?.insuranceGroupId || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Information Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-file-alt"></i> Additional Information</h3>
+            <div class="info-grid">
+              <div class="info-item full-width">
+                <label>Notes</label>
+                <p>{{ patient?.notes || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <button class="btn-primary" (click)="toggleEditMode()" [disabled]="loading">
+              <i class="fas fa-edit"></i> Edit Medical Info
+            </button>
+            <button class="btn-secondary" (click)="goBackToDashboard()">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Mode - Security & Passwords Tab -->
+      <div *ngIf="!editMode && activeTab === 'security'" class="tab-content">
+        <div class="profile-view">
+          <!-- Change Password Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-key"></i> Change Password</h3>
+            <div class="security-section">
+              <p class="section-description">Update your password to keep your account secure</p>
+              <div class="security-item">
+                <div class="security-info">
+                  <p class="font-weight-bold">Password Management</p>
+                </div>
+                <button class="btn-secondary" (click)="switchTab('security'); toggleEditMode()">
+                  <i class="fas fa-edit"></i> Change Password
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Two-Factor Authentication Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-mobile-alt"></i> Two-Factor Authentication</h3>
+            <div class="security-section">
+              <p class="section-description">Add an extra layer of security to your account</p>
+              <div class="security-item">
+                <div class="security-info">
+                  <p class="font-weight-bold">SMS Authentication</p>
+                  <p class="text-muted">Currently disabled</p>
+                </div>
+                <button class="btn-secondary">
+                  <i class="fas fa-toggle-off"></i> Enable 2FA
+                </button>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <button class="btn-secondary" (click)="goBackToDashboard()">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

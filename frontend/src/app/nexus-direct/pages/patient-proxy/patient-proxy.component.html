@@ -1,0 +1,24 @@
+<app-service-header></app-service-header>
+
+<div class="proxy-header">
+  <div class="header-content">
+    <h1>Nexus Proxy - Family Care</h1>
+    <p>Manage healthcare for your family members</p>
+  </div>
+</div>
+
+<div class="proxy-container">
+  <div class="family-grid">
+    <div *ngFor="let member of familyMembers" class="family-card">
+      <div class="member-icon">{{ member.icon }}</div>
+      <h3>{{ member.name }}</h3>
+      <p class="relation">{{ member.relation }}</p>
+      <button class="btn-manage">Manage</button>
+    </div>
+  </div>
+
+  <div class="placeholder">
+    <p>Add family members to manage their healthcare</p>
+    <button class="btn-add">+ Add Family Member</button>
+  </div>
+</div>

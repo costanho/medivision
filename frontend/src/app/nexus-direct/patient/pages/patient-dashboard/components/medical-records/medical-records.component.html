@@ -1,0 +1,249 @@
+<div class="scrollable-wrapper">
+<div class="medical-records-container">
+  <!-- Header -->
+  <div class="records-header">
+    <div class="header-content">
+      <h1><i class="fas fa-clipboard-list"></i> Medical Records</h1>
+      <p class="subtitle">Manage your medical history, allergies, and prescriptions</p>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="success" class="success-message">{{ success }}</div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button
+      (click)="selectTab('conditions')"
+      [class.active]="activeTab === 'conditions'"
+      class="tab-button">
+      <i class="fas fa-hospital"></i> Medical Conditions
+    </button>
+    <button
+      (click)="selectTab('allergies')"
+      [class.active]="activeTab === 'allergies'"
+      class="tab-button">
+      <i class="fas fa-exclamation-triangle"></i> Allergies
+    </button>
+    <button
+      (click)="selectTab('prescriptions')"
+      [class.active]="activeTab === 'prescriptions'"
+      class="tab-button">
+      <i class="fas fa-pills"></i> Prescriptions
+    </button>
+    <button
+      (click)="selectTab('lab-results')"
+      [class.active]="activeTab === 'lab-results'"
+      class="tab-button">
+      <i class="fas fa-flask"></i> Lab Results
+    </button>
+    <button
+      (click)="selectTab('medications')"
+      [class.active]="activeTab === 'medications'"
+      class="tab-button">
+      <i class="fas fa-syringe"></i> Medications
+    </button>
+    <button
+      (click)="selectTab('immunizations')"
+      [class.active]="activeTab === 'immunizations'"
+      class="tab-button">
+      <i class="fas fa-shield"></i> Immunizations
+    </button>
+  </div>
+
+  <!-- Content Area -->
+  <div class="records-content">
+
+    <!-- MEDICAL CONDITIONS TAB -->
+    <div *ngIf="activeTab === 'conditions'" class="tab-content">
+      <div class="content-header">
+        <h2>Medical Conditions</h2>
+        <button (click)="openConditionModal()" class="btn-primary"><i class="fas fa-plus"></i> Add Condition</button>
+      </div>
+
+      <div *ngIf="medicalConditions.length === 0" class="empty-state">
+        <p>No medical conditions recorded</p>
+      </div>
+
+      <div *ngIf="medicalConditions.length > 0" class="conditions-table-wrapper">
+        <table class="conditions-table">
+          <thead>
+            <tr>
+              <th>Condition Name</th>
+              <th>Description</th>
+              <th>Diagnosed Date</th>
+              <th>Status</th>
+              <th>Doctor Viewed</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let condition of medicalConditions" [class]="'status-' + condition.status">
+              <td class="condition-name">{{ condition.conditionName || condition.name }}</td>
+              <td class="description">{{ condition.description || 'N/A' }}</td>
+              <td class="diagnosed-date">{{ condition.diagnosedDate | date:'MMM d, yyyy' }}</td>
+              <td class="status-cell">
+                <span [class]="'status-badge ' + getStatusClass(condition.status)">
+                  {{ getStatusIcon(condition.status) }} {{ condition.status | uppercase }}
+                </span>
+              </td>
+              <td class="doctor-viewed">{{ condition.doctorName || 'Not viewed' }}</td>
+              <td class="created-at">{{ condition.createdAt | date:'MMM d, yyyy' }}</td>
+              <td class="actions-cell">
+                <button (click)="openConditionModal(condition)" class="btn-icon btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                <button (click)="deleteCondition(condition.id)" class="btn-icon btn-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                <button (click)="updateConditionStatus(condition.id)" class="btn-icon btn-update" title="Update"><i class="fas fa-sync"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALLERGIES TAB - Delegated to standalone component -->
+    <div *ngIf="activeTab === 'allergies'" class="tab-content">
+      <app-allergies></app-allergies>
+    </div>
+
+    <!-- PRESCRIPTIONS TAB - Delegated to standalone component -->
+    <div *ngIf="activeTab === 'prescriptions'" class="tab-content">
+      <app-prescriptions></app-prescriptions>
+    </div>
+
+    <!-- LAB RESULTS TAB - Delegated to standalone component -->
+    <div *ngIf="activeTab === 'lab-results'" class="tab-content">
+      <app-lab-results></app-lab-results>
+    </div>
+
+    <!-- MEDICATIONS TAB -->
+    <div *ngIf="activeTab === 'medications'" class="tab-content">
+      <div class="content-header">
+        <h2>Current Medications</h2>
+      </div>
+
+      <div *ngIf="medications.length === 0" class="empty-state">
+        <p>No medications recorded</p>
+      </div>
+
+      <div *ngIf="medications.length > 0" class="medications-list">
+        <div *ngFor="let medication of medications" class="medication-card">
+          <div class="med-header">
+            <h3>{{ medication.name }}</h3>
+            <span class="badge active">💊 Active</span>
+          </div>
+          <div class="med-details">
+            <div class="detail-row">
+              <label>Dosage:</label>
+              <p>{{ medication.dosage }}</p>
+            </div>
+            <div class="detail-row">
+              <label>Frequency:</label>
+              <p>{{ medication.frequency }}</p>
+            </div>
+            <div class="detail-row">
+              <label>Start Date:</label>
+              <p>{{ medication.startDate }}</p>
+            </div>
+            <div class="detail-row">
+              <label>Reason:</label>
+              <p>{{ medication.reason }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMMUNIZATIONS TAB -->
+    <div *ngIf="activeTab === 'immunizations'" class="tab-content">
+      <div class="content-header">
+        <h2>Immunization History</h2>
+      </div>
+
+      <div *ngIf="immunizations.length === 0" class="empty-state">
+        <p>No immunizations recorded</p>
+      </div>
+
+      <div *ngIf="immunizations.length > 0" class="immunizations-timeline">
+        <div *ngFor="let vaccine of immunizations" class="timeline-item">
+          <div class="timeline-marker"><i class="fas fa-shield"></i></div>
+          <div class="timeline-content">
+            <h3>{{ vaccine.vaccineName }}</h3>
+            <div class="vaccine-info">
+              <div class="info-item">
+                <label>Date Administered:</label>
+                <p>{{ vaccine.dateAdministered }}</p>
+              </div>
+              <div class="info-item">
+                <label>Provider:</label>
+                <p>{{ vaccine.provider }}</p>
+              </div>
+              <div *ngIf="vaccine.nextDueDate" class="info-item">
+                <label>Next Due:</label>
+                <p>{{ vaccine.nextDueDate }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- Medical Condition Modal -->
+<div *ngIf="showConditionModal" class="modal-overlay" (click)="closeConditionModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingCondition ? 'Edit Medical Condition' : 'Add Medical Condition' }}</h2>
+      <button (click)="closeConditionModal()" class="btn-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form [formGroup]="conditionForm" class="modal-form">
+      <div class="form-group">
+        <label for="name">Condition Name</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          placeholder="e.g., Type 2 Diabetes"
+        />
+      </div>
+      <div class="form-group">
+        <label for="diagnosedDate">Diagnosed Date</label>
+        <input
+          type="date"
+          id="diagnosedDate"
+          formControlName="diagnosedDate"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" formControlName="status" class="form-control">
+          <option value="active">Active</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea
+          id="notes"
+          formControlName="notes"
+          class="form-control"
+          placeholder="Additional notes..."
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" (click)="saveCondition()" class="btn-primary">Save</button>
+        <button type="button" (click)="closeConditionModal()" class="btn-secondary">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</div>

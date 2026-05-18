@@ -1,0 +1,958 @@
+<div class="scrollable-wrapper">
+  <div class="profile-container">
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="header-content">
+        <h1><i class="fas fa-stethoscope"></i> My Profile</h1>
+        <p class="subtitle">Manage your professional information and credentials</p>
+      </div>
+    </div>
+
+    <!-- Error & Success Messages -->
+    <div *ngIf="error" class="alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ error }}</span>
+      <button class="close-btn" (click)="clearError()">×</button>
+    </div>
+
+    <div *ngIf="successMessage" class="alert-success">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading profile...</p>
+    </div>
+
+    <div *ngIf="!loading && doctorProfile">
+      <!-- Navigation Tabs -->
+      <div class="profile-nav-tabs" [class.editing-disabled]="editing">
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'personal'"
+          (click)="activeTab = 'personal'"
+          [disabled]="editing">
+          <i class="fas fa-user-circle"></i> Personal Information
+        </button>
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'professional'"
+          (click)="activeTab = 'professional'"
+          [disabled]="editing">
+          <i class="fas fa-briefcase"></i> More Professional Information
+        </button>
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'security'"
+          (click)="activeTab = 'security'"
+          [disabled]="editing">
+          <i class="fas fa-lock"></i> Security & Passwords
+        </button>
+      </div>
+
+      <!-- Profile Picture Section -->
+      <div class="profile-picture-section">
+        <div class="picture-container">
+          <img
+            *ngIf="doctorProfile.profileImageUrl"
+            [src]="doctorProfile.profileImageUrl"
+            alt="Profile Picture"
+            class="profile-image">
+          <div *ngIf="!doctorProfile.profileImageUrl" class="profile-image-placeholder">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <div *ngIf="editing" class="picture-overlay">
+            <label for="profilePictureUpload" class="picture-upload-btn">
+              <i class="fas fa-camera"></i> Upload
+              <input
+                id="profilePictureUpload"
+                type="file"
+                accept="image/*"
+                (change)="onProfileImageSelected($event)"
+                style="display: none;">
+            </label>
+          </div>
+        </div>
+        <div class="picture-info">
+          <h2>{{ doctorProfile.name }}</h2>
+          <p class="specialization">{{ doctorProfile.specialization }}</p>
+          <p class="experience">
+            <i class="fas fa-briefcase"></i>
+            {{ doctorProfile.yearsOfExperience }} years of experience
+          </p>
+        </div>
+      </div>
+
+      <!-- Edit Form -->
+      <div *ngIf="editing" class="edit-form-container">
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+          <!-- Basic Information Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-user-circle"></i> Basic Information</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  class="form-control"
+                  [class.is-invalid]="submitted && f['name'].errors"
+                  (change)="onFormChange()"
+                  placeholder="Enter full name">
+                <div *ngIf="submitted && f['name'].errors" class="error-text">
+                  <div *ngIf="f['name'].errors['required']">Full name is required</div>
+                  <div *ngIf="f['name'].errors['minlength']">Full name must be at least 2 characters</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  class="form-control"
+                  [class.is-invalid]="submitted && f['email'].errors"
+                  (change)="onFormChange()"
+                  placeholder="Enter email address"
+                  readonly>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input
+                  id="phone"
+                  type="tel"
+                  formControlName="phone"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="+1 (555) 123-4567">
+              </div>
+
+              <div class="form-group">
+                <label for="mobilePhone">Mobile Phone</label>
+                <input
+                  id="mobilePhone"
+                  type="tel"
+                  formControlName="mobilePhone"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="+1 (555) 987-6543">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input
+                  id="dateOfBirth"
+                  type="date"
+                  formControlName="dateOfBirth"
+                  class="form-control"
+                  (change)="onFormChange()">
+              </div>
+
+              <div class="form-group">
+                <label for="gender">Gender</label>
+                <select
+                  id="gender"
+                  formControlName="gender"
+                  class="form-control"
+                  (change)="onFormChange()">
+                  <option value="">Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="passportNumber">Passport Number</label>
+                <input
+                  id="passportNumber"
+                  type="text"
+                  formControlName="passportNumber"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Passport number">
+              </div>
+
+              <div class="form-group">
+                <label for="nationalIdNumber">National ID Number</label>
+                <input
+                  id="nationalIdNumber"
+                  type="text"
+                  formControlName="nationalIdNumber"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="National ID number">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="clinic">Clinic/Hospital</label>
+              <input
+                id="clinic"
+                type="text"
+                formControlName="clinic"
+                class="form-control"
+                (change)="onFormChange()"
+                placeholder="Name of your clinic or hospital">
+            </div>
+
+            <div class="form-group">
+              <label for="bio">Bio/About</label>
+              <textarea
+                id="bio"
+                formControlName="bio"
+                class="form-control"
+                (change)="onFormChange()"
+                rows="4"
+                placeholder="Write a brief bio about yourself..."></textarea>
+            </div>
+          </div>
+
+          <!-- Professional Information Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-certificate"></i> Professional Information</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="specialization">Specialization *</label>
+                <select
+                  id="specialization"
+                  formControlName="specialization"
+                  class="form-control"
+                  (change)="onFormChange()">
+                  <option value="">Select specialization</option>
+                  <option *ngFor="let spec of specializations" [value]="spec">
+                    {{ spec }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="licenseNumber">License Number *</label>
+                <input
+                  id="licenseNumber"
+                  type="text"
+                  formControlName="licenseNumber"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Medical license number">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="yearsOfExperience">Years of Experience *</label>
+                <input
+                  id="yearsOfExperience"
+                  type="number"
+                  formControlName="yearsOfExperience"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  min="0"
+                  max="70"
+                  placeholder="0">
+              </div>
+            </div>
+
+            <!-- Qualifications -->
+            <div class="form-group">
+              <label>Qualifications</label>
+              <div class="checkbox-list">
+                <label *ngFor="let qual of ['MD', 'DO', 'Board Certified', 'Fellowship Trained']">
+                  <input
+                    type="checkbox"
+                    [checked]="(profileForm.get('qualifications')?.value || []).includes(qual)"
+                    (change)="toggleQualification(qual)">
+                  {{ qual }}
+                </label>
+              </div>
+            </div>
+
+            <!-- Certifications -->
+            <div class="form-group">
+              <label>Certifications</label>
+              <div class="checkbox-list">
+                <label *ngFor="let cert of ['ACLS', 'BLS', 'ATLS', 'PALS']">
+                  <input
+                    type="checkbox"
+                    [checked]="(profileForm.get('certifications')?.value || []).includes(cert)"
+                    (change)="toggleCertification(cert)">
+                  {{ cert }}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Language & Location Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-language"></i> Languages & Location</h3>
+
+            <!-- Languages -->
+            <div class="form-group">
+              <label>Languages Spoken</label>
+              <div class="checkbox-list">
+                <label *ngFor="let lang of languages">
+                  <input
+                    type="checkbox"
+                    [checked]="(profileForm.get('languages')?.value || []).includes(lang)"
+                    (change)="toggleLanguage(lang)">
+                  {{ lang }}
+                </label>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="address">Street Address</label>
+                <input
+                  id="address"
+                  type="text"
+                  formControlName="address"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="123 Medical Plaza">
+              </div>
+
+              <div class="form-group">
+                <label for="city">City</label>
+                <input
+                  id="city"
+                  type="text"
+                  formControlName="city"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="New York">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="state">State/Province</label>
+                <input
+                  id="state"
+                  type="text"
+                  formControlName="state"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="NY">
+              </div>
+
+              <div class="form-group">
+                <label for="zipCode">Zip/Postal Code</label>
+                <input
+                  id="zipCode"
+                  type="text"
+                  formControlName="zipCode"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="10001">
+              </div>
+
+              <div class="form-group">
+                <label for="country">Country</label>
+                <input
+                  id="country"
+                  type="text"
+                  formControlName="country"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="United States">
+              </div>
+            </div>
+          </div>
+
+          <!-- Banking Information Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-university"></i> Banking Information</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bankName">Bank Name</label>
+                <input
+                  id="bankName"
+                  type="text"
+                  formControlName="bankName"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Your bank name">
+              </div>
+
+              <div class="form-group">
+                <label for="accountName">Account Name</label>
+                <input
+                  id="accountName"
+                  type="text"
+                  formControlName="accountName"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Account holder name">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="accountNumber">Account Number</label>
+                <input
+                  id="accountNumber"
+                  type="text"
+                  formControlName="accountNumber"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Account number">
+              </div>
+
+              <div class="form-group">
+                <label for="branchCode">Branch Code</label>
+                <input
+                  id="branchCode"
+                  type="text"
+                  formControlName="branchCode"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Branch code">
+              </div>
+
+              <div class="form-group">
+                <label for="taxId">Tax ID</label>
+                <input
+                  id="taxId"
+                  type="text"
+                  formControlName="taxId"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Tax identification number">
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Indemnity Insurance Card -->
+          <div class="form-card specialist-card">
+            <h3><i class="fas fa-shield-alt"></i> Professional Indemnity Insurance</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="insurerName">Insurer Name</label>
+                <input
+                  id="insurerName"
+                  type="text"
+                  formControlName="insurerName"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Insurance company name">
+              </div>
+
+              <div class="form-group">
+                <label for="policyNumber">Policy Number</label>
+                <input
+                  id="policyNumber"
+                  type="text"
+                  formControlName="policyNumber"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Policy number">
+              </div>
+
+              <div class="form-group">
+                <label for="expiryDate">Expiry Date</label>
+                <input
+                  id="expiryDate"
+                  type="date"
+                  formControlName="expiryDate"
+                  class="form-control"
+                  (change)="onFormChange()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Type of Practice & Work Location Card -->
+          <div class="form-card">
+            <h3><i class="fas fa-stethoscope"></i> Practice Details</h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="typeOfPractice">Type of Practice</label>
+                <select
+                  id="typeOfPractice"
+                  formControlName="typeOfPractice"
+                  class="form-control"
+                  (change)="onFormChange()">
+                  <option value="">Select practice type</option>
+                  <option value="GP">General Practice</option>
+                  <option value="Specialist">Specialist</option>
+                  <option value="Emergency">Emergency</option>
+                  <option value="Surgeon">Surgeon</option>
+                  <option value="Telemedicine">Telemedicine Only</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="primaryPracticeLocation">Primary Practice Location</label>
+                <input
+                  id="primaryPracticeLocation"
+                  type="text"
+                  formControlName="primaryPracticeLocation"
+                  class="form-control"
+                  (change)="onFormChange()"
+                  placeholder="Your primary practice location">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="consultationFees">Consultation Fees ($)</label>
+              <input
+                id="consultationFees"
+                type="number"
+                formControlName="consultationFees"
+                class="form-control"
+                (change)="onFormChange()"
+                min="0"
+                placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+              <label for="availabilitySchedule">Availability Schedule</label>
+              <textarea
+                id="availabilitySchedule"
+                formControlName="availabilitySchedule"
+                class="form-control"
+                (change)="onFormChange()"
+                rows="3"
+                placeholder="e.g., Monday-Friday: 9AM-5PM EST"></textarea>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn-primary"
+              [disabled]="savingProfile"
+              title="Save your profile changes">
+              <i class="fas fa-check-circle"></i>
+              <span *ngIf="!savingProfile">Save Changes</span>
+              <span *ngIf="savingProfile"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="toggleEdit()"
+              [disabled]="savingProfile"
+              title="Cancel and return to view mode">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- View Mode - Personal Information Tab -->
+      <div *ngIf="!editing && activeTab === 'personal'" class="tab-content">
+        <div class="profile-view">
+          <!-- Contact Information Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-phone"></i> Contact Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Email</label>
+                <p>{{ doctorProfile.email }}</p>
+              </div>
+              <div class="info-item">
+                <label>Phone</label>
+                <p>{{ doctorProfile.phone || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Mobile Phone</label>
+                <p>{{ doctorProfile.mobilePhone || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Information Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-user-circle"></i> Personal Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Date of Birth</label>
+                <p>{{ doctorProfile.dateOfBirth || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Gender</label>
+                <p>{{ doctorProfile.gender || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Country</label>
+                <p>{{ doctorProfile.country || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>City</label>
+                <p>{{ doctorProfile.city || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Passport Number</label>
+                <p>{{ doctorProfile.passportNumber || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>National ID Number</label>
+                <p>{{ doctorProfile.nationalIdNumber || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Overview Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-briefcase"></i> Professional Overview</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Specialization</label>
+                <p>{{ doctorProfile.specialization }}</p>
+              </div>
+              <div class="info-item">
+                <label>License Number</label>
+                <p>{{ doctorProfile.licenseNumber }}</p>
+              </div>
+              <div class="info-item">
+                <label>Years of Experience</label>
+                <p>{{ doctorProfile.yearsOfExperience }} years</p>
+              </div>
+              <div class="info-item">
+                <label>Clinic/Hospital</label>
+                <p>{{ doctorProfile.clinic || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Address</label>
+                <p>{{ doctorProfile.address || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>City</label>
+                <p>{{ doctorProfile.city || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>State</label>
+                <p>{{ doctorProfile.state || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Zip Code</label>
+                <p>{{ doctorProfile.zipCode || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Country</label>
+                <p>{{ doctorProfile.country || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Qualifications & Certifications Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-certificate"></i> Qualifications & Certifications</h3>
+          <div class="info-grid-full">
+            <div class="info-section">
+              <label>Qualifications</label>
+              <div class="badge-list">
+                <span *ngFor="let qual of doctorProfile.qualifications" class="badge badge-primary">
+                  {{ qual }}
+                </span>
+                <span *ngIf="doctorProfile.qualifications.length === 0" class="text-muted">None specified</span>
+              </div>
+            </div>
+            <div class="info-section">
+              <label>Certifications</label>
+              <div class="badge-list">
+                <span *ngFor="let cert of doctorProfile.certifications" class="badge badge-success">
+                  {{ cert }}
+                </span>
+                <span *ngIf="doctorProfile.certifications.length === 0" class="text-muted">None specified</span>
+              </div>
+            </div>
+            <div class="info-section">
+              <label>Languages</label>
+              <div class="badge-list">
+                <span *ngFor="let lang of doctorProfile.languages" class="badge badge-info">
+                  {{ lang }}
+                </span>
+                <span *ngIf="doctorProfile.languages.length === 0" class="text-muted">None specified</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bio Card -->
+        <div class="info-card" *ngIf="doctorProfile.bio">
+          <h3><i class="fas fa-file-alt"></i> About Me</h3>
+          <p class="bio-text">{{ doctorProfile.bio }}</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-actions">
+          <button class="btn-primary" (click)="toggleEdit()" [disabled]="loading">
+            <i class="fas fa-edit"></i> Edit Profile
+          </button>
+          <button class="btn-secondary" (click)="goBackToDashboard()">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+          </button>
+        </div>
+        </div>
+      </div>
+
+      <!-- View Mode - More Professional Information Tab -->
+      <div *ngIf="!editing && activeTab === 'professional'" class="tab-content">
+        <div class="profile-view">
+          <!-- Banking Information Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-university"></i> Banking Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Bank Name</label>
+                <p>{{ doctorProfile.bankName || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Account Name</label>
+                <p>{{ doctorProfile.accountName || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Account Number</label>
+                <p>{{ doctorProfile.accountNumber || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Branch Code</label>
+                <p>{{ doctorProfile.branchCode || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Tax ID</label>
+                <p>{{ doctorProfile.taxId || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Indemnity Insurance Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-shield-alt"></i> Professional Indemnity Insurance</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Insurer Name</label>
+                <p>{{ doctorProfile.insurerName || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Policy Number</label>
+                <p>{{ doctorProfile.policyNumber || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Expiry Date</label>
+                <p>{{ doctorProfile.expiryDate || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Type of Practice Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-stethoscope"></i> Practice Details</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Type of Practice</label>
+                <p>{{ doctorProfile.typeOfPractice || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Primary Practice Location</label>
+                <p>{{ doctorProfile.primaryPracticeLocation || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Consultation Fees</label>
+                <p>${{ doctorProfile.consultationFees || 'Not provided' }}</p>
+              </div>
+              <div class="info-item">
+                <label>Availability Schedule</label>
+                <p>{{ doctorProfile.availabilitySchedule || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <button class="btn-primary" (click)="toggleEdit()" [disabled]="loading">
+              <i class="fas fa-edit"></i> Edit Profile
+            </button>
+            <button class="btn-secondary" (click)="goBackToDashboard()">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Mode - Security & Passwords Tab -->
+      <div *ngIf="!editing && activeTab === 'security'" class="tab-content">
+        <div class="profile-view">
+          <!-- Change Password Card - View Mode -->
+          <div *ngIf="!changingPassword" class="info-card">
+            <h3><i class="fas fa-key"></i> Change Password</h3>
+            <div class="security-section">
+              <p class="section-description">Update your password to keep your account secure</p>
+              <div class="security-item">
+                <div class="security-info">
+                  <p class="font-weight-bold">Password Management</p>
+                  <p class="text-muted">Last changed 3 months ago</p>
+                </div>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="togglePasswordChange()"
+                  title="Open password change form">
+                  <i class="fas fa-edit"></i> Change Password
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Change Password Form -->
+          <div *ngIf="changingPassword" class="info-card password-form-card">
+            <h3><i class="fas fa-key"></i> Change Your Password</h3>
+            <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="password-form">
+              <div class="form-group">
+                <label for="currentPassword">Current Password *</label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  formControlName="currentPassword"
+                  class="form-control"
+                  [class.is-invalid]="passwordSubmitted && pf['currentPassword'].errors"
+                  placeholder="Enter your current password">
+                <div *ngIf="passwordSubmitted && pf['currentPassword'].errors" class="error-text">
+                  <div *ngIf="pf['currentPassword'].errors['required']">Current password is required</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="newPassword">New Password *</label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  formControlName="newPassword"
+                  class="form-control"
+                  [class.is-invalid]="passwordSubmitted && pf['newPassword'].errors"
+                  placeholder="Enter your new password">
+                <div *ngIf="passwordSubmitted && pf['newPassword'].errors" class="error-text">
+                  <div *ngIf="pf['newPassword'].errors['required']">New password is required</div>
+                  <div *ngIf="pf['newPassword'].errors['minlength']">Password must be at least 8 characters</div>
+                </div>
+                <small class="form-text text-muted">Password must be at least 8 characters long</small>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Confirm New Password *</label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  formControlName="confirmPassword"
+                  class="form-control"
+                  [class.is-invalid]="passwordSubmitted && pf['confirmPassword'].errors"
+                  placeholder="Confirm your new password">
+                <div *ngIf="passwordSubmitted && pf['confirmPassword'].errors" class="error-text">
+                  <div *ngIf="pf['confirmPassword'].errors['required']">Password confirmation is required</div>
+                  <div *ngIf="pf['confirmPassword'].errors['passwordMismatch']">Passwords do not match</div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  type="submit"
+                  class="btn-primary"
+                  [disabled]="savingProfile"
+                  title="Change your password">
+                  <i class="fas fa-check-circle"></i>
+                  <span *ngIf="!savingProfile">Change Password</span>
+                  <span *ngIf="savingProfile"><i class="fas fa-spinner fa-spin"></i> Changing...</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="cancelPasswordChange()"
+                  [disabled]="savingProfile"
+                  title="Cancel password change">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Two-Factor Authentication Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-mobile-alt"></i> Two-Factor Authentication</h3>
+            <div class="security-section">
+              <p class="section-description">Add an extra layer of security to your account</p>
+              <div class="security-item">
+                <div class="security-info">
+                  <p class="font-weight-bold">SMS Authentication</p>
+                  <p class="text-muted">Currently disabled</p>
+                </div>
+                <button class="btn-secondary">
+                  <i class="fas fa-toggle-off"></i> Enable 2FA
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Sessions Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-wifi"></i> Active Sessions</h3>
+            <div class="session-item">
+              <div class="session-info">
+                <p class="font-weight-bold">Current Device</p>
+                <p class="text-muted">Chrome on macOS • New York, United States</p>
+                <p class="text-muted">Last activity: Just now</p>
+              </div>
+              <div class="badge">
+                <span class="badge-success">Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Login History Card -->
+          <div class="info-card">
+            <h3><i class="fas fa-history"></i> Login History</h3>
+            <div class="login-history-item">
+              <div class="history-info">
+                <p class="font-weight-bold">Chrome on macOS</p>
+                <p class="text-muted">New York, United States</p>
+                <p class="text-muted">March 3, 2026 at 10:30 AM</p>
+              </div>
+            </div>
+            <div class="login-history-item">
+              <div class="history-info">
+                <p class="font-weight-bold">Safari on iOS</p>
+                <p class="text-muted">New York, United States</p>
+                <p class="text-muted">March 2, 2026 at 2:15 PM</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <button class="btn-secondary" (click)="goBackToDashboard()">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

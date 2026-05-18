@@ -1,0 +1,55 @@
+<div class="pagination">
+  <button
+    (click)="previousPage()"
+    [disabled]="currentPage === 0 || loading"
+    class="btn-pagination prev"
+  >
+    ← Previous
+  </button>
+
+  <div class="page-numbers">
+    <button
+      *ngIf="pages[0] > 0"
+      (click)="goToPage(0)"
+      [disabled]="loading"
+      class="page-btn"
+    >
+      1
+    </button>
+
+    <span *ngIf="pages[0] > 1" class="ellipsis">...</span>
+
+    <button
+      *ngFor="let page of pages"
+      (click)="goToPage(page)"
+      [disabled]="loading"
+      [class.active]="page === currentPage"
+      class="page-btn"
+    >
+      {{ page + 1 }}
+    </button>
+
+    <span *ngIf="pages[pages.length - 1] < totalPages - 2" class="ellipsis">...</span>
+
+    <button
+      *ngIf="pages[pages.length - 1] < totalPages - 1"
+      (click)="goToPage(totalPages - 1)"
+      [disabled]="loading"
+      class="page-btn"
+    >
+      {{ totalPages }}
+    </button>
+  </div>
+
+  <button
+    (click)="nextPage()"
+    [disabled]="currentPage === totalPages - 1 || loading"
+    class="btn-pagination next"
+  >
+    Next →
+  </button>
+</div>
+
+<div class="page-info">
+  Page {{ currentPage + 1 }} of {{ totalPages }}
+</div>

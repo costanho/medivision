@@ -1,0 +1,166 @@
+<div class="scrollable-wrapper">
+<!-- HEADER -->
+<div class="header">
+  <div class="header-content">
+    <div>
+      <button class="back-btn" (click)="backToProfile()">← Back</button>
+      <h1>Nexus Proxy - Family Healthcare</h1>
+      <p>Manage healthcare for your family members</p>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon">👨‍👩‍👧‍👦</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ dependents.length }}</div>
+        <div class="stat-label">Family Members</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ familyAppointments.length }}</div>
+        <div class="stat-label">Upcoming</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ familyRecords.length }}</div>
+        <div class="stat-label">Records</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-container">
+  <div class="tab-nav">
+    <button [class.active]="activeTab === 'dependents'" (click)="switchTab('dependents')">
+      👨‍👩‍👧 Family Members
+    </button>
+    <button [class.active]="activeTab === 'health'" (click)="switchTab('health')">
+      💊 Health Overview
+    </button>
+    <button [class.active]="activeTab === 'appointments'" (click)="switchTab('appointments')">
+      📅 Appointments
+    </button>
+    <button [class.active]="activeTab === 'records'" (click)="switchTab('records')">
+      📋 Medical Records
+    </button>
+  </div>
+
+  <!-- DEPENDENTS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'dependents'">
+    <div class="section-header">
+      <h2>Family Members</h2>
+      <button class="btn-primary" (click)="addDependent()">+ Add Family Member</button>
+    </div>
+
+    <div class="dependents-grid">
+      <div *ngFor="let dependent of dependents" class="dependent-card">
+        <div class="card-header">
+          <span class="avatar" [style.background-color]="dependent.color">{{ dependent.avatar }}</span>
+          <div class="header-content">
+            <h3>{{ dependent.name }}</h3>
+            <p>{{ dependent.relationship }}</p>
+          </div>
+          <span class="status-badge">{{ dependent.status }}</span>
+        </div>
+
+        <div class="card-info">
+          <p><strong>Age:</strong> {{ dependent.age }} years</p>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-secondary" (click)="editDependent(dependent)">Edit</button>
+          <button class="btn-secondary" (click)="removeDependent(dependent)">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEALTH OVERVIEW TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'health'">
+    <div class="section-header">
+      <h2>Family Health Overview</h2>
+    </div>
+
+    <div class="health-list">
+      <div *ngFor="let person of familyHealth" class="health-card">
+        <div class="health-header">
+          <h3>{{ person.name }}</h3>
+          <div class="health-score">
+            <div class="score-value">{{ person.healthScore }}</div>
+            <span class="score-label">Health Score</span>
+          </div>
+        </div>
+
+        <div class="health-details">
+          <div class="detail-item">
+            <strong>Last Checkup:</strong>
+            <span>{{ person.lastCheckup }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>Conditions:</strong>
+            <span>{{ person.conditions.join(', ') || 'None' }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>Current Medications:</strong>
+            <span>{{ person.medications.join(', ') || 'None' }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>Allergies:</strong>
+            <span>{{ person.allergies.join(', ') || 'None' }}</span>
+          </div>
+        </div>
+
+        <div class="health-actions">
+          <button class="btn-secondary" (click)="viewHealthHistory(person)">View Full History</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPOINTMENTS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'appointments'">
+    <div class="section-header">
+      <h2>Family Appointments</h2>
+      <button class="btn-primary" (click)="scheduleAppointment({})">+ Schedule Appointment</button>
+    </div>
+
+    <div class="appointments-list">
+      <div *ngFor="let appt of familyAppointments" class="appointment-item">
+        <div class="appt-left">
+          <div class="appt-dependent">{{ appt.dependent }}</div>
+          <div class="appt-doctor">{{ appt.doctor }} • {{ appt.specialty }}</div>
+          <div class="appt-time">📅 {{ appt.date }} • 🕐 {{ appt.time }}</div>
+        </div>
+        <span class="status-badge confirmed">{{ appt.status | uppercase }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORDS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'records'">
+    <div class="section-header">
+      <h2>Family Medical Records</h2>
+    </div>
+
+    <div class="records-list">
+      <div *ngFor="let record of familyRecords" class="record-item">
+        <div class="record-icon">{{ record.icon }}</div>
+        <div class="record-info">
+          <h4>{{ record.title }}</h4>
+          <p>{{ record.dependent }} • {{ record.type }} • {{ record.date }}</p>
+        </div>
+        <button class="btn-secondary">View</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

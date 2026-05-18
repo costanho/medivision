@@ -1,0 +1,414 @@
+<div class="doctor-appointments-container">
+  <!-- Header -->
+  <div class="appointments-header">
+    <h2><i class="fas fa-calendar"></i> Doctor Appointments</h2>
+    <p>Manage your appointments, view system appointments, and create new ones</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'my-appointments'"
+      (click)="activeTab = 'my-appointments'; loadMyAppointments()">
+      <i class="fas fa-user-clock"></i> My Appointments
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'system-appointments'"
+      (click)="activeTab = 'system-appointments'; loadSystemAppointments()">
+      <i class="fas fa-globe"></i> System Appointments
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'create'"
+      (click)="switchToCreateTab()">
+      <i class="fas fa-plus-circle"></i> Create Appointment
+    </button>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────────────────
+       TAB 1: MY APPOINTMENTS
+       ───────────────────────────────────────────────────────────────────────── -->
+  <div *ngIf="activeTab === 'my-appointments'" class="tab-content">
+    <!-- Error Message -->
+    <div *ngIf="myAppointmentsError" class="error-message">
+      {{ myAppointmentsError }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="myAppointmentsLoading" class="loading-state">
+      <p>Loading your appointments...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!myAppointmentsLoading && myAppointments.length === 0" class="empty-state">
+      <p>No appointments found</p>
+    </div>
+
+    <!-- Appointments List -->
+    <div *ngIf="!myAppointmentsLoading && myAppointments.length > 0" class="appointments-grid">
+      <div *ngFor="let appointment of myAppointments"
+           class="appointment-card"
+           [class]="getStatusClass(appointment.status)"
+           (click)="openAppointmentDetail(appointment)">
+
+        <!-- Card Header -->
+        <div class="card-header">
+          <span class="status-badge" [class]="'status ' + getStatusClass(appointment.status)">
+            {{ getStatusIcon(appointment.status) }} {{ appointment.status }}
+          </span>
+          <span class="appointment-id">#{{ appointment.id }}</span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">Patient:</span>
+            <span class="value">{{ appointment.patientName || '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Date/Time:</span>
+            <span class="value">{{ formatTime(appointment.appointmentTime) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Reason:</span>
+            <span class="value">{{ appointment.reason || '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Location:</span>
+            <span class="value">{{ appointment.location || '—' }}</span>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <button class="view-details-btn">View Details →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!myAppointmentsLoading && myAppointments.length > 0" class="pagination">
+      <button
+        (click)="previousPageMyAppointments()"
+        [disabled]="myAppointmentPage === 0"
+        class="pagination-btn">
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      <span class="pagination-info">
+        Page {{ myAppointmentPage + 1 }} of {{ Math.ceil(myAppointmentTotal / myAppointmentPageSize) }}
+      </span>
+      <button
+        (click)="nextPageMyAppointments()"
+        [disabled]="myAppointmentPage >= Math.ceil(myAppointmentTotal / myAppointmentPageSize) - 1"
+        class="pagination-btn">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────────────────
+       TAB 2: SYSTEM APPOINTMENTS
+       ───────────────────────────────────────────────────────────────────────── -->
+  <div *ngIf="activeTab === 'system-appointments'" class="tab-content">
+    <!-- Error Message -->
+    <div *ngIf="systemAppointmentsError" class="error-message">
+      {{ systemAppointmentsError }}
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label>Status</label>
+        <select [(ngModel)]="systemFilterStatus" (change)="onSystemFilterStatusChange()" class="filter-select">
+          <option value="ALL">All Status</option>
+          <option value="SCHEDULED">Scheduled</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Search Patient</label>
+        <input
+          type="text"
+          [(ngModel)]="systemSearchPatient"
+          (input)="onSystemSearchChange()"
+          placeholder="Enter patient name..."
+          class="filter-input"
+        />
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="systemAppointmentsLoading" class="loading-state">
+      <p>Loading system appointments...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!systemAppointmentsLoading && systemAppointments.length === 0" class="empty-state">
+      <p>No appointments found in system</p>
+    </div>
+
+    <!-- Appointments List -->
+    <div *ngIf="!systemAppointmentsLoading && systemAppointments.length > 0" class="appointments-table">
+      <div class="table-header">
+        <div class="col-id">ID</div>
+        <div class="col-patient">Patient</div>
+        <div class="col-doctor">Doctor</div>
+        <div class="col-datetime">Date/Time</div>
+        <div class="col-reason">Reason</div>
+        <div class="col-status">Status</div>
+        <div class="col-action">Action</div>
+      </div>
+
+      <div *ngFor="let appointment of systemAppointments"
+           class="table-row"
+           [class]="getStatusClass(appointment.status)">
+        <div class="col-id">{{ appointment.id }}</div>
+        <div class="col-patient">{{ appointment.patientName || '—' }}</div>
+        <div class="col-doctor">{{ appointment.doctorName || '—' }}</div>
+        <div class="col-datetime">{{ formatTime(appointment.appointmentTime) }}</div>
+        <div class="col-reason">{{ appointment.reason || '—' }}</div>
+        <div class="col-status">
+          <span [class]="'status-badge ' + getStatusClass(appointment.status)">
+            {{ getStatusIcon(appointment.status) }} {{ appointment.status }}
+          </span>
+        </div>
+        <div class="col-action">
+          <button class="action-btn" (click)="openAppointmentDetail(appointment)">View</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!systemAppointmentsLoading && systemAppointments.length > 0" class="pagination">
+      <button
+        (click)="previousPageSystemAppointments()"
+        [disabled]="systemAppointmentPage === 0"
+        class="pagination-btn">
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      <span class="pagination-info">
+        Page {{ systemAppointmentPage + 1 }} of {{ Math.ceil(systemAppointmentTotal / systemAppointmentPageSize) }}
+      </span>
+      <button
+        (click)="nextPageSystemAppointments()"
+        [disabled]="systemAppointmentPage >= Math.ceil(systemAppointmentTotal / systemAppointmentPageSize) - 1"
+        class="pagination-btn">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────────────────
+       TAB 3: CREATE APPOINTMENT
+       ───────────────────────────────────────────────────────────────────────── -->
+  <div *ngIf="activeTab === 'create'" class="tab-content">
+    <div class="create-appointment-form">
+      <h3>Create New Appointment</h3>
+
+      <!-- Error Message -->
+      <div *ngIf="createError" class="error-message">
+        {{ createError }}
+      </div>
+
+      <!-- Form -->
+      <form class="form-grid">
+        <!-- Doctor Selection -->
+        <div class="form-group">
+          <label>Select Doctor</label>
+          <select class="form-select" *ngIf="!doctorsLoading">
+            <option value="">Choose a doctor...</option>
+            <option *ngFor="let doctor of availableDoctors" [value]="doctor.id">
+              {{ doctor.name }} - {{ doctor.specialization }}
+            </option>
+          </select>
+          <div *ngIf="doctorsLoading" class="loading-text">Loading doctors...</div>
+        </div>
+
+        <!-- Patient Selection -->
+        <div class="form-group">
+          <label>Select Patient</label>
+          <select class="form-select" *ngIf="!patientsLoading">
+            <option value="">Choose a patient...</option>
+            <option *ngFor="let patient of availablePatients" [value]="patient.id">
+              {{ patient.name || patient.firstName + ' ' + patient.lastName }}
+            </option>
+          </select>
+          <div *ngIf="patientsLoading" class="loading-text">Loading patients...</div>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label>Appointment Date</label>
+          <input type="date" class="form-input" />
+        </div>
+
+        <!-- Time -->
+        <div class="form-group">
+          <label>Appointment Time</label>
+          <input type="time" class="form-input" />
+        </div>
+
+        <!-- Reason -->
+        <div class="form-group form-full">
+          <label>Reason for Appointment</label>
+          <textarea class="form-textarea" placeholder="Enter reason for appointment..."></textarea>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group form-full">
+          <label>Notes</label>
+          <textarea class="form-textarea" placeholder="Add any additional notes..."></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="button" class="btn-primary">
+            <i class="fas fa-save"></i> Create Appointment
+          </button>
+          <button type="button" class="btn-secondary" (click)="activeTab = 'my-appointments'">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     APPOINTMENT DETAIL MODAL
+     ───────────────────────────────────────────────────────────────────────── -->
+<div *ngIf="showDetailModal" class="modal-overlay" (click)="closeDetailModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Appointment Details</h3>
+      <button class="close-btn" (click)="closeDetailModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div *ngIf="modalError" class="error-message">
+      {{ modalError }}
+    </div>
+    <div *ngIf="modalSuccess" class="success-message">
+      {{ modalSuccess }}
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body" *ngIf="selectedAppointment && !actionType">
+      <div class="detail-section">
+        <h4>Appointment Information</h4>
+        <div class="detail-item">
+          <span class="label">ID:</span>
+          <span class="value">#{{ selectedAppointment.id }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Status:</span>
+          <span class="value">
+            <span [class]="'status-badge ' + getStatusClass(selectedAppointment.status)">
+              {{ getStatusIcon(selectedAppointment.status) }} {{ selectedAppointment.status }}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Patient:</span>
+          <span class="value">{{ selectedAppointment.patientName || '—' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Doctor:</span>
+          <span class="value">{{ selectedAppointment.doctorName || '—' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Date/Time:</span>
+          <span class="value">{{ formatTime(selectedAppointment.appointmentTime) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Reason:</span>
+          <span class="value">{{ selectedAppointment.reason || '—' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Location:</span>
+          <span class="value">{{ selectedAppointment.location || '—' }}</span>
+        </div>
+        <div class="detail-item" *ngIf="selectedAppointment.notes">
+          <span class="label">Notes:</span>
+          <span class="value">{{ selectedAppointment.notes }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="modal-actions" *ngIf="selectedAppointment.status === 'SCHEDULED'">
+        <button class="btn-accept" (click)="actionType = 'accept'" [disabled]="modalProcessing">
+          <i class="fas fa-check-circle"></i> Accept
+        </button>
+        <button class="btn-reschedule" (click)="actionType = 'reschedule'" [disabled]="modalProcessing">
+          <i class="fas fa-calendar-alt"></i> Reschedule
+        </button>
+        <button class="btn-cancel" (click)="actionType = 'cancel'" [disabled]="modalProcessing">
+          <i class="fas fa-ban"></i> Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Accept Confirmation -->
+    <div class="modal-body action-section" *ngIf="actionType === 'accept'">
+      <h4>Confirm Acceptance</h4>
+      <p>Are you sure you want to accept this appointment?</p>
+      <div class="action-buttons">
+        <button class="btn-confirm" (click)="acceptAppointment()" [disabled]="modalProcessing">
+          <span *ngIf="!modalProcessing"><i class="fas fa-check"></i> Yes, Accept</span>
+          <span *ngIf="modalProcessing"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+        </button>
+        <button class="btn-cancel" (click)="actionType = null" [disabled]="modalProcessing">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Reschedule Form -->
+    <div class="modal-body action-section" *ngIf="actionType === 'reschedule'">
+      <h4>Reschedule Appointment</h4>
+      <div class="form-group">
+        <label>New Date</label>
+        <input type="date" [(ngModel)]="newDate" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label>New Time</label>
+        <input type="time" [(ngModel)]="newTime" class="form-input" />
+      </div>
+      <div class="action-buttons">
+        <button class="btn-confirm" (click)="rescheduleAppointment()" [disabled]="modalProcessing">
+          <span *ngIf="!modalProcessing"><i class="fas fa-save"></i> Save Changes</span>
+          <span *ngIf="modalProcessing"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+        </button>
+        <button class="btn-cancel" (click)="actionType = null" [disabled]="modalProcessing">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Cancel Confirmation -->
+    <div class="modal-body action-section" *ngIf="actionType === 'cancel'">
+      <h4>Cancel Appointment</h4>
+      <div class="form-group">
+        <label>Reason for Cancellation</label>
+        <textarea [(ngModel)]="cancelReason"
+                  class="form-textarea"
+                  placeholder="Please provide a reason..."></textarea>
+      </div>
+      <div class="action-buttons">
+        <button class="btn-cancel" (click)="cancelAppointment()" [disabled]="modalProcessing">
+          <span *ngIf="!modalProcessing"><i class="fas fa-trash"></i> Cancel Appointment</span>
+          <span *ngIf="modalProcessing"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+        </button>
+        <button class="btn-secondary" (click)="actionType = null" [disabled]="modalProcessing">
+          <i class="fas fa-times"></i> Go Back
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

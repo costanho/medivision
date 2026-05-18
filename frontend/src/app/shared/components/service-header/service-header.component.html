@@ -1,0 +1,72 @@
+<!-- SERVICE HEADER -->
+<header class="service-header">
+  <div class="header-container">
+
+    <!-- LEFT: LOGO + BRAND -->
+    <div class="header-left">
+      <a routerLink="/" class="logo">
+        <span class="logo-icon">🏥</span>
+        <span class="logo-text">CareNexus</span>
+      </a>
+    </div>
+
+    <!-- CENTER: CURRENT SERVICE SELECTOR -->
+    <div class="header-center">
+      <div class="service-selector">
+        <button class="service-current" (click)="toggleServiceMenu()">
+          <span class="service-name">{{ getCurrentServiceName() }}</span>
+          <span class="dropdown-icon">▼</span>
+        </button>
+
+        <!-- SERVICE DROPDOWN MENU -->
+        <div *ngIf="showServiceMenu" class="service-menu" (click)="closeServiceMenu()">
+          <div class="menu-header">Select Service</div>
+          <button *ngFor="let service of availableServices"
+                  class="menu-item"
+                  (click)="switchService(service.id)"
+                  [class.active]="service.id === currentService">
+            <span class="service-icon">{{ service.icon }}</span>
+            <span class="service-label">{{ service.name }}</span>
+            <span *ngIf="service.id === currentService" class="checkmark">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: USER MENU -->
+    <div class="header-right">
+      <!-- User Profile -->
+      <div class="user-menu">
+        <button class="user-button">
+          <span class="user-avatar">👤</span>
+          <span class="user-name">{{ currentUser?.fullName }}</span>
+          <span class="dropdown-icon">▼</span>
+        </button>
+
+        <!-- User Dropdown -->
+        <div class="user-dropdown">
+          <div class="user-info">
+            <p class="user-email">{{ currentUser?.email }}</p>
+            <p class="user-role">{{ userType === 'doctor' ? 'Healthcare Provider' : 'Patient' }}</p>
+          </div>
+
+          <div class="menu-divider"></div>
+
+          <a routerLink="/profile" class="menu-link">
+            <span>👤</span> My Profile
+          </a>
+          <a routerLink="/settings" class="menu-link">
+            <span>⚙️</span> Settings
+          </a>
+
+          <div class="menu-divider"></div>
+
+          <button class="menu-link logout" (click)="logout()">
+            <span>🚪</span> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>

@@ -1,0 +1,197 @@
+<div class="scrollable-wrapper">
+<div class="financial-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1><i class="fas fa-chart-bar"></i> Financial Dashboard</h1>
+      <p class="subtitle">Comprehensive financial analytics and reporting</p>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading financial data...</p>
+  </div>
+
+  <!-- Filters -->
+  <div *ngIf="!isLoading" class="filters-section">
+    <div class="filter-group">
+      <h3>Date Range Filter</h3>
+      <div class="filter-inputs">
+        <div class="input-field">
+          <label for="startDate">Start Date</label>
+          <input
+            type="date"
+            id="startDate"
+            [(ngModel)]="dateRangeStart"
+            class="date-input"
+          />
+        </div>
+        <div class="input-field">
+          <label for="endDate">End Date</label>
+          <input
+            type="date"
+            id="endDate"
+            [(ngModel)]="dateRangeEnd"
+            class="date-input"
+          />
+        </div>
+        <div class="button-group">
+          <button (click)="filterByDateRange()" class="btn-filter"><i class="fas fa-search"></i> Filter</button>
+          <button (click)="clearFilters()" class="btn-clear"><i class="fas fa-times"></i> Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div *ngIf="!isLoading" class="metrics-section">
+    <h2>Key Financial Metrics</h2>
+    <div class="metrics-grid">
+      <!-- Total Billed -->
+      <div class="metric-card total-billed">
+        <div class="metric-icon"><i class="fas fa-money-bill"></i></div>
+        <div class="metric-content">
+          <p class="metric-label">Total Billed</p>
+          <p class="metric-value">{{ formatCurrency(metrics.totalBilled) }}</p>
+          <p class="metric-change">100% of target</p>
+        </div>
+      </div>
+
+      <!-- Total Paid -->
+      <div class="metric-card total-paid">
+        <div class="metric-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="metric-content">
+          <p class="metric-label">Total Paid</p>
+          <p class="metric-value">{{ formatCurrency(metrics.totalPaid) }}</p>
+          <p class="metric-change">{{ metrics.collectionRate.toFixed(2) }}% collection rate</p>
+        </div>
+      </div>
+
+      <!-- Total Pending -->
+      <div class="metric-card total-pending">
+        <div class="metric-icon"><i class="fas fa-hourglass-half"></i></div>
+        <div class="metric-content">
+          <p class="metric-label">Total Pending</p>
+          <p class="metric-value">{{ formatCurrency(metrics.totalPending) }}</p>
+          <p class="metric-change">{{ getOutstandingPercentage().toFixed(2) }}% of billed</p>
+        </div>
+      </div>
+
+      <!-- Total Overdue -->
+      <div class="metric-card total-overdue">
+        <div class="metric-icon"><i class="fas fa-exclamation-circle"></i></div>
+        <div class="metric-content">
+          <p class="metric-label">Total Overdue</p>
+          <p class="metric-value">{{ formatCurrency(metrics.totalOverdue) }}</p>
+          <p class="metric-change">{{ getOverduePercentage().toFixed(2) }}% of billed</p>
+        </div>
+      </div>
+
+      <!-- Collection Rate -->
+      <div class="metric-card collection-rate">
+        <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="metric-content">
+          <p class="metric-label">Collection Rate</p>
+          <p class="metric-value">{{ metrics.collectionRate.toFixed(2) }}%</p>
+          <p class="metric-change">Performance metric</p>
+        </div>
+      </div>
+
+      <!-- Average Payment Time -->
+      <div class="metric-card avg-payment-time">
+        <div class="metric-icon"><i class="fas fa-clock"></i></div>
+        <div class="metric-content">
+          <p class="metric-label">Avg Payment Time</p>
+          <p class="metric-value">{{ metrics.averagePaymentTime }} days</p>
+          <p class="metric-change">From bill to payment</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Breakdown Chart -->
+  <div *ngIf="!isLoading && monthlyData.length > 0" class="chart-section">
+    <h2>Monthly Financial Breakdown</h2>
+    <div class="chart-container">
+      <div class="month-bars">
+        <div *ngFor="let month of monthlyData" class="month-bar-group">
+          <div class="month-bars-container">
+            <div class="bar billed" [style.height]="(month.billed / getMaxMonthlyBilled() * 100) + '%'" [title]="'Billed: ' + formatCurrency(month.billed)"></div>
+            <div class="bar paid" [style.height]="(month.paid / getMaxMonthlyBilled() * 100) + '%'" [title]="'Paid: ' + formatCurrency(month.paid)"></div>
+            <div class="bar pending" [style.height]="(month.pending / getMaxMonthlyBilled() * 100) + '%'" [title]="'Pending: ' + formatCurrency(month.pending)"></div>
+          </div>
+          <p class="month-label">{{ month.month }}</p>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-box billed"></span>
+          <span>Billed</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-box paid"></span>
+          <span>Paid</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-box pending"></span>
+          <span>Pending</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Summary Table -->
+  <div *ngIf="!isLoading && monthlyData.length > 0" class="table-section">
+    <h2>Monthly Summary</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Billed</th>
+            <th>Paid</th>
+            <th>Pending</th>
+            <th>Collection %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let month of monthlyData">
+            <td class="month-cell">{{ month.month }}</td>
+            <td class="amount-cell">{{ formatCurrency(month.billed) }}</td>
+            <td class="amount-cell paid">{{ formatCurrency(month.paid) }}</td>
+            <td class="amount-cell pending">{{ formatCurrency(month.pending) }}</td>
+            <td class="percentage-cell">
+              {{ month.billed > 0 ? ((month.paid / month.billed) * 100).toFixed(2) : 0 }}%
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Export Section -->
+  <div *ngIf="!isLoading" class="export-section">
+    <h2>Export Report</h2>
+    <div class="export-buttons">
+      <button (click)="exportData('csv')" class="btn-export csv">
+        <i class="fas fa-file-csv"></i> Export as CSV
+      </button>
+      <button (click)="exportData('pdf')" class="btn-export pdf">
+        <i class="fas fa-file-pdf"></i> Export as PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && allBills.length === 0" class="empty-state">
+    <div class="empty-icon"><i class="fas fa-chart-bar"></i></div>
+    <h2>No Financial Data Available</h2>
+    <p>There are no bills or payments to display yet. Create bills and payments to see financial analytics.</p>
+  </div>
+</div>
+</div>

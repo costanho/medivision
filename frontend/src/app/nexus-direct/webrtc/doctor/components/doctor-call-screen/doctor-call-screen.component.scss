@@ -1,0 +1,947 @@
+// System Colors - CareNexus Theme (using Ionic defaults)
+$primary: #0055cc;
+$secondary: #26c485;
+$tertiary: #ffc409;
+$danger: #e31c23;
+$warning: #ffc409;
+$success: #2dd36f;
+$light: #f4f5f8;
+$medium: #92949c;
+$dark: #222428;
+
+// Custom colors
+$text-light: #fff;
+$text-secondary: #666;
+$text-dark: #222428;
+$bg-dark: #f4f5f8;
+$bg-darker: #fff;
+$bg-surface: #fff;
+$border-color: #e8e8e8;
+$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+.doctor-call-screen {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: $bg-dark;
+  color: $text-dark;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+  position: relative;
+
+  .call-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 320px 1fr 360px;
+    gap: 0;
+    height: 100%;
+    overflow: hidden;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 280px 1fr 300px;
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ==================== LEFT PANEL ====================
+  .left-panel {
+    background: $bg-surface;
+    border-right: 1px solid $border-color;
+    overflow-y: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: $card-shadow;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+
+    .panel-content {
+      padding: 20px;
+      flex: 1;
+    }
+
+    .section {
+      margin-bottom: 32px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 12px;
+      padding: 0;
+    }
+
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      gap: 10px;
+
+      p {
+        font-size: 13px;
+        color: $text-secondary;
+        margin: 0;
+      }
+    }
+
+    .error-state {
+      padding: 12px;
+      background: rgba(227, 28, 35, 0.1);
+      border: 1px solid rgba(227, 28, 35, 0.3);
+      border-radius: 6px;
+      color: $danger;
+      font-size: 12px;
+      text-align: center;
+      margin-bottom: 12px;
+
+      p {
+        margin: 0;
+      }
+    }
+
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: $text-secondary;
+      font-size: 12px;
+
+      p {
+        margin: 0;
+      }
+    }
+
+    .no-results-state {
+      padding: 20px;
+      text-align: center;
+      color: $text-secondary;
+      font-size: 12px;
+      background: rgba(0, 85, 204, 0.05);
+      border: 1px solid rgba(0, 85, 204, 0.1);
+      border-radius: 6px;
+      margin-bottom: 12px;
+
+      p {
+        margin: 0;
+      }
+    }
+
+    .search-container {
+      position: relative;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fafafa;
+      color: $text-dark;
+      outline: none;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: $primary;
+        background: $bg-surface;
+        box-shadow: 0 0 0 3px rgba(0, 85, 204, 0.1);
+      }
+
+      &::placeholder {
+        color: $text-secondary;
+      }
+    }
+
+    .clear-search-btn {
+      padding: 6px 10px;
+      background: transparent;
+      border: 1px solid $border-color;
+      border-radius: 4px;
+      cursor: pointer;
+      color: $text-secondary;
+      font-size: 14px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 85, 204, 0.05);
+        border-color: $primary;
+        color: $primary;
+      }
+    }
+
+    .patient-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .patient-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: #f9f9f9;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      align-items: flex-start;
+      text-align: left;
+
+      &:hover {
+        background: #f0f6ff;
+        border-color: $primary;
+        transform: translateX(2px);
+      }
+
+      .avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, $primary, $secondary);
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .patient-info {
+        flex: 1;
+        overflow: hidden;
+        min-width: 0;
+
+        .name {
+          font-weight: 500;
+          font-size: 13px;
+          color: $text-dark;
+          margin: 0 0 2px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .email {
+          font-size: 11px;
+          color: $text-secondary;
+          margin: 0 0 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .meta {
+          font-size: 10px;
+          color: $medium;
+          margin: 0;
+        }
+      }
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid $border-color;
+      margin-top: 12px;
+
+      .pagination-btn {
+        flex: 1;
+        padding: 8px 12px;
+        background: $primary;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: darken($primary, 10%);
+          transform: translateY(-1px);
+        }
+
+        &:disabled {
+          background: $medium;
+          cursor: not-allowed;
+          opacity: 0.5;
+        }
+      }
+
+      .pagination-info {
+        flex: 2;
+        text-align: center;
+        font-size: 12px;
+        color: $text-secondary;
+        white-space: nowrap;
+      }
+    }
+
+    .textarea-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      color: $text-dark;
+      resize: vertical;
+      min-height: 80px;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s ease;
+
+      &:focus {
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba(0, 85, 204, 0.1);
+      }
+
+      &.small {
+        min-height: 60px;
+      }
+
+      &::placeholder {
+        color: $text-secondary;
+      }
+    }
+  }
+
+  // ==================== CENTER: VIDEO AREA ====================
+  .video-area {
+    background: linear-gradient(135deg, #f4f5f8 0%, #f8f8f9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+      grid-column: 1;
+    }
+
+    .call-active,
+    .call-waiting,
+    .call-ended {
+      width: 100%;
+      height: 100%;
+    }
+
+    .call-waiting {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f4f5f8 0%, #e8eaed 100%);
+
+      .waiting-content {
+        text-align: center;
+
+        .patient-avatar-large {
+          width: 100px;
+          height: 100px;
+          margin: 0 auto 20px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, $primary, $secondary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 40px;
+          font-weight: 600;
+        }
+
+        .patient-name {
+          font-size: 20px;
+          font-weight: 600;
+          color: $text-dark;
+          margin: 0 0 8px;
+        }
+
+        .status {
+          font-size: 14px;
+          color: $text-secondary;
+          margin: 0 0 16px;
+        }
+
+        small {
+          color: $medium;
+          font-size: 12px;
+        }
+      }
+    }
+
+    .call-ended {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .ended-content {
+        text-align: center;
+
+        p {
+          font-size: 24px;
+          font-weight: 600;
+          color: $text-dark;
+          margin: 0 0 8px;
+        }
+
+        small {
+          color: $text-secondary;
+          font-size: 12px;
+          display: block;
+          margin-bottom: 20px;
+        }
+
+        .btn-primary {
+          padding: 12px 32px;
+          background: $primary;
+          border: none;
+          border-radius: 6px;
+          color: $text-light;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: #1166dd;
+            box-shadow: 0 4px 12px rgba(0, 85, 204, 0.3);
+          }
+        }
+      }
+    }
+
+    .layout-toggle {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .layout-toggle-btn {
+        padding: 8px 12px;
+        background: transparent;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.2s ease;
+
+        &.active {
+          background: $primary;
+          color: white;
+          border-color: $primary;
+        }
+
+        &:hover:not(.active) {
+          border-color: $primary;
+          background: rgba(0, 85, 204, 0.05);
+        }
+      }
+    }
+  }
+
+  // ==================== RIGHT PANEL ====================
+  .right-panel {
+    background: $bg-surface;
+    border-left: 1px solid $border-color;
+    overflow-y: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: $card-shadow;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+
+    .panel-content {
+      padding: 20px;
+      flex: 1;
+    }
+
+    .patient-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid $border-color;
+
+      .patient-avatar {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, $primary, $secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        font-weight: 600;
+      }
+
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: $text-dark;
+        margin: 0 0 4px;
+      }
+
+      .details {
+        font-size: 12px;
+        color: $text-secondary;
+        margin: 0 0 12px;
+      }
+
+      .status-badge {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+
+        span {
+          padding: 4px 12px;
+          border-radius: 16px;
+          font-size: 12px;
+          font-weight: 500;
+
+          &.status-connected {
+            background: rgba(45, 211, 111, 0.1);
+            color: $success;
+          }
+
+          &.status-waiting {
+            background: rgba(255, 196, 9, 0.1);
+            color: #ffa500;
+          }
+        }
+      }
+    }
+
+    .contact-info,
+    .call-info,
+    .medical-history {
+      margin-bottom: 16px;
+
+      h4 {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 8px;
+        padding: 0;
+      }
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 12px;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .label {
+          color: $text-secondary;
+          font-weight: 500;
+        }
+
+        .value {
+          color: $text-dark;
+          font-weight: 500;
+          text-align: right;
+          max-width: 60%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .patient-vitals {
+      margin-bottom: 16px;
+
+      h4 {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 12px;
+        padding: 0;
+      }
+
+      .vitals-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .vital-card {
+        padding: 12px;
+        background: #f9f9f9;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: all 0.2s ease;
+
+        &.vital-abnormal {
+          background: rgba(227, 28, 35, 0.05);
+          border-color: rgba(227, 28, 35, 0.3);
+
+          .vital-value {
+            color: $danger;
+            font-weight: 600;
+          }
+        }
+
+        .vital-label {
+          font-size: 10px;
+          color: $text-secondary;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+          margin-bottom: 4px;
+          font-weight: 500;
+        }
+
+        .vital-value {
+          font-size: 18px;
+          font-weight: 600;
+          color: $text-dark;
+          margin-bottom: 2px;
+        }
+
+        .vital-unit {
+          font-size: 10px;
+          color: $medium;
+        }
+      }
+
+      .vital-timestamp {
+        font-size: 10px;
+        color: $medium;
+        margin: 0;
+        text-align: right;
+      }
+    }
+
+    .documents-section {
+      margin-bottom: 16px;
+
+      h4 {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 12px;
+        padding: 0;
+      }
+
+      .documents-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 12px;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .document-item {
+        display: flex;
+        gap: 10px;
+        padding: 10px;
+        background: #fafafa;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        align-items: flex-start;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #f0f6ff;
+          border-color: $primary;
+        }
+
+        .doc-icon {
+          font-size: 20px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+        }
+
+        .doc-info {
+          flex: 1;
+          min-width: 0;
+
+          .doc-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: $text-dark;
+            margin: 0 0 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .doc-meta {
+            font-size: 10px;
+            color: $medium;
+            margin: 0;
+          }
+        }
+      }
+
+      .empty-docs {
+        padding: 12px;
+        text-align: center;
+        color: $text-secondary;
+        font-size: 12px;
+        background: #f9f9f9;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        margin-bottom: 12px;
+
+        p {
+          margin: 0;
+        }
+      }
+
+      .document-upload {
+        .upload-btn {
+          width: 100%;
+          padding: 10px;
+          background: rgba(0, 85, 204, 0.05);
+          border: 1px dashed $primary;
+          border-radius: 6px;
+          color: $primary;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba(0, 85, 204, 0.1);
+            border-color: $primary;
+          }
+        }
+      }
+    }
+
+    .chat-section {
+      margin-bottom: 16px;
+
+      h4 {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 12px;
+        padding: 0;
+      }
+
+      .chat-messages {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        margin-bottom: 12px;
+        padding: 8px;
+        background: #f9f9f9;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+      }
+
+      .message {
+        padding: 8px 10px;
+        background: white;
+        border-left: 3px solid $secondary;
+        border-radius: 4px;
+
+        &.message-doctor {
+          border-left-color: $primary;
+          background: rgba(0, 85, 204, 0.03);
+        }
+
+        .message-sender {
+          font-size: 11px;
+          font-weight: 600;
+          color: $text-secondary;
+          margin: 0 0 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+        }
+
+        .message-text {
+          font-size: 12px;
+          color: $text-dark;
+          margin: 0 0 4px;
+          line-height: 1.4;
+          word-wrap: break-word;
+        }
+
+        .message-time {
+          font-size: 10px;
+          color: $medium;
+        }
+      }
+
+      .chat-input-area {
+        display: flex;
+        gap: 8px;
+
+        .chat-input {
+          flex: 1;
+          padding: 8px 10px;
+          border: 1px solid $border-color;
+          border-radius: 4px;
+          font-family: inherit;
+          font-size: 12px;
+          color: $text-dark;
+          resize: none;
+          min-height: 60px;
+          outline: none;
+          transition: border-color 0.2s ease;
+
+          &:focus {
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba(0, 85, 204, 0.1);
+          }
+
+          &::placeholder {
+            color: $text-secondary;
+          }
+        }
+
+        .send-btn {
+          padding: 8px 12px;
+          background: $primary;
+          border: none;
+          border-radius: 4px;
+          color: white;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          align-self: flex-end;
+
+          &:hover:not(:disabled) {
+            background: #1166dd;
+            box-shadow: 0 2px 6px rgba(0, 85, 204, 0.2);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+
+    .medical-history {
+      ul {
+        margin: 0;
+        padding-left: 16px;
+
+        li {
+          font-size: 12px;
+          color: $text-secondary;
+          margin-bottom: 6px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+
+  // ==================== TOOLBAR ====================
+  .toolbar-area {
+    background: $bg-surface;
+    border-top: 1px solid $border-color;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+
+    .btn-end-call {
+      padding: 12px 32px;
+      background: $danger;
+      border: none;
+      border-radius: 6px;
+      color: $text-light;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #c41815;
+        box-shadow: 0 4px 12px rgba(227, 28, 35, 0.3);
+      }
+    }
+  }
+}
+
+// ==================== LOADING SPINNER ====================
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 85, 204, 0.1);
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(0, 85, 204, 0.1);
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

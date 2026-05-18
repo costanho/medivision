@@ -1,0 +1,71 @@
+<header class="app-header">
+  <div class="header-container">
+    <!-- Logo -->
+    <div class="logo">
+      <a [routerLink]="getDashboardRoute()">
+        <span class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9h12M6 9l1.5-4.5h9l1.5 4.5M6 9v8c0 .5.5 1 1 1h10c.5 0 1-.5 1-1V9M10 13h4M9 6h6"></path>
+          </svg>
+        </span>
+        <span class="logo-text">CareNexus</span>
+      </a>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="header-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        Dashboard
+      </a>
+      <a routerLink="/doctors" routerLinkActive="active">
+        Doctors
+      </a>
+      <a routerLink="/appointments" routerLinkActive="active">
+        Appointments
+      </a>
+      <a routerLink="/messages" routerLinkActive="active">
+        Messages
+      </a>
+    </nav>
+
+    <!-- User Menu -->
+    <div class="user-section">
+      <button (click)="toggleUserMenu()" class="user-button">
+        <span class="user-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M6 20c0-2 4-3 6-3s6 1 6 3"></path>
+          </svg>
+        </span>
+        <span class="user-name">{{ currentUser?.fullName || 'User' }}</span>
+        <span class="dropdown-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="showUserMenu" class="user-dropdown">
+        <a routerLink="/profile" class="dropdown-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M6 20c0-2 4-3 6-3s6 1 6 3"></path>
+          </svg> Profile
+        </a>
+        <a routerLink="/settings" class="dropdown-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
+          </svg> Settings
+        </a>
+        <div class="dropdown-divider"></div>
+        <button (click)="logout()" class="dropdown-item logout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 3l1 1m3-1l-1 1M16 17l1 1m3-1l-1 1M16 10l4 4m-4-4l-4 4"></path>
+          </svg> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

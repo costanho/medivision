@@ -1,0 +1,41 @@
+<div class="admin-layout">
+  <!-- Admin Header -->
+  <app-admin-header
+    [currentUser]="currentUser"
+    [notificationBadge]="5"
+    [alertBadge]="2"
+    (sidebarToggle)="toggleSidebar()"
+    (menuClick)="toggleSidebar()">
+  </app-admin-header>
+
+  <!-- Admin Sidebar -->
+  <app-admin-sidebar
+    [showDrawer]="showSidebar">
+  </app-admin-sidebar>
+
+  <!-- Main Content -->
+  <main class="admin-content">
+    <div class="dashboard-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>Dashboard Overview</h1>
+        <p class="subtitle">Welcome back, {{ currentUser?.fullName }}!</p>
+      </div>
+
+      <!-- Stats Grid Component -->
+      <app-stats-grid [stats]="stats"></app-stats-grid>
+
+      <!-- Recent Activity Component -->
+      <app-recent-activity
+        [activities]="recentActivities"
+        (viewAll)="navigateTo('/admin/logs')">
+      </app-recent-activity>
+
+      <!-- Quick Actions Component -->
+      <app-quick-actions
+        [actions]="quickActions"
+        (actionClick)="navigateTo($event)">
+      </app-quick-actions>
+    </div>
+  </main>
+</div>

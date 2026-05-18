@@ -1,0 +1,125 @@
+<div class="scrollable-wrapper">
+<div class="schedule-appointment-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading doctor information...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !loading" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+
+  <!-- Booking Form -->
+  <div *ngIf="doctor && !loading" class="booking-card">
+    <!-- Doctor Info Summary -->
+    <div class="doctor-summary">
+      <div class="doctor-avatar">👨‍⚕️</div>
+      <div class="doctor-info">
+        <h2>{{ doctor.name }}</h2>
+        <p class="specialization">{{ doctor.specialization }}</p>
+        <p *ngIf="doctor.consultationFee" class="fee">${{ doctor.consultationFee }} / consultation</p>
+      </div>
+    </div>
+
+    <!-- Booking Header -->
+    <div class="booking-header">
+      <h2>Schedule an Appointment</h2>
+      <p class="subtitle">Select your preferred date and time</p>
+    </div>
+
+    <!-- Booking Form -->
+    <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+      <!-- Date Field -->
+      <div class="form-group">
+        <label for="appointmentDate">Preferred Date</label>
+        <input
+          type="date"
+          id="appointmentDate"
+          formControlName="appointmentDate"
+          class="form-control"
+          [class.is-invalid]="submitted && f['appointmentDate'].errors"
+        />
+        <div *ngIf="submitted && f['appointmentDate'].errors" class="error-text">
+          <div *ngIf="f['appointmentDate'].errors['required']">Date is required</div>
+        </div>
+      </div>
+
+      <!-- Time Field -->
+      <div class="form-group">
+        <label for="appointmentTime">Preferred Time</label>
+        <input
+          type="time"
+          id="appointmentTime"
+          formControlName="appointmentTime"
+          class="form-control"
+          [class.is-invalid]="submitted && f['appointmentTime'].errors"
+        />
+        <div *ngIf="submitted && f['appointmentTime'].errors" class="error-text">
+          <div *ngIf="f['appointmentTime'].errors['required']">Time is required</div>
+        </div>
+      </div>
+
+      <!-- Reason Field -->
+      <div class="form-group">
+        <label for="reason">Reason for Appointment</label>
+        <input
+          type="text"
+          id="reason"
+          formControlName="reason"
+          placeholder="e.g., Regular checkup, Follow-up, Consultation"
+          class="form-control"
+          [class.is-invalid]="submitted && f['reason'].errors"
+        />
+        <div *ngIf="submitted && f['reason'].errors" class="error-text">
+          <div *ngIf="f['reason'].errors['required']">Reason is required</div>
+        </div>
+      </div>
+
+      <!-- Notes Field -->
+      <div class="form-group">
+        <label for="notes">Notes (Optional)</label>
+        <textarea
+          id="notes"
+          formControlName="notes"
+          placeholder="Any symptoms, allergies, or special notes for the doctor?"
+          class="form-control textarea"
+          rows="4"
+          [class.is-invalid]="submitted && f['notes'].errors"
+        ></textarea>
+        <div *ngIf="submitted && f['notes'].errors" class="error-text">
+          <div *ngIf="f['notes'].errors['maxlength']">Notes cannot exceed 500 characters</div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-submit" [disabled]="submitting">
+        <span *ngIf="!submitting">Confirm Appointment</span>
+        <span *ngIf="submitting">Scheduling...</span>
+      </button>
+    </form>
+
+    <!-- Important Info -->
+    <div class="important-info">
+      <h3>⚠️ Important Information</h3>
+      <ul>
+        <li>Please arrive 10 minutes early for your appointment</li>
+        <li>Have your health insurance card ready</li>
+        <li>You will receive a confirmation email shortly</li>
+        <li>Cancel or reschedule at least 24 hours in advance</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!doctor && !loading && !error" class="empty-state">
+    <p>Doctor not found</p>
+  </div>
+</div>
+</div>

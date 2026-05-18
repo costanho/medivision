@@ -1,0 +1,48 @@
+<!-- Quick Stats Section -->
+<section class="quick-stats-section">
+  <div class="stats-grid">
+    <!-- Upcoming Appointments (clickable) -->
+    <div class="stat-card clickable" (click)="navigateToAppointments()">
+      <div class="stat-icon-wrapper" [style.background-color]="stats[0].color + '15'">
+        <i [ngClass]="stats[0].icon" class="stat-icon" [style.color]="stats[0].color"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats[0].value }}</span>
+        <span class="stat-label">{{ stats[0].label }}</span>
+      </div>
+    </div>
+
+    <!-- Connected Doctors (clickable) -->
+    <div class="stat-card clickable" (click)="navigateToDoctors()">
+      <div class="stat-icon-wrapper" [style.background-color]="stats[1].color + '15'">
+        <i [ngClass]="stats[1].icon" class="stat-icon" [style.color]="stats[1].color"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats[1].value }}</span>
+        <span class="stat-label">{{ stats[1].label }}</span>
+      </div>
+    </div>
+
+    <!-- Unread Messages (clickable) -->
+    <div class="stat-card clickable" (click)="navigateToMessages()">
+      <div class="stat-icon-wrapper" [style.background-color]="stats[2].color + '15'">
+        <i [ngClass]="stats[2].icon" class="stat-icon" [style.color]="stats[2].color"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats[2].value }}</span>
+        <span class="stat-label">{{ stats[2].label }}</span>
+      </div>
+    </div>
+
+    <!-- Health Score (non-clickable) -->
+    <div class="stat-card">
+      <div class="stat-icon-wrapper" [style.background-color]="stats[3].color + '15'">
+        <i [ngClass]="stats[3].icon" class="stat-icon" [style.color]="stats[3].color"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats[3].value }}</span>
+        <span class="stat-label">{{ stats[3].label }}</span>
+      </div>
+    </div>
+  </div>
+</section>

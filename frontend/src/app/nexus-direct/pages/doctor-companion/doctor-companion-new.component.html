@@ -1,0 +1,159 @@
+<div class="scrollable-wrapper">
+<!-- HEADER SECTION -->
+<div class="header">
+  <div class="header-content">
+    <div>
+      <button class="back-btn" (click)="backToProfile()">← Back</button>
+      <h1>Nexus Companion - Clinical Support</h1>
+      <p>AI-powered assistant for clinical decision support and patient insights</p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <!-- TAB NAVIGATION -->
+  <div class="tab-nav">
+    <button [class.active]="activeTab === 'chat'" (click)="switchTab('chat')">
+      💬 Chat with Assistant
+    </button>
+    <button [class.active]="activeTab === 'resources'" (click)="switchTab('resources')">
+      📚 Medical Resources
+    </button>
+    <button [class.active]="activeTab === 'patients'" (click)="switchTab('patients')">
+      👥 Patient Insights
+    </button>
+    <button [class.active]="activeTab === 'learning'" (click)="switchTab('learning')">
+      🎓 Learning & Development
+    </button>
+  </div>
+
+  <!-- CHAT TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'chat'">
+    <div class="chat-wrapper">
+      <!-- Chat Messages -->
+      <div class="chat-container" #chatContainer>
+        <div *ngFor="let message of chatMessages" class="chat-message" [class.user]="message.sender === 'user'">
+          <div class="message-content">
+            <div class="message-avatar" *ngIf="message.sender === 'assistant'">🧑‍⚕️</div>
+            <div class="message-bubble" [class]="'type-' + message.type">
+              <p>{{ message.message }}</p>
+              <span class="timestamp">{{ message.timestamp | date:'short' }}</span>
+            </div>
+            <div class="message-avatar doctor-avatar" *ngIf="message.sender === 'user'">👨‍⚕️</div>
+          </div>
+        </div>
+        <div class="loading-indicator" *ngIf="isLoading">
+          <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Suggestions -->
+      <div class="quick-suggestions" *ngIf="chatMessages.length <= 2">
+        <p>Quick actions:</p>
+        <div class="suggestions-grid">
+          <button *ngFor="let suggestion of quickSuggestions"
+                  class="suggestion-btn"
+                  (click)="selectQuickSuggestion(suggestion)">
+            <span class="icon">{{ suggestion.icon }}</span>
+            <span class="text">{{ suggestion.text }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="chat-input-section">
+        <div class="input-wrapper">
+          <textarea
+            [(ngModel)]="userInput"
+            (keyup.enter)="sendMessage()"
+            placeholder="Ask me about medications, diagnoses, guidelines, or patient management..."
+            rows="3">
+          </textarea>
+          <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isLoading">
+            <span *ngIf="!isLoading">Send ➤</span>
+            <span *ngIf="isLoading">Sending...</span>
+          </button>
+        </div>
+        <p class="disclaimer">⚕️ Clinical Support: This AI provides information support, not medical diagnosis. Always use your clinical judgment.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDICAL RESOURCES TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'resources'">
+    <div class="section-header">
+      <h2>Medical Resources</h2>
+      <p>Access clinical guidelines, drug information, and medical references</p>
+    </div>
+
+    <div class="resources-grid">
+      <div *ngFor="let resource of medicalResources" class="resource-card">
+        <div class="resource-icon">{{ resource.icon }}</div>
+        <div class="resource-content">
+          <h3>{{ resource.title }}</h3>
+          <p>{{ resource.description }}</p>
+          <span class="resource-category">{{ resource.category }}</span>
+        </div>
+        <button class="btn-primary" (click)="viewResource(resource)">Access →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATIENT INSIGHTS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'patients'">
+    <div class="section-header">
+      <h2>Patient Insights & Alerts</h2>
+      <p>Important patient management alerts and follow-up reminders</p>
+    </div>
+
+    <div class="insights-list">
+      <div *ngFor="let insight of patientInsights" class="insight-card" [ngClass]="'priority-' + insight.priority">
+        <div class="insight-header">
+          <div class="insight-icon">{{ insight.icon }}</div>
+          <div class="insight-meta">
+            <h3>{{ insight.patientName }}</h3>
+            <span class="category">{{ insight.category }}</span>
+          </div>
+          <span class="priority-badge" [ngClass]="insight.priority">{{ insight.priority }}</span>
+        </div>
+
+        <p class="insight-text">{{ insight.insight }}</p>
+
+        <div class="insight-actions">
+          <button class="btn-primary" (click)="checkInsight(insight)">Review Patient</button>
+          <button class="btn-secondary">Add Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEARNING TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'learning'">
+    <div class="section-header">
+      <h2>Learning & Professional Development</h2>
+      <p>CME resources and clinical updates</p>
+    </div>
+
+    <div class="articles-grid">
+      <div *ngFor="let article of learningResources" class="article-card">
+        <div class="article-header">
+          <div class="article-icon">{{ article.icon }}</div>
+          <span class="article-category">{{ article.category }}</span>
+        </div>
+
+        <div class="article-content">
+          <h3>{{ article.title }}</h3>
+          <p>{{ article.excerpt }}</p>
+        </div>
+
+        <button class="btn-primary" (click)="readArticle(article)">Read More →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

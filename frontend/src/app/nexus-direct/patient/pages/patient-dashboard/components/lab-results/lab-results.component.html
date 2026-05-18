@@ -1,0 +1,43 @@
+<div class="lab-results-wrapper">
+  <!-- Header -->
+  <div class="content-header">
+    <h2><i class="fas fa-flask"></i> Lab Results</h2>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="success" class="success-message">{{ success }}</div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <p>Loading lab results...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && labResults.length === 0" class="empty-state">
+    <p>No lab results on file</p>
+  </div>
+
+  <!-- Lab Results Table -->
+  <div *ngIf="!loading && labResults.length > 0" class="lab-results-table">
+    <div class="table-header">
+      <div class="col-test">Test Name</div>
+      <div class="col-value">Result Value</div>
+      <div class="col-status">Status</div>
+      <div class="col-date">Date</div>
+    </div>
+    <div *ngFor="let labResult of labResults" class="table-row" [class]="'status-' + ((labResult.resultStatus || labResult.status) | lowercase)">
+      <div class="col-test">{{ labResult.resultName || labResult.testName || '—' }}</div>
+      <div class="col-value">
+        <span class="value-text">{{ labResult.resultValue || labResult.value || '—' }}</span>
+        <span class="unit-text">{{ labResult.resultUnit || labResult.unit || '' }}</span>
+      </div>
+      <div class="col-status">
+        <span [class]="'status ' + getStatusClass(labResult.resultStatus || labResult.status)">
+          {{ getStatusIcon(labResult.resultStatus || labResult.status) }} {{ (labResult.resultStatus || labResult.status || '') | uppercase }}
+        </span>
+      </div>
+      <div class="col-date">{{ labResult.specimenCollectionDate ? (labResult.specimenCollectionDate | date:'short') : (labResult.resultDateTime | date:'short') }}</div>
+    </div>
+  </div>
+</div>

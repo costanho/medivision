@@ -1,0 +1,356 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import '@ionic/angular/css/palettes/dark.system.css';
+
+/**
+ * Global Scrolling Support for All Pages
+ * ============================================================================
+ * This ensures all pages and components can scroll properly.
+ *
+ * Usage for future pages:
+ * 1. Wrap your content in a div with class="scrollable-wrapper"
+ * 2. Or apply these styles to your component's :host
+ * ============================================================================
+ */
+
+/* Global scrollable wrapper class for all pages */
+.scrollable-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure all page components can scroll */
+[class*="-component"]:not(app-profile) {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Override Ionic's default page styling for profile */
+app-profile {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Scrollbar styling for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+
+  &:hover {
+    background: #555;
+  }
+}
+
+/**
+ * Mobile & Ionic Optimization
+ * ============================================================================
+ * These styles optimize the app for mobile devices and Ionic compatibility
+ */
+
+/* Safe Area Support for devices with notches/cutouts */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+}
+
+/* Body optimization for mobile */
+body {
+  /* Prevent unwanted margin/padding on mobile */
+  margin: 0;
+  padding: 0;
+  /* Smooth scrolling on iOS */
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent text scaling on orientation change */
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* Improve touch target sizes for mobile (minimum 44x44px recommended) */
+button, a, [role="button"], input[type="button"], input[type="submit"] {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 12px;
+}
+
+/* Optimize input fields for mobile */
+input, textarea, select {
+  /* Prevent iOS zoom on input focus */
+  font-size: 16px;
+  /* Add padding for better mobile UX */
+  padding: 10px 12px;
+  /* Better mobile touch experience */
+  border-radius: 4px;
+  /* Smooth transitions */
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Prevent double-tap delay on mobile */
+* {
+  touch-action: manipulation;
+}
+
+/* Optimize scrolling performance on mobile */
+.scrollable-wrapper, [class*="-content"] {
+  /* Use native scrolling on iOS/Android */
+  -webkit-overflow-scrolling: touch;
+  /* Reduce motion if user prefers */
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Mobile-friendly font sizing */
+@media (max-width: 480px) {
+  html {
+    /* Slightly increase base font size for small screens for readability */
+    font-size: 14px;
+  }
+
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 12px;
+    margin-bottom: 8px;
+  }
+
+  /* Ensure images scale properly on mobile */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Portrait orientation optimizations (typical mobile orientation) */
+@media (orientation: portrait) {
+  body {
+    padding: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+  }
+}
+
+/* Landscape orientation optimizations */
+@media (orientation: landscape) {
+  body {
+    /* Reduce padding in landscape to maximize content area */
+    padding: calc(var(--safe-area-inset-top) * 0.5) var(--safe-area-inset-right) 0 var(--safe-area-inset-left);
+  }
+}
+
+/* High-density display optimization (Retina/2x screens) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Fine-tune styles for high-DPI screens if needed */
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/**
+ * Enhanced Mobile Keyboard & Input Support
+ * ============================================================================
+ * Prevents keyboard from covering content on mobile devices
+ */
+
+/* Prevent iOS input elements from zooming */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+  font-size: 16px !important;
+  /* Prevent auto-zoom on focus */
+  -webkit-user-zoom: 1;
+  /* Better touch padding */
+  padding: 12px 14px;
+  /* Smoother focus states */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Optimize select dropdowns for mobile */
+select {
+  /* Better styling on iOS */
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+/**
+ * Small Phone Optimization (iPhone SE, 375px and below)
+ * ============================================================================
+ */
+
+@media (max-width: 375px) {
+  body {
+    font-size: 13px;
+  }
+
+  input, textarea, select {
+    padding: 10px 10px;
+    font-size: 16px;
+  }
+
+  button, a, [role="button"] {
+    padding: 10px 10px;
+    min-height: 40px;
+    min-width: 40px;
+  }
+
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  h3 { font-size: 18px; }
+}
+
+/**
+ * Tablet Optimization (768px and above)
+ * ============================================================================
+ */
+
+@media (min-width: 768px) {
+  input, textarea, select {
+    padding: 12px 14px;
+  }
+}
+
+/**
+ * Large Screen Optimization (1024px and above)
+ * ============================================================================
+ */
+
+@media (min-width: 1024px) {
+  input, textarea, select {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  button, a, [role="button"] {
+    padding: 12px 16px;
+  }
+}
+
+/**
+ * iOS Status Bar Handling
+ * ============================================================================
+ * Adjust layout when status bar is visible/hidden
+ */
+
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, var(--safe-area-inset-left));
+    padding-right: max(0px, var(--safe-area-inset-right));
+    padding-top: max(0px, var(--safe-area-inset-top));
+    padding-bottom: max(0px, var(--safe-area-inset-bottom));
+  }
+}
+
+/**
+ * Virtual Keyboard Support for Mobile
+ * ============================================================================
+ * Prevent content from being hidden by virtual keyboard
+ */
+
+/* When virtual keyboard appears on mobile */
+@media (max-height: 500px) {
+  .scrollable-wrapper {
+    min-height: 100vh;
+  }
+}
+
+/**
+ * Touch and Interaction Optimizations
+ * ============================================================================
+ */
+
+/* Ensure proper cursor on mobile */
+a, button, [role="button"], input[type="button"], input[type="submit"] {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Prevent text selection on elements */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection where needed */
+p, span, div {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}

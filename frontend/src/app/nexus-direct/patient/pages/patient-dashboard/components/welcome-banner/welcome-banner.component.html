@@ -1,0 +1,28 @@
+<!-- Welcome Banner Section -->
+<section class="welcome-banner">
+  <div class="banner-content">
+    <div class="banner-left">
+      <div class="banner-avatar" [style.background-color]="getAvatarColor()">
+        {{ getInitials() }}
+      </div>
+      <div class="banner-text">
+        <h1>Welcome back, {{ currentUser?.fullName?.split(' ')[0] }}</h1>
+        <p>You're here to manage your healthcare. Let's stay healthy together.</p>
+      </div>
+    </div>
+    <div class="banner-stats">
+      <div class="stat-box">
+        <span class="stat-number">3</span>
+        <span class="stat-label">Upcoming</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">5</span>
+        <span class="stat-label">Doctors</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">2</span>
+        <span class="stat-label">Messages</span>
+      </div>
+    </div>
+  </div>
+</section>

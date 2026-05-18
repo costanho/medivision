@@ -1,0 +1,46 @@
+<!-- Empty State Container -->
+<div 
+  class="empty-state-container"
+  [class.size-sm]="isSizeSmall"
+  [class.size-lg]="isSizeLarge"
+  [attr.role]="'status'"
+  [attr.aria-label]="'Empty state: ' + displayTitle">
+
+  <!-- Decorative background -->
+  <div *ngIf="showDecorations" class="empty-state-decoration"></div>
+
+  <!-- Content wrapper -->
+  <div class="empty-state-content">
+    
+    <!-- Icon -->
+    <div class="empty-state-icon">
+      {{ displayIcon }}
+    </div>
+
+    <!-- Title -->
+    <h2 class="empty-state-title">
+      {{ displayTitle }}
+    </h2>
+
+    <!-- Description -->
+    <p class="empty-state-description">
+      {{ displayDescription }}
+    </p>
+
+    <!-- Action buttons -->
+    <div *ngIf="actions.length > 0" class="empty-state-actions">
+      <button
+        *ngFor="let action of actions"
+        (click)="onActionClick(action)"
+        [class.btn-primary]="!action.variant || action.variant === 'primary'"
+        [class.btn-secondary]="action.variant === 'secondary'"
+        class="empty-state-btn"
+        [attr.aria-label]="action.label">
+        <span *ngIf="action.icon" class="btn-icon">{{ action.icon }}</span>
+        {{ action.label }}
+      </button>
+    </div>
+
+  </div>
+
+</div>

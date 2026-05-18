@@ -1,0 +1,56 @@
+<!-- Sidebar Navigation -->
+<aside class="sidebar-left"
+       [class.is-desktop]="!isMobile && !isTablet"
+       [class.is-mobile]="isMobile"
+       [class.is-tablet]="isTablet"
+       [class.collapsed]="sidebarCollapsed"
+       [class.mobile-open]="sidebarOpen && (isMobile || isTablet)">
+
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <h2 class="sidebar-title">CareNexus Direct</h2>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <!-- Navigation Sections -->
+    <div *ngFor="let section of navSections; let sectionIndex = index" class="nav-section">
+      <!-- Navigation Items -->
+      <div *ngFor="let item of section.items" class="nav-item" [class.expandable]="item.children?.length"
+           (click)="item.children?.length ? toggleSection(sectionIndex) : navigateTo(item.route)">
+        <i [ngClass]="item.icon" class="nav-icon"></i>
+        <span class="nav-label">{{ item.label }}</span>
+        <span *ngIf="item.children?.length" class="expand-icon" [class.open]="expandedSections[sectionIndex]">▶</span>
+      </div>
+
+      <!-- Submenu Items -->
+      <div *ngIf="item.children?.length" class="nav-submenu" [class.visible]="expandedSections[sectionIndex]">
+        <div *ngFor="let child of item.children" class="nav-item sub-item" (click)="navigateTo(child.route)">
+          <i [ngClass]="child.icon" class="nav-icon"></i>
+          <span class="nav-label">{{ child.label }}</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Chat Button -->
+  <button class="chat-btn">
+    <i class="fas fa-comments"></i>
+    <span class="chat-label">Chat with us</span>
+  </button>
+
+  <!-- Logout Button -->
+  <button class="logout-btn" (click)="logout()">
+    <i class="fas fa-sign-out-alt"></i>
+    <span class="logout-label">Logout</span>
+  </button>
+
+  <!-- User Profile Section -->
+  <div class="user-profile-footer">
+    <div class="user-avatar">J</div>
+    <div class="user-info">
+      <p class="user-name">John Doe</p>
+      <p class="user-email">test.patient@carenexus.l8</p>
+    </div>
+  </div>
+</aside>

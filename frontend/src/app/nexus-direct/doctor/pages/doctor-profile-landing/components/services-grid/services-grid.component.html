@@ -1,0 +1,22 @@
+<section class="services-section">
+  <div class="section-header">
+    <h2>Explore Our Services</h2>
+    <p>Find the tools you need to manage your practice</p>
+  </div>
+
+  <div class="services-grid">
+    <div *ngFor="let service of availableServices" class="service-card" (click)="selectService(service)">
+      <div class="card-header-section">
+        <i [class]="'service-icon fas ' + service.icon"></i>
+        <h3>{{ service.name }}</h3>
+      </div>
+      <p class="service-description">{{ service.description }}</p>
+      <div class="service-features">
+        <span *ngFor="let feature of service.features.slice(0, 2)" class="feature-tag">
+          <i class="fas fa-check"></i> {{ feature }}
+        </span>
+      </div>
+      <button class="btn-details">View Details</button>
+    </div>
+  </div>
+</section>

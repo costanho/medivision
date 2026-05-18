@@ -1,0 +1,142 @@
+<!-- Modal Header -->
+<div class="modal-header">
+  <h2 class="modal-title">Start New Conversation</h2>
+  <button type="button" class="close-button" (click)="close()" aria-label="Close">
+    <span>&times;</span>
+  </button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body">
+  <!-- Error Alert -->
+  <div *ngIf="error" class="alert alert-error">
+    <div class="alert-content">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-text">
+        <strong>Error</strong>
+        <p>{{ error }}</p>
+      </div>
+      <button type="button" class="alert-close" (click)="dismissError()">
+        <span>&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Alert -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <div class="alert-content">
+      <span class="alert-icon">✓</span>
+      <div class="alert-text">
+        <strong>Success</strong>
+        <p>{{ successMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-input-group">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by name, email, or specialty..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange($event.target.value)"
+        [disabled]="isSearching"
+        aria-label="Search for users"
+      />
+      <span *ngIf="searchQuery" class="search-clear" (click)="clearSearch()" role="button" tabindex="0">
+        ✕
+      </span>
+      <span *ngIf="isSearching" class="search-spinner">
+        <span class="spinner"></span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="results-section">
+    <!-- Loading State -->
+    <div *ngIf="(isSearching || showLoadingDoctors) && searchResults.length === 0" class="loading-state">
+      <div class="spinner-large"></div>
+      <p>{{ searchQuery ? 'Searching...' : 'Loading doctors...' }}</p>
+    </div>
+
+    <!-- No Results -->
+    <div *ngIf="showNoResults && !isSearching" class="no-results">
+      <div class="no-results-icon">🔍</div>
+      <p class="no-results-text">No users found matching "{{ searchQuery }}"</p>
+      <p class="no-results-hint">Try searching by name or email</p>
+    </div>
+
+    <!-- Results List -->
+    <div *ngIf="searchResults.length > 0" class="results-list">
+      <p *ngIf="!searchQuery" class="section-label">Available Doctors</p>
+
+      <div
+        *ngFor="let user of searchResults"
+        class="result-item"
+        [class.disabled]="isCurrentUser(user)"
+        [class.loading]="isCreatingConversation && selectedUser?.id === user.id"
+      >
+        <!-- User Card -->
+        <div class="user-card" (click)="!isCurrentUser(user) && startConversation(user)">
+          <!-- Avatar -->
+          <div class="avatar-container">
+            <div class="avatar" [style.background-color]="getStatusColor(user.status)">
+              <span class="initials">{{ getAvatarInitials(user.name) }}</span>
+            </div>
+            <span class="status-dot" [style.background-color]="getStatusColor(user.status)"></span>
+          </div>
+
+          <!-- User Info -->
+          <div class="user-info">
+            <div class="user-header">
+              <h3 class="user-name">{{ user.name }}</h3>
+              <span class="role-badge" [class]="user.role">{{ getRoleBadge(user) }}</span>
+            </div>
+            <p class="user-email">{{ user.email }}</p>
+            <p class="user-status">{{ user.status }}</p>
+          </div>
+
+          <!-- Current User Badge -->
+          <div *ngIf="isCurrentUser(user)" class="current-user-badge">
+            This is you
+          </div>
+
+          <!-- Loading Indicator -->
+          <div *ngIf="isCreatingConversation && selectedUser?.id === user.id" class="creating-loader">
+            <span class="spinner-small"></span>
+          </div>
+
+          <!-- Action Button -->
+          <button
+            *ngIf="!isCurrentUser(user) && !(isCreatingConversation && selectedUser?.id === user.id)"
+            type="button"
+            class="action-button"
+            (click)="startConversation(user)"
+            [disabled]="isCreatingConversation"
+            aria-label="Start conversation"
+          >
+            <span class="button-icon">→</span>
+            <span class="button-text">Message</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State (no search, no results) -->
+    <div *ngIf="searchResults.length === 0 && !isSearching && !showLoadingDoctors && !showNoResults" class="empty-state">
+      <div class="empty-icon">💬</div>
+      <p class="empty-text">Search for a doctor or patient to start a conversation</p>
+      <p class="empty-hint">Use the search box above to find people</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer">
+  <button type="button" class="button button-secondary" (click)="close()">
+    Close
+  </button>
+</div>

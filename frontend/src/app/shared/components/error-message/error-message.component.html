@@ -1,0 +1,14 @@
+<div *ngIf="visible && message" [class]="'error-message ' + type">
+  <div class="message-content">
+    <span class="icon">{{ getIcon() }}</span>
+    <span class="text">{{ message }}</span>
+  </div>
+  <button
+    *ngIf="dismissible"
+    (click)="onDismiss()"
+    class="close-btn"
+    aria-label="Close message"
+  >
+    ×
+  </button>
+</div>

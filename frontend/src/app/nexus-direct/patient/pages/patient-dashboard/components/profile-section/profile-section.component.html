@@ -1,0 +1,16 @@
+<!-- Patient Profile Section -->
+<section class="profile-section" *ngIf="currentUser">
+  <div class="profile-card">
+    <!-- Profile Avatar -->
+    <div class="profile-avatar" [style.background-color]="getAvatarColor()">
+      {{ getInitials() }}
+    </div>
+
+    <!-- Profile Information -->
+    <div class="profile-info">
+      <h3 class="profile-name">{{ currentUser?.fullName || 'Patient' }}</h3>
+      <p class="profile-email">{{ currentUser?.email }}</p>
+      <p class="profile-role">Patient</p>
+    </div>
+  </div>
+</section>

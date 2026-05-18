@@ -1,0 +1,183 @@
+$primary: #6200EA;
+$error: #F44336;
+$success: #4CAF50;
+$text-light: #fff;
+$text-secondary: #bbb;
+$bg-dark: #212121;
+$surface: #303030;
+
+.participant-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(33, 33, 33, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+
+  .header {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h3 {
+      margin: 0;
+      color: $text-light;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .participants-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+
+  .participant-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(98, 0, 234, 0.3);
+    }
+
+    &.current {
+      background: rgba(98, 0, 234, 0.15);
+      border-color: $primary;
+    }
+
+    .avatar {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $primary, #9C27B0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .avatar-placeholder {
+        color: $text-light;
+        font-weight: bold;
+        font-size: 12px;
+      }
+    }
+
+    .info {
+      flex: 1;
+      min-width: 0;
+
+      .name {
+        color: $text-light;
+        font-size: 13px;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .status {
+        color: $text-secondary;
+        font-size: 11px;
+        margin-top: 2px;
+        text-transform: capitalize;
+
+        &.status-connected {
+          color: $success;
+        }
+
+        &.status-connecting {
+          color: #FFC107;
+        }
+
+        &.status-disconnected {
+          color: #999;
+        }
+
+        &.status-invited,
+        &.status-ringing {
+          color: $primary;
+        }
+      }
+    }
+
+    .indicators {
+      display: flex;
+      gap: 4px;
+
+      .indicator {
+        font-size: 12px;
+      }
+    }
+
+    .actions {
+      flex-shrink: 0;
+
+      .btn-action {
+        width: 24px;
+        height: 24px;
+        border-radius: 3px;
+        background: rgba(244, 67, 54, 0.2);
+        color: $error;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.4);
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .show-more {
+    padding: 8px;
+    background: rgba(98, 0, 234, 0.2);
+    color: $primary;
+    border: 1px solid rgba(98, 0, 234, 0.4);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(98, 0, 234, 0.3);
+      border-color: $primary;
+    }
+  }
+}

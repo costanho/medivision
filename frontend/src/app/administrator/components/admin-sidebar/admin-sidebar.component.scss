@@ -1,0 +1,268 @@
+// System Color Variables
+$primary: #667eea;
+$primary-dark: #764ba2;
+$bg-white: #fff;
+$bg-light: #f8f9fa;
+$text-dark: #1a1a1a;
+$text-main: #333;
+$text-light: #666;
+$border: #e0e0e0;
+
+// Sidebar Overlay
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+// Main Admin Sidebar
+.admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 100px; // Start below fixed header (header height = 100px)
+  height: calc(100vh - 100px); // Full height minus header
+  width: 280px;
+  background: $bg-white;
+  border-right: 1px solid $border;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 999; // Below header (header z-index: 1000)
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &.is-mobile,
+  &.is-tablet {
+    top: 90px; // Mobile/tablet header is shorter (90px on tablet, 80px on mobile)
+    height: calc(100vh - 90px);
+    transform: translateX(-100%);
+    z-index: 1001; // Above header when open on mobile
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+
+  &.is-mobile {
+    top: 80px; // Mobile header height
+    height: calc(100vh - 80px);
+  }
+
+  &.collapsed {
+    width: 80px;
+
+    .nav-label,
+    .back-label,
+    .logout-label,
+    .expand-icon,
+    .nav-label-header {
+      display: none;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: 12px;
+    }
+  }
+
+  // Back Button
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    color: $bg-white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+    i {
+      font-size: 16px;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, darken($primary, 5%) 0%, darken($primary-dark, 5%) 100%);
+    }
+  }
+
+  // Sidebar Navigation
+  .sidebar-nav {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $bg-light;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $border;
+      border-radius: 3px;
+
+      &:hover {
+        background: darken($border, 10%);
+      }
+    }
+  }
+
+  // Nav Section
+  .nav-section {
+    padding: 0 12px;
+    margin-bottom: 8px;
+
+    .nav-label-header {
+      padding: 12px 16px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: $text-light;
+    }
+  }
+
+  // Nav Item
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin: 4px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: $text-main;
+    font-weight: 500;
+    font-size: 14px;
+    position: relative;
+
+    .nav-icon {
+      font-size: 18px;
+      color: $primary;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .nav-label {
+      flex: 1;
+    }
+
+    .expand-icon {
+      font-size: 10px;
+      color: $text-light;
+      transition: transform 0.3s ease;
+
+      &.open {
+        transform: rotate(90deg);
+      }
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($primary, 0.08) 0%, rgba($primary-dark, 0.08) 100%);
+      transform: translateX(4px);
+    }
+
+    &.active {
+      background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+      color: $bg-white;
+
+      .nav-icon {
+        color: $bg-white;
+      }
+
+      .expand-icon {
+        color: $bg-white;
+      }
+    }
+
+    &.expandable {
+      &.expanded {
+        background: rgba($primary, 0.05);
+      }
+    }
+
+    &.sub-item {
+      padding-left: 48px;
+      font-size: 13px;
+      color: $text-light;
+
+      .nav-icon {
+        font-size: 14px;
+      }
+
+      &:hover {
+        color: $text-main;
+        background: rgba($primary, 0.05);
+      }
+    }
+  }
+
+  // Nav Submenu
+  .nav-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+
+    &.visible {
+      max-height: 500px;
+    }
+  }
+
+  // Nav Divider
+  .nav-divider {
+    height: 1px;
+    background: $border;
+    margin: 16px 20px;
+  }
+
+  // Logout Button
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: $bg-white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: auto;
+
+    i {
+      font-size: 16px;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, darken(#ef4444, 5%) 0%, darken(#dc2626, 5%) 100%);
+      box-shadow: 0 -4px 12px rgba(239, 68, 68, 0.3);
+    }
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

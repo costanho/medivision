@@ -1,0 +1,66 @@
+<!-- Mobile/Tablet Menu Button (shown only on small screens) -->
+<button class="mobile-menu-btn"
+        *ngIf="isMobile || isTablet"
+        (click)="toggleSidebarMobile()"
+        [class.open]="sidebarOpen"
+        aria-label="Toggle sidebar menu">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- Sidebar Overlay (Mobile only) -->
+<div class="sidebar-overlay"
+     *ngIf="(isMobile || isTablet) && sidebarOpen"
+     (click)="closeSidebarMobile(); closeDrawer.emit()"></div>
+
+<!-- Dashboard Sidebar -->
+<aside class="dashboard-sidebar"
+       [class.is-desktop]="!isMobile && !isTablet"
+       [class.is-mobile]="isMobile"
+       [class.is-tablet]="isTablet"
+       [class.is-small-phone]="isSmallPhone"
+       [class.mobile-open]="sidebarOpen && (isMobile || isTablet)">
+
+  <!-- Back Button -->
+  <button class="back-btn" (click)="goBack()">
+    <i class="fas fa-arrow-left"></i>
+    <span class="back-label">Back</span>
+  </button>
+
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <h3>CareNexus Direct</h3>
+    <button class="close-btn" (click)="closeSidebarMobile()" *ngIf="isMobile || isTablet">×</button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <button *ngFor="let item of navigationItems"
+            type="button"
+            class="nav-item"
+            [attr.aria-label]="'Navigate to ' + item.label"
+            (click)="selectNavItem(item.path)"
+            (keydown.enter)="selectNavItem(item.path)"
+            (keydown.space)="selectNavItem(item.path)">
+      <span class="nav-icon"><i [class]="item.icon"></i></span>
+      <span class="nav-label">{{ item.label }}</span>
+      <span class="nav-badge" *ngIf="item.badge">{{ item.badge }}</span>
+    </button>
+  </nav>
+
+  <!-- Chat Button -->
+  <button class="chat-btn">
+    <i class="fas fa-comments"></i>
+    <span class="chat-label">Chat with us</span>
+  </button>
+
+  <!-- Logout Button -->
+  <button class="logout-btn" (click)="logout()">
+    <i class="fas fa-sign-out-alt"></i>
+    <span class="logout-label">Logout</span>
+  </button>
+</aside>
+
+<!-- Sidebar Overlay (Mobile only) -->
+<div class="sidebar-overlay" *ngIf="isMobile && sidebarOpen" (click)="closeSidebarMobile()"></div>

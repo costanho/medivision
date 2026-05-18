@@ -1,0 +1,42 @@
+<div class="not-found-container">
+  <div class="not-found-content">
+    <!-- Error Code -->
+    <div class="error-code">404</div>
+
+    <!-- Error Message -->
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-description">
+      The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+    </p>
+
+    <!-- Illustration Area -->
+    <div class="error-illustration">
+      <div class="lost-icon">🔍</div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a routerLink="/" class="btn btn-primary">
+        <span>Go Home</span>
+      </a>
+      <button class="btn btn-secondary" (click)="goBack()">
+        <span>Go Back</span>
+      </button>
+    </div>
+
+    <!-- Additional Help -->
+    <div class="help-section">
+      <p class="help-text">Need help?</p>
+      <ul class="help-links">
+        <li><a routerLink="/">Home</a></li>
+        <li><a routerLink="/login">Login</a></li>
+        <li><a routerLink="/register">Register</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="not-found-footer">
+    <p>&copy; {{ currentYear }} CareNexus. All rights reserved.</p>
+  </footer>
+</div>

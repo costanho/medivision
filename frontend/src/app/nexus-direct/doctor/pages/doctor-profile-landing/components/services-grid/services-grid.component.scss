@@ -1,0 +1,192 @@
+// Color Variables
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$text-dark: #1a1a1a;
+$text-main: #333;
+$text-light: #666;
+$text-lighter: #999;
+$bg-white: #fff;
+$bg-light: #f8f9fa;
+$border-color: #e0e0e0;
+
+// ─────────────────────────────────────────────────────────────────────────
+// SERVICES GRID
+// ─────────────────────────────────────────────────────────────────────────
+
+.services-section {
+  padding: 30px 100px;
+  margin: 0 80px 30px 80px;
+}
+
+.section-header {
+  margin-bottom: 30px;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-main;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: $text-light;
+    margin: 0;
+  }
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.service-card {
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+    transform: translateY(-4px);
+
+    .card-header-section {
+      h3 {
+        color: $primary-color;
+      }
+    }
+
+    .btn-details {
+      background: $primary-color;
+      color: white;
+    }
+  }
+
+  .card-header-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .service-icon {
+      font-size: 32px;
+      color: $primary-color;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: $text-main;
+      margin: 0;
+      transition: color 0.3s ease;
+    }
+  }
+
+  .service-description {
+    font-size: 14px;
+    color: $text-light;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .service-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .feature-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: $text-light;
+
+      i {
+        color: #4caf50;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .btn-details {
+    align-self: flex-start;
+    padding: 10px 20px;
+    background: transparent;
+    color: $primary-color;
+    border: 1px solid $primary-color;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+
+    &:hover {
+      background: $primary-color;
+      color: white;
+    }
+  }
+}
+
+// Responsive - Tablet (768px - 1024px)
+@media (max-width: 1024px) {
+  .services-section {
+    padding: 20px 60px;
+    margin: 0 50px 30px 50px;
+  }
+}
+
+// Responsive - Mobile (≤ 768px)
+@media (max-width: 768px) {
+  .services-section {
+    padding: 15px 40px;
+    margin: 0 30px 30px 30px;
+  }
+
+  .section-header {
+    margin-bottom: 20px;
+
+    h2 {
+      font-size: 20px;
+    }
+
+    p {
+      font-size: 13px;
+    }
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .service-card {
+    padding: 16px;
+    gap: 12px;
+
+    .card-header-section {
+      gap: 12px;
+
+      .service-icon {
+        font-size: 28px;
+      }
+
+      h3 {
+        font-size: 16px;
+      }
+    }
+
+    .service-description {
+      font-size: 13px;
+    }
+  }
+}

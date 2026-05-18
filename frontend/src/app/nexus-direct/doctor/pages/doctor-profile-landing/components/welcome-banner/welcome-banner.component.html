@@ -1,0 +1,27 @@
+<section class="welcome-banner">
+  <div class="banner-content">
+    <div class="banner-left">
+      <div class="banner-avatar" [style.background-color]="getAvatarColor()">
+        {{ getInitials() }}
+      </div>
+      <div class="banner-text">
+        <h1>Welcome back, {{ currentUser?.fullName?.split(' ')[0] }}</h1>
+        <p>Manage your practice and connect with patients efficiently.</p>
+      </div>
+    </div>
+    <div class="banner-stats">
+      <div class="stat-box">
+        <span class="stat-number">{{ stats[0]?.value }}</span>
+        <span class="stat-label">Appointments</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">{{ stats[1]?.value }}</span>
+        <span class="stat-label">Patients</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">{{ stats[2]?.value }}</span>
+        <span class="stat-label">Messages</span>
+      </div>
+    </div>
+  </div>
+</section>

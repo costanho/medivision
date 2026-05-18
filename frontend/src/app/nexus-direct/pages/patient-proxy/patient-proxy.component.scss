@@ -1,0 +1,115 @@
+$primary: #667eea;
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$text-dark: #333;
+$bg-light: #f8f9fa;
+$border-color: #e0e0e0;
+
+.proxy-header {
+  background: $primary-gradient;
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+    opacity: 0.9;
+  }
+}
+
+.proxy-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.family-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+
+  .family-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    border: 2px solid $border-color;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: $primary;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px);
+    }
+
+    .member-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0;
+    }
+
+    .relation {
+      font-size: 12px;
+      color: #999;
+      margin: 5px 0 15px 0;
+    }
+
+    .btn-manage {
+      background: $primary;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: darken($primary, 10%);
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+.placeholder {
+  background: $bg-light;
+  border-radius: 12px;
+  padding: 60px 20px;
+  text-align: center;
+
+  p {
+    font-size: 14px;
+    color: #999;
+    margin: 0 0 20px 0;
+  }
+
+  .btn-add {
+    background: $primary;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: darken($primary, 10%);
+      transform: scale(1.05);
+    }
+  }
+}

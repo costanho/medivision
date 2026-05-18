@@ -1,0 +1,19 @@
+<div class="doctor-service-wrapper">
+  <!-- TOP NAVBAR -->
+  <app-top-navbar
+    [currentUser]="currentUser"
+    [appointmentBadge]="5"
+    [messageBadge]="3"
+    (sidebarToggle)="onNavbarSidebarToggle()">
+  </app-top-navbar>
+
+  <div class="wrapper-container">
+    <!-- SIDEBAR NAVIGATION -->
+    <app-sidebar-nav [showDrawer]="showSidebarDrawer" [navSections]="navSections"></app-sidebar-nav>
+
+    <!-- MAIN CONTENT AREA WITH ROUTER OUTLET -->
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

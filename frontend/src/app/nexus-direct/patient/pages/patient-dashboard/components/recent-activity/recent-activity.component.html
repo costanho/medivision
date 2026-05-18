@@ -1,0 +1,22 @@
+<!-- Recent Activity Section -->
+<section class="recent-activity-section">
+  <div class="section-header">
+    <h2>Recent Activity</h2>
+    <p>Your latest updates and interactions</p>
+  </div>
+
+  <div class="activity-list">
+    <ng-container *ngFor="let activity of activities">
+      <div *ngIf="activity" class="activity-item" [attr.data-status]="activity?.status">
+        <div class="activity-icon">
+          <i [ngClass]="activity.icon"></i>
+        </div>
+        <div class="activity-content">
+          <h3 class="activity-title">{{ activity.title }}</h3>
+          <p class="activity-description">{{ activity.description }}</p>
+          <span class="activity-date">{{ activity.date }}</span>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</section>

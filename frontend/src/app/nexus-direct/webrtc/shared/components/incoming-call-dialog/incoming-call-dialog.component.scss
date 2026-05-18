@@ -1,0 +1,224 @@
+$primary: #6200EA;
+$error: #F44336;
+$success: #4CAF50;
+$text-light: #fff;
+
+.incoming-call-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .dialog-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+  }
+
+  .dialog-content {
+    position: relative;
+    z-index: 1001;
+    background: #212121;
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    min-width: 300px;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+    .caller-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, $primary, #9C27B0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+
+      .avatar-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .avatar-placeholder {
+        color: $text-light;
+        font-size: 48px;
+        font-weight: bold;
+      }
+
+      // Ring animation is handled by the component
+      &::after {
+        content: '';
+        position: absolute;
+        width: 110%;
+        height: 110%;
+        border: 3px solid rgba(98, 0, 234, 0.5);
+        border-radius: 50%;
+        top: -5%;
+        left: -5%;
+        animation: ring 1.5s infinite ease-out;
+      }
+    }
+
+    .caller-info {
+      margin-bottom: 24px;
+
+      h2 {
+        margin: 0 0 8px;
+        color: $text-light;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .role {
+        margin: 0 0 4px;
+        color: #bbb;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .ringing {
+        margin: 0;
+        color: $primary;
+        font-size: 14px;
+        font-weight: 500;
+        animation: pulse-text 1.5s infinite ease-in-out;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+
+      button {
+        flex: 1;
+        padding: 12px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        color: $text-light;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      .btn-reject {
+        background: rgba(244, 67, 54, 0.2);
+        color: $error;
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.3);
+          box-shadow: 0 0 15px rgba(244, 67, 54, 0.3);
+        }
+      }
+
+      .btn-accept {
+        background: linear-gradient(135deg, $success, #45a049);
+
+        &:hover {
+          box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+      }
+    }
+
+    .keyboard-hints {
+      color: #999;
+      font-size: 11px;
+
+      kbd {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: monospace;
+        margin: 0 4px;
+      }
+    }
+  }
+}
+
+// Ring animation for avatar
+@keyframes ring {
+  0% {
+    width: 110%;
+    height: 110%;
+    opacity: 1;
+  }
+  100% {
+    width: 150%;
+    height: 150%;
+    opacity: 0;
+  }
+}
+
+// Pulse text animation
+@keyframes pulse-text {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 480px) {
+  .incoming-call-dialog {
+    .dialog-content {
+      min-width: 280px;
+      padding: 24px 16px;
+
+      .caller-avatar {
+        width: 80px;
+        height: 80px;
+
+        .avatar-placeholder {
+          font-size: 36px;
+        }
+      }
+
+      .caller-info {
+        h2 {
+          font-size: 20px;
+        }
+      }
+
+      .actions {
+        flex-direction: column;
+
+        button {
+          span {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}

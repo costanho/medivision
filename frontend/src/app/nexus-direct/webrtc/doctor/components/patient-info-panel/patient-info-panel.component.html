@@ -1,0 +1,164 @@
+<div class="patient-info-panel" *ngIf="patientInfo" [class.compact]="isCompact">
+  <!-- Header with patient basics -->
+  <div class="panel-header">
+    <div class="patient-header">
+      <div class="patient-avatar">
+        {{ patientInfo.name.charAt(0).toUpperCase() }}
+      </div>
+      <div class="patient-basics">
+        <h3>{{ patientInfo.name }}</h3>
+        <p class="meta">Age: {{ patientInfo.age }} • ID: {{ patientInfo.id }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accordion sections -->
+  <div class="accordion">
+    <!-- Allergies Section (Critical) -->
+    <div class="accordion-item" *ngIf="patientInfo.allergies && patientInfo.allergies.length > 0">
+      <button class="accordion-header"
+              [class.expanded]="isSectionExpanded('allergies')"
+              (click)="toggleSection('allergies')">
+        <span class="header-icon">⚠️</span>
+        <span class="header-title">Allergies</span>
+        <span class="badge alert">{{ patientInfo.allergies.length }}</span>
+        <span class="toggle-icon">{{ isSectionExpanded('allergies') ? '▼' : '▶' }}</span>
+      </button>
+      <div class="accordion-content" [@expand] *ngIf="isSectionExpanded('allergies')">
+        <div class="tags-list">
+          <span class="tag alert" *ngFor="let allergy of patientInfo.allergies">
+            {{ getAllergyIcon(allergy) }} {{ allergy }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Medications Section -->
+    <div class="accordion-item" *ngIf="patientInfo.medications && patientInfo.medications.length > 0">
+      <button class="accordion-header"
+              [class.expanded]="isSectionExpanded('medications')"
+              (click)="toggleSection('medications')">
+        <span class="header-icon">💊</span>
+        <span class="header-title">Medications</span>
+        <span class="badge info">{{ patientInfo.medications.length }}</span>
+        <span class="toggle-icon">{{ isSectionExpanded('medications') ? '▼' : '▶' }}</span>
+      </button>
+      <div class="accordion-content" [@expand] *ngIf="isSectionExpanded('medications')">
+        <div class="list">
+          <div class="list-item" *ngFor="let med of patientInfo.medications">
+            <span class="bullet">•</span>
+            <span class="text">{{ med }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conditions Section -->
+    <div class="accordion-item" *ngIf="patientInfo.conditions && patientInfo.conditions.length > 0">
+      <button class="accordion-header"
+              [class.expanded]="isSectionExpanded('conditions')"
+              (click)="toggleSection('conditions')">
+        <span class="header-icon">📋</span>
+        <span class="header-title">Medical Conditions</span>
+        <span class="badge warning">{{ patientInfo.conditions.length }}</span>
+        <span class="toggle-icon">{{ isSectionExpanded('conditions') ? '▼' : '▶' }}</span>
+      </button>
+      <div class="accordion-content" [@expand] *ngIf="isSectionExpanded('conditions')">
+        <div class="tags-list">
+          <span class="tag warning" *ngFor="let condition of patientInfo.conditions">
+            {{ condition }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vital Signs Section -->
+    <div class="accordion-item" *ngIf="patientInfo.vitalSigns">
+      <button class="accordion-header"
+              [class.expanded]="isSectionExpanded('vitalSigns')"
+              (click)="toggleSection('vitalSigns')">
+        <span class="header-icon">❤️</span>
+        <span class="header-title">Vital Signs</span>
+        <span class="badge">Last recorded</span>
+        <span class="toggle-icon">{{ isSectionExpanded('vitalSigns') ? '▼' : '▶' }}</span>
+      </button>
+      <div class="accordion-content" [@expand] *ngIf="isSectionExpanded('vitalSigns')">
+        <div class="vitals-grid">
+          <!-- Blood Pressure -->
+          <div class="vital-card">
+            <span class="vital-label">Blood Pressure</span>
+            <span class="vital-value">{{ patientInfo.vitalSigns.bloodPressure }}</span>
+            <span class="vital-unit">mmHg</span>
+          </div>
+
+          <!-- Heart Rate -->
+          <div class="vital-card" [style.borderColor]="getStatusColor(getVitalStatus('heartRate', patientInfo.vitalSigns.heartRate))">
+            <span class="vital-label">Heart Rate</span>
+            <span class="vital-value">{{ patientInfo.vitalSigns.heartRate }}</span>
+            <span class="vital-unit">bpm</span>
+            <span class="vital-status" [style.color]="getStatusColor(getVitalStatus('heartRate', patientInfo.vitalSigns.heartRate))">
+              {{ getVitalStatus('heartRate', patientInfo.vitalSigns.heartRate) | uppercase }}
+            </span>
+          </div>
+
+          <!-- Temperature -->
+          <div class="vital-card" [style.borderColor]="getStatusColor(getVitalStatus('temperature', patientInfo.vitalSigns.temperature))">
+            <span class="vital-label">Temperature</span>
+            <span class="vital-value">{{ patientInfo.vitalSigns.temperature }}</span>
+            <span class="vital-unit">°C</span>
+            <span class="vital-status" [style.color]="getStatusColor(getVitalStatus('temperature', patientInfo.vitalSigns.temperature))">
+              {{ getVitalStatus('temperature', patientInfo.vitalSigns.temperature) | uppercase }}
+            </span>
+          </div>
+
+          <!-- Oxygen Level -->
+          <div class="vital-card" [style.borderColor]="getStatusColor(getVitalStatus('oxygenLevel', patientInfo.vitalSigns.oxygenLevel))">
+            <span class="vital-label">O₂ Level</span>
+            <span class="vital-value">{{ patientInfo.vitalSigns.oxygenLevel }}</span>
+            <span class="vital-unit">%</span>
+            <span class="vital-status" [style.color]="getStatusColor(getVitalStatus('oxygenLevel', patientInfo.vitalSigns.oxygenLevel))">
+              {{ getVitalStatus('oxygenLevel', patientInfo.vitalSigns.oxygenLevel) | uppercase }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical History Section -->
+    <div class="accordion-item" *ngIf="patientInfo.lastVisit">
+      <button class="accordion-header"
+              [class.expanded]="isSectionExpanded('history')"
+              (click)="toggleSection('history')">
+        <span class="header-icon">📅</span>
+        <span class="header-title">Medical History</span>
+        <span class="toggle-icon">{{ isSectionExpanded('history') ? '▼' : '▶' }}</span>
+      </button>
+      <div class="accordion-content" [@expand] *ngIf="isSectionExpanded('history')">
+        <div class="history-info">
+          <p><strong>Last Visit:</strong> {{ formatDate(patientInfo.lastVisit) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="accordion-item" *ngIf="patientInfo.notes">
+      <button class="accordion-header"
+              [class.expanded]="isSectionExpanded('notes')"
+              (click)="toggleSection('notes')">
+        <span class="header-icon">📝</span>
+        <span class="header-title">Additional Notes</span>
+        <span class="toggle-icon">{{ isSectionExpanded('notes') ? '▼' : '▶' }}</span>
+      </button>
+      <div class="accordion-content" [@expand] *ngIf="isSectionExpanded('notes')">
+        <div class="notes-text">
+          {{ patientInfo.notes }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty state -->
+<div class="patient-info-panel empty" *ngIf="!patientInfo">
+  <p>No patient information available</p>
+</div>

@@ -1,0 +1,96 @@
+// ─────────────────────────────────────────────────────────────────────────
+// DOCTOR PROFILE LANDING - MAIN LAYOUT
+// ─────────────────────────────────────────────────────────────────────────
+
+// Global variables
+$navbar-height: 100px;
+$sidebar-width: 240px;
+$bg-light: #f8f9fa;
+$border-light: #f0f0f0;
+
+// ─────────────────────────────────────────────────────────────────────────
+// MAIN CONTAINER
+// ─────────────────────────────────────────────────────────────────────────
+
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.doctor-profile-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+
+  // Top navbar is sticky and positioned at top
+  app-top-navbar {
+    flex-shrink: 0;
+    z-index: 1000;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// DASHBOARD CONTAINER - Flex Layout for Sidebar + Main
+// ─────────────────────────────────────────────────────────────────────────
+
+.dashboard-container {
+  display: flex;
+  flex: 1;
+  overflow: visible;
+  height: calc(100vh - #{$navbar-height});
+
+  // Sidebar navigation
+  app-sidebar-nav {
+    flex-shrink: 0;
+    border-right: 1px solid $border-light;
+  }
+
+  // Main content area
+  main.main-content {
+    flex: 1;
+    overflow-y: auto;
+    background: $bg-light;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// RESPONSIVE DESIGN
+// ─────────────────────────────────────────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+    position: relative;
+
+    app-sidebar-nav {
+      border-right: none;
+      border-bottom: none;
+    }
+
+    main.main-content {
+      flex: 1;
+    }
+  }
+
+  .doctor-profile-layout {
+    height: auto;
+    min-height: 100vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .doctor-profile-layout {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+  }
+}

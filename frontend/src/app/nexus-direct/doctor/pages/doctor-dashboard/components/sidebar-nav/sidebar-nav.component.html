@@ -1,0 +1,71 @@
+<!-- Main Sidebar - Responsive visibility controlled by classes -->
+<aside class="sidebar-left"
+       [class.is-desktop]="!isMobile && !isTablet"
+       [class.is-mobile]="isMobile"
+       [class.is-tablet]="isTablet"
+       [class.collapsed]="sidebarCollapsed"
+       [class.mobile-open]="sidebarOpen && (isMobile || isTablet)">
+  <!-- Back Button -->
+  <button type="button" class="back-btn" (click)="goBack()">
+    <i class="fas fa-arrow-left"></i>
+    <span class="back-label">Back</span>
+  </button>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <!-- Dynamic Navigation Sections -->
+    <ng-container *ngFor="let section of navSections; let i = index">
+      <!-- Section Divider (skip before first section) -->
+      <div class="nav-divider" *ngIf="i > 0"></div>
+
+      <!-- Navigation Section -->
+      <div class="nav-section">
+        <!-- Section Header (if section has a name) -->
+        <div class="nav-label-header" *ngIf="section.name">
+          {{ section.name }}
+        </div>
+
+        <!-- Navigation Items -->
+        <ng-container *ngFor="let item of section.items">
+          <!-- Expandable Item (has children) -->
+          <button type="button" *ngIf="item.children && item.children.length > 0"
+               class="nav-item expandable"
+               [class.expanded]="isCareNexusExpanded"
+               (click)="toggleCareNexus()">
+            <i [ngClass]="item.icon" class="nav-icon"></i>
+            <span class="nav-label">{{ item.label }}</span>
+            <span class="expand-icon" [class.open]="isCareNexusExpanded">▶</span>
+          </button>
+
+          <!-- Submenu (children items) -->
+          <div *ngIf="item.children && item.children.length > 0"
+               class="nav-submenu"
+               [class.visible]="isCareNexusExpanded">
+            <button type="button" *ngFor="let child of item.children" class="nav-item sub-item" (click)="navigateTo(child.route)">
+              <i [ngClass]="child.icon" class="nav-icon"></i>
+              <span class="nav-label">{{ child.label }}</span>
+            </button>
+          </div>
+
+          <!-- Regular Item (no children) -->
+          <button type="button" *ngIf="!item.children || item.children.length === 0" class="nav-item" (click)="navigateTo(item.route)">
+            <i [ngClass]="item.icon" class="nav-icon"></i>
+            <span class="nav-label">{{ item.label }}</span>
+          </button>
+        </ng-container>
+      </div>
+    </ng-container>
+  </nav>
+
+  <!-- Chat Button -->
+  <button type="button" class="chat-btn" (click)="navigateTo('/doctor/nexus-direct/messages')">
+    <i class="fas fa-comments"></i>
+    <span class="chat-label">Chat with us</span>
+  </button>
+
+  <!-- Logout Button -->
+  <button type="button" class="logout-btn" (click)="logout()">
+    <i class="fas fa-sign-out-alt"></i>
+    <span class="logout-label">Logout</span>
+  </button>
+</aside>

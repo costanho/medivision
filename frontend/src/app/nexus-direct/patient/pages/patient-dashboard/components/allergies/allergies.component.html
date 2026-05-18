@@ -1,0 +1,110 @@
+<div class="allergies-wrapper">
+  <!-- Debug: Component is loaded -->
+  <div style="background: #e3f2fd; padding: 10px; margin-bottom: 10px; border-radius: 4px; color: #1976d2;">
+    ✓ Allergies Component Loaded - {{allergies.length}} allergies found
+  </div>
+
+  <!-- Header -->
+  <div class="content-header">
+    <h2><i class="fas fa-exclamation-triangle"></i> Allergies</h2>
+    <button (click)="openAllergyModal()" class="btn-primary"><i class="fas fa-plus"></i> Add Allergy</button>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="success" class="success-message">{{ success }}</div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <p>Loading allergies...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && allergies.length === 0" class="empty-state">
+    <p>No allergies recorded</p>
+  </div>
+
+  <!-- Allergies Table -->
+  <div *ngIf="!loading && allergies.length > 0" class="allergies-table-wrapper">
+    <table class="allergies-table">
+      <thead>
+        <tr>
+          <th>Allergen</th>
+          <th>Severity</th>
+          <th>Reaction</th>
+          <th>Date Identified</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let allergy of allergies" [class]="'severity-' + allergy.severity">
+          <td class="allergen-name">{{ allergy.allergen }}</td>
+          <td class="severity-cell">
+            <span [class]="'severity-badge ' + getSeverityClass(allergy.severity)">
+              {{ getSeverityIcon(allergy.severity) }} {{ allergy.severity | uppercase }}
+            </span>
+          </td>
+          <td class="reaction">{{ allergy.reaction }}</td>
+          <td class="date-identified">{{ allergy.dateIdentified | date:'MMM d, yyyy' }}</td>
+          <td class="actions-cell">
+            <button (click)="openAllergyModal(allergy)" class="btn-icon btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
+            <button (click)="deleteAllergy(allergy.id)" class="btn-icon btn-delete" title="Delete"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Allergy Modal -->
+<div *ngIf="showAllergyModal" class="modal-overlay" (click)="closeAllergyModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingAllergy ? 'Edit Allergy' : 'Add Allergy' }}</h2>
+      <button (click)="closeAllergyModal()" class="btn-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form [formGroup]="allergyForm" class="modal-form">
+      <div class="form-group">
+        <label for="allergen">Allergen</label>
+        <input
+          type="text"
+          id="allergen"
+          formControlName="allergen"
+          class="form-control"
+          placeholder="e.g., Peanuts, Penicillin"
+        />
+      </div>
+      <div class="form-group">
+        <label for="severity">Severity</label>
+        <select id="severity" formControlName="severity" class="form-control">
+          <option value="mild">Mild</option>
+          <option value="moderate">Moderate</option>
+          <option value="severe">Severe</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="reaction">Reaction</label>
+        <textarea
+          id="reaction"
+          formControlName="reaction"
+          class="form-control"
+          placeholder="Describe the allergic reaction..."
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="form-group">
+        <label for="dateIdentified">Date Identified</label>
+        <input
+          type="date"
+          id="dateIdentified"
+          formControlName="dateIdentified"
+          class="form-control"
+        />
+      </div>
+      <div class="modal-actions">
+        <button type="button" (click)="saveAllergy()" class="btn-primary">Save</button>
+        <button type="button" (click)="closeAllergyModal()" class="btn-secondary">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

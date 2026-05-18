@@ -1,0 +1,42 @@
+<!-- MAIN CONTAINER -->
+<div class="direct-service-container">
+
+  <!-- SIDE NAVIGATION (Collapsible on mobile) - COMMENTED OUT -->
+  <!--
+  <aside class="direct-sidebar" [class.open]="sidebarOpen">
+
+    <div class="sidebar-header">
+      <h3>CareNexus Direct</h3>
+      <button class="close-btn" (click)="toggleSidebar()" *ngIf="isMobile">×</button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of navigationItems"
+         (click)="selectNavItem(item.path)"
+         [class.active]="activeTab === item.path"
+         class="nav-item">
+        <span class="nav-icon"><i [class]="item.icon"></i></span>
+        <span class="nav-label">{{ item.label }}</span>
+        <span class="nav-badge" *ngIf="item.badge">{{ item.badge }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ currentUser?.fullName?.charAt(0) }}</div>
+        <div class="user-details">
+          <p class="user-name">{{ currentUser?.fullName }}</p>
+          <p class="user-email">{{ currentUser?.email }}</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" *ngIf="isMobile && sidebarOpen" (click)="toggleSidebar()"></div>
+  -->
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="direct-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

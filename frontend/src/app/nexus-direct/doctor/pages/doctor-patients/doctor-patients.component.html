@@ -1,0 +1,268 @@
+<div class="scrollable-wrapper">
+<div class="patients-container">
+  <!-- Header with Title and Action Button -->
+  <div class="section-header">
+    <h1><i class="fas fa-users-alt"></i> Patient Directory</h1>
+    <button class="btn-primary" (click)="openCreateModal()">
+      <i class="fas fa-plus"></i> Add New Patient
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error }}</span>
+    <button class="close-btn" (click)="clearError()">×</button>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert-success">
+    <i class="fas fa-check-circle"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <div class="search-filters">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Search by name, email, or phone..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange(searchQuery)"
+      />
+    </div>
+
+    <div class="filter-box">
+      <i class="fas fa-filter"></i>
+      <input
+        type="text"
+        placeholder="Filter by medical condition..."
+        [(ngModel)]="filterByMedicalCondition"
+        (input)="onFilterChange(filterByMedicalCondition)"
+      />
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading patients...</p>
+  </div>
+
+  <!-- Patients Table -->
+  <div *ngIf="!loading && filteredPatients.length > 0" class="patients-container">
+    <div class="patients-table">
+      <div class="table-header">
+        <div class="col-name">Name</div>
+        <div class="col-email">Email</div>
+        <div class="col-phone">Phone</div>
+        <div class="col-condition">Medical Condition</div>
+        <div class="col-status">Status</div>
+        <div class="col-actions">Actions</div>
+      </div>
+
+      <div *ngFor="let patient of filteredPatients; let last = last" class="table-row" [class.last]="last">
+        <div class="col-name">
+          <span class="patient-name">{{ getPatientDisplayName(patient) }}</span>
+        </div>
+
+        <div class="col-email">
+          <span class="patient-email">{{ patient.email || patient.userEmail || '-' }}</span>
+        </div>
+
+        <div class="col-phone">
+          <span class="patient-phone">{{ patient.phone || '-' }}</span>
+        </div>
+
+        <div class="col-condition">
+          <span class="patient-condition">{{ patient.medicalConditions || '-' }}</span>
+        </div>
+
+        <div class="col-status">
+          <div class="status-badge" [class.online]="patient.isOnline" [class.offline]="!patient.isOnline">
+            <span class="status-dot"></span>
+            <span class="status-text">{{ patient.isOnline ? 'Online' : 'Offline' }}</span>
+            <span class="last-seen" *ngIf="patient.lastSeenAt">
+              ({{ patient.lastSeenAt }})
+            </span>
+          </div>
+        </div>
+
+        <div class="col-actions">
+          <button class="action-btn view" (click)="viewPatientDetails(patient)" title="View Details">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="action-btn message" title="Send Message">
+            <i class="fas fa-comment"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+      <div class="pagination-info">
+        <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+        <span class="total-elements">({{ totalElements }} patients)</span>
+      </div>
+
+      <div class="pagination-controls">
+        <button class="btn-secondary" (click)="previousPage()" [disabled]="currentPage === 0">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+
+        <div class="page-indicators">
+          <button
+            *ngFor="let page of [].constructor(totalPages); let i = index"
+            class="page-dot"
+            [class.active]="i === currentPage"
+            (click)="currentPage = i; loadPatients()"
+            [title]="'Go to page ' + (i + 1)"
+          >
+            {{ i + 1 }}
+          </button>
+        </div>
+
+        <button class="btn-secondary" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredPatients.length === 0" class="empty-state">
+    <div class="empty-icon"><i class="fas fa-users"></i></div>
+    <p>No patients found</p>
+    <button class="btn-primary" (click)="openCreateModal()">
+      <i class="fas fa-plus"></i> Add First Patient
+    </button>
+  </div>
+
+  <!-- Create Patient Modal -->
+  <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Create New Patient</h2>
+        <button class="close-btn" (click)="closeCreateModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="createPatient()" #patientForm="ngForm">
+          <!-- Row 1: Name and Email -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input
+                id="name"
+                type="text"
+                placeholder="Patient's full name"
+                [(ngModel)]="newPatient.name"
+                name="name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="patient@example.com"
+                [(ngModel)]="newPatient.email"
+                name="email"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Row 2: Phone and Date of Birth -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="Phone number"
+                [(ngModel)]="newPatient.phone"
+                name="phone"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="dob">Date of Birth</label>
+              <input
+                id="dob"
+                type="date"
+                [(ngModel)]="newPatient.dateOfBirth"
+                name="dateOfBirth"
+              />
+            </div>
+          </div>
+
+          <!-- Row 3: Gender and Blood Type -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender" [(ngModel)]="newPatient.gender" name="gender">
+                <option value="">Select gender</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="bloodType">Blood Type</label>
+              <select id="bloodType" [(ngModel)]="newPatient.bloodType" name="bloodType">
+                <option value="">Select blood type</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 4: Medical Conditions -->
+          <div class="form-group full-width">
+            <label for="conditions">Medical Conditions</label>
+            <textarea
+              id="conditions"
+              placeholder="Comma-separated list (e.g., Diabetes, Hypertension)"
+              [(ngModel)]="newPatient.medicalConditions"
+              name="medicalConditions"
+              rows="2"
+            ></textarea>
+          </div>
+
+          <!-- Row 5: Allergies -->
+          <div class="form-group full-width">
+            <label for="allergies">Allergies</label>
+            <textarea
+              id="allergies"
+              placeholder="Comma-separated list of allergies"
+              [(ngModel)]="newPatient.allergies"
+              name="allergies"
+              rows="2"
+            ></textarea>
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="!patientForm.form.valid || loading">
+              <i class="fas fa-plus"></i> Create Patient
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

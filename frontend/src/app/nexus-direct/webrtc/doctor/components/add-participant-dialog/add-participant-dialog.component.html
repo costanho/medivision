@@ -1,0 +1,120 @@
+<div class="add-participant-dialog" *ngIf="isVisible" [@fadeInOut]>
+  <div class="dialog-overlay" (click)="onClose()"></div>
+
+  <div class="dialog-content" [@slideIn]>
+    <!-- Header -->
+    <div class="dialog-header">
+      <h2>Add Participants</h2>
+      <button class="close-btn" (click)="onClose()" title="Close">×</button>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="dialog-filters">
+      <!-- Search input -->
+      <div class="search-box">
+        <input type="text"
+               [(ngModel)]="searchText"
+               (input)="onSearchChange()"
+               placeholder="Search by name, email, or specialty..."
+               class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Role filter -->
+      <div class="filter-group">
+        <label>Role:</label>
+        <div class="filter-buttons">
+          <button *ngFor="let role of roles"
+                  [class.active]="selectedRole === role.value"
+                  (click)="onRoleChange(role.value)"
+                  class="filter-btn">
+            {{ role.icon }} {{ role.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Status filter -->
+      <div class="filter-group">
+        <label>Status:</label>
+        <div class="filter-buttons">
+          <button *ngFor="let status of statuses"
+                  [class.active]="selectedStatus === status.value"
+                  (click)="onStatusChange(status.value)"
+                  class="filter-btn">
+            <span class="status-dot" [style.backgroundColor]="status.color"></span>
+            {{ status.label }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participants List -->
+    <div class="participants-list">
+      <div *ngIf="filteredParticipants.length === 0" class="empty-state">
+        <p>No participants found</p>
+        <small>Try adjusting your search or filters</small>
+      </div>
+
+      <div *ngFor="let participant of filteredParticipants; trackBy: trackByParticipantId"
+           class="participant-item"
+           [class.selected]="isParticipantSelected(participant.id)">
+        <!-- Checkbox/Selection -->
+        <div class="participant-select">
+          <input type="checkbox"
+                 [checked]="isParticipantSelected(participant.id)"
+                 (change)="toggleParticipant(participant.id)"
+                 [disabled]="!isParticipantSelected(participant.id) && !canSelectMore()"
+                 class="checkbox">
+        </div>
+
+        <!-- Avatar -->
+        <div class="participant-avatar">
+          <div *ngIf="participant.avatar" class="avatar-image" [style.backgroundImage]="'url(' + participant.avatar + ')'"></div>
+          <div *ngIf="!participant.avatar" class="avatar-placeholder">
+            {{ participant.name.charAt(0).toUpperCase() }}
+          </div>
+          <div class="status-indicator" [style.backgroundColor]="getStatusColor(participant.status)"></div>
+        </div>
+
+        <!-- Info -->
+        <div class="participant-info">
+          <div class="participant-name">
+            {{ participant.name }}
+            <span class="role-badge">{{ getRoleIcon(participant.role) }} {{ participant.role }}</span>
+          </div>
+          <div class="participant-meta">
+            <span class="email">{{ participant.email }}</span>
+            <span *ngIf="participant.specialty" class="specialty">{{ participant.specialty }}</span>
+          </div>
+        </div>
+
+        <!-- Quick invite button -->
+        <button class="quick-invite-btn"
+                (click)="quickInvite(participant)"
+                [disabled]="isParticipantSelected(participant.id) || isInviting"
+                title="Invite directly">
+          +
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer with actions -->
+    <div class="dialog-footer">
+      <div class="selection-info">
+        <span class="selected-count">{{ getSelectedLabel() }}</span>
+        <span *ngIf="selectedToInvite.size > 0" class="max-info">
+          (Max: {{ maxParticipants - 1 }})
+        </span>
+      </div>
+
+      <div class="dialog-actions">
+        <button (click)="onClose()" class="btn-cancel">Cancel</button>
+        <button (click)="inviteSelected()"
+                [disabled]="selectedToInvite.size === 0 || isInviting"
+                class="btn-invite">
+          {{ isInviting ? 'Inviting...' : `Invite ${selectedToInvite.size > 0 ? '(' + selectedToInvite.size + ')' : ''}` }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

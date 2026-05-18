@@ -1,0 +1,42 @@
+<div [ngClass]="getContainerClass()">
+  <!-- Local video (always visible) -->
+  <div class="video-wrapper local-video"
+       [class.focused]="isFocused(null)"
+       (click)="onVideoClick(null)">
+    <video #localVideo
+           autoplay
+           muted
+           playsinline
+           class="video-element"></video>
+
+    <!-- Labels and indicators -->
+    <div class="video-overlay">
+      <span class="label">You</span>
+      <span class="badge-local">Local</span>
+    </div>
+  </div>
+
+  <!-- Remote videos grid -->
+  <div [ngClass]="getGridClass()" *ngIf="remoteUserIds.length > 0">
+    <div *ngFor="let userId of remoteUserIds; let i = index"
+         class="video-wrapper remote-video"
+         [class.focused]="isFocused(userId)"
+         (click)="onVideoClick(userId)">
+
+      <video #remoteVideo
+             autoplay
+             playsinline
+             class="video-element"></video>
+
+      <!-- Labels and indicators -->
+      <div class="video-overlay">
+        <span class="label">{{ getParticipantName(userId) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="remoteUserIds.length === 0" class="empty-state">
+    <p>Waiting for remote participant...</p>
+  </div>
+</div>

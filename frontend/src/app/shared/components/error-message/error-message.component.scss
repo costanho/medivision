@@ -1,0 +1,82 @@
+.error-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid;
+  font-size: 14px;
+  animation: slideIn 0.3s ease-out;
+
+  .message-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+
+    .icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .text {
+      line-height: 1.5;
+    }
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    opacity: 0.7;
+    transition: all 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // Error styling
+  &.error {
+    background-color: #fee;
+    color: #c33;
+    border-left-color: #c33;
+  }
+
+  // Warning styling
+  &.warning {
+    background-color: #ffeaa7;
+    color: #d63031;
+    border-left-color: #d63031;
+  }
+
+  // Info styling
+  &.info {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border-left-color: #1976d2;
+  }
+
+  // Success styling
+  &.success {
+    background-color: #efe;
+    color: #3c3;
+    border-left-color: #3c3;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,484 @@
+// Color Variables
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$text-dark: #1a1a1a;
+$text-main: #333;
+$text-light: #666;
+$text-lighter: #999;
+$bg-light: #f8f9fa;
+$border-color: #e0e0e0;
+$sidebar-width: 240px;
+$sidebar-collapsed-width: 70px;
+
+// Breakpoints
+$mobile: 768px;
+$tablet: 1024px;
+
+// ─────────────────────────────────────────────────────────────────────────
+// BUTTON RESETS & BASE STYLES
+// ─────────────────────────────────────────────────────────────────────────
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: left;
+
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: -2px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// BACK BUTTON
+// ─────────────────────────────────────────────────────────────────────────
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin: 12px 20px 12px 20px;
+  background: rgba($primary-color, 0.1);
+  color: $primary-color;
+  border: 1px solid rgba($primary-color, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-height: 40px;
+  flex-shrink: 0;
+  width: calc(100% - 40px);
+
+  i {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .back-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    background: rgba($primary-color, 0.15);
+    border-color: $primary-color;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// MAIN SIDEBAR NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────
+
+.sidebar-left {
+  width: $sidebar-width;
+  background: $bg-light;
+  border-right: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+  transition: all 0.3s ease;
+  height: 100%;
+
+  // Mobile/Tablet Open State
+  &.mobile-open {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    z-index: 998;
+    height: calc(100vh - 70px);
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
+    width: $sidebar-width;
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      top: 100px;
+      height: calc(100vh - 100px);
+    }
+  }
+
+  // Sidebar Collapsed State (Desktop/Tablet)
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+
+    .nav-item {
+      justify-content: center;
+      padding: 12px;
+
+      .nav-label,
+      .nav-label-header,
+      .expand-icon {
+        display: none;
+      }
+
+      .nav-icon {
+        min-width: auto;
+      }
+
+      &.sub-item {
+        padding-left: 12px;
+      }
+    }
+
+    .nav-divider {
+      margin: 12px 0;
+    }
+
+    .chat-btn {
+      width: calc(100% - 16px);
+      margin: 0 8px;
+      padding: 10px;
+      font-size: 0;
+
+      i {
+        margin: 0;
+      }
+
+      .chat-label {
+        display: none;
+      }
+    }
+
+    .sidebar-header {
+      padding: 8px;
+
+      .collapse-toggle {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+
+  // Desktop: Always visible
+  &.is-desktop {
+    display: flex;
+    position: relative;
+    height: 100%;
+    max-height: calc(100vh - 100px);
+  }
+
+  // Mobile/Tablet: Hidden by default
+  &.is-mobile,
+  &.is-tablet {
+    display: none;
+
+    &.mobile-open {
+      display: flex;
+      position: fixed;
+      top: 100px;
+      left: 0;
+      z-index: 998;
+      height: calc(100vh - 100px);
+      box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
+      width: $sidebar-width;
+      max-height: none;
+    }
+  }
+
+  // Mobile specific top position
+  &.is-mobile.mobile-open {
+    top: 70px;
+    height: calc(100vh - 70px);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 12px 0;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 12px 16px;
+    border-bottom: 1px solid $border-color;
+
+    .collapse-toggle {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      color: $text-light;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba($primary-color, 0.05);
+        color: $primary-color;
+        border-color: $primary-color;
+      }
+
+      i {
+        transition: transform 0.3s ease;
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// NAVIGATION SECTIONS & ITEMS
+// ─────────────────────────────────────────────────────────────────────────
+
+.nav-section {
+  padding: 15px 0;
+
+  .nav-label-header {
+    padding: 0 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: $text-lighter;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+}
+
+.nav-divider {
+  height: 1px;
+  background: $border-color;
+  margin: 15px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  color: $text-light;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 44px;
+  user-select: none;
+
+  &:hover {
+    background: rgba($primary-color, 0.08);
+    color: $primary-color;
+  }
+
+  &:active {
+    background: rgba($primary-color, 0.15);
+  }
+
+  &.active {
+    background: rgba($primary-color, 0.12);
+    color: $primary-color;
+    font-weight: 600;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: $primary-color;
+    }
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    min-width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .nav-label {
+    flex: 1;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.expandable {
+    .expand-icon {
+      font-size: 12px;
+      transition: transform 0.3s ease;
+      color: $text-lighter;
+      flex-shrink: 0;
+
+      &.open {
+        transform: rotate(90deg);
+      }
+    }
+
+    &.expanded {
+      color: $primary-color;
+    }
+  }
+
+  &.sub-item {
+    padding-left: 48px;
+    font-size: 13px;
+    color: $text-lighter;
+
+    .nav-icon {
+      font-size: 16px;
+      min-width: 20px;
+    }
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.nav-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+
+  &.visible {
+    max-height: 600px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// CHAT BUTTON
+// ─────────────────────────────────────────────────────────────────────────
+
+.chat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: calc(100% - 40px);
+  margin: 12px 20px 0;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-height: 48px;
+  box-shadow: 0 4px 12px rgba($primary-color, 0.2);
+
+  i {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .chat-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba($primary-color, 0.35);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// LOGOUT BUTTON
+// ─────────────────────────────────────────────────────────────────────────
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: calc(100% - 40px);
+  margin: 12px 20px 20px;
+  padding: 12px 16px;
+  background: rgba(#f5576c, 0.1);
+  color: #f5576c;
+  border: 1px solid #f5576c;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-height: 44px;
+
+  i {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .logout-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    background: #f5576c;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(#f5576c, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// TABLET RESPONSIVE
+// ─────────────────────────────────────────────────────────────────────────
+
+@media (min-width: 769px) and (max-width: $tablet) {
+  .sidebar-left {
+    width: $sidebar-width;
+
+    &.collapsed {
+      width: $sidebar-collapsed-width;
+    }
+  }
+
+  .nav-item {
+    padding: 12px 16px;
+    gap: 10px;
+
+    .nav-icon {
+      font-size: 16px;
+    }
+
+    .nav-label {
+      font-size: 13px;
+    }
+
+    &.sub-item {
+      padding-left: 40px;
+      font-size: 12px;
+    }
+  }
+
+  .nav-section {
+    padding: 12px 0;
+
+    .nav-label-header {
+      padding: 0 16px;
+      font-size: 10px;
+      margin-bottom: 8px;
+    }
+  }
+}

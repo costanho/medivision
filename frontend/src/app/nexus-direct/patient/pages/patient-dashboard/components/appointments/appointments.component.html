@@ -1,0 +1,235 @@
+<div class="scrollable-wrapper">
+<div class="appointments-container">
+  <!-- Header -->
+  <div class="appointments-header">
+    <div class="header-content">
+      <h1><i class="fas fa-calendar-check"></i> My Appointments</h1>
+      <p class="subtitle">View and manage your healthcare appointments</p>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="success" class="success-message">{{ success }}</div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading appointments...</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div *ngIf="!loading" class="tab-navigation">
+    <button
+      (click)="selectTab('upcoming')"
+      [class.active]="activeTab === 'upcoming'"
+      class="tab-button">
+      <i class="fas fa-clock"></i> Upcoming
+    </button>
+    <button
+      (click)="selectTab('past')"
+      [class.active]="activeTab === 'past'"
+      class="tab-button">
+      <i class="fas fa-check"></i> Past
+    </button>
+  </div>
+
+  <!-- Status Filter -->
+  <div *ngIf="!loading && filteredAppointments.length > 0" class="filter-bar">
+    <label>Filter by Status:</label>
+    <select [(ngModel)]="statusFilter" (change)="filterByStatus(statusFilter)" class="filter-select">
+      <option value="all">All Status</option>
+      <option value="SCHEDULED">Scheduled</option>
+      <option value="COMPLETED">Completed</option>
+      <option value="CANCELLED">Cancelled</option>
+    </select>
+  </div>
+
+  <!-- Appointments List -->
+  <div *ngIf="!loading && filteredAppointments.length > 0" class="appointments-list">
+    <div *ngFor="let appointment of filteredAppointments" class="appointment-card">
+      <div class="card-header">
+        <div class="doctor-section">
+          <h3>{{ appointment.doctorName }}</h3>
+          <p class="specialty">{{ appointment.specialty || 'Healthcare Professional' }}</p>
+        </div>
+        <div [class]="'status-badge ' + getStatusClass(appointment.status)">
+          {{ getStatusIcon(appointment.status) }} {{ appointment.status }}
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="appointment-details">
+          <div class="detail-item">
+            <label><i class="fas fa-calendar"></i> Date & Time</label>
+            <p>{{ appointment.appointmentDate }} at {{ appointment.appointmentTime }}</p>
+          </div>
+          <div *ngIf="isUpcoming(appointment.appointmentDate)" class="detail-item">
+            <label><i class="fas fa-hourglass-half"></i> Days Until</label>
+            <p>{{ getDaysUntilAppointment(appointment.appointmentDate) }} day(s)</p>
+          </div>
+          <div *ngIf="appointment.location" class="detail-item">
+            <label><i class="fas fa-map-marker-alt"></i> Location</label>
+            <p>{{ appointment.location }}</p>
+          </div>
+          <div *ngIf="appointment.notes" class="detail-item">
+            <label><i class="fas fa-sticky-note"></i> Notes</label>
+            <p>{{ appointment.notes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button (click)="openDetailsModal(appointment)" class="btn-view"><i class="fas fa-eye"></i> View Details</button>
+        <button *ngIf="isUpcoming(appointment.appointmentDate) && appointment.status === 'SCHEDULED'"
+                (click)="openRescheduleModal(appointment)" class="btn-reschedule">
+          <i class="fas fa-sync"></i> Reschedule
+        </button>
+        <button *ngIf="appointment.status === 'SCHEDULED'"
+                (click)="openCancelModal(appointment)" class="btn-cancel">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredAppointments.length === 0" class="empty-state">
+    <div class="empty-icon"><i class="fas fa-calendar"></i></div>
+    <h2>No {{ activeTab }} appointments</h2>
+    <p *ngIf="activeTab === 'upcoming'">You have no upcoming appointments. Book one now!</p>
+    <p *ngIf="activeTab === 'past'">You have no past appointments yet.</p>
+    <a *ngIf="activeTab === 'upcoming'" routerLink="/patient/nexus-direct/dashboard/doctors" class="btn-book">Find a Doctor</a>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="pagination">
+    <button
+      (click)="previousPage()"
+      [disabled]="currentPage === 0"
+      class="btn-pagination">
+      <i class="fas fa-chevron-left"></i> Previous
+    </button>
+    <span class="page-info">
+      Page {{ currentPage + 1 }} of {{ totalPages }}
+    </span>
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages - 1"
+      class="btn-pagination">
+      Next <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- Appointment Details Modal -->
+<div *ngIf="showDetailsModal && selectedAppointment" class="modal-overlay" (click)="closeDetailsModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Appointment Details</h2>
+      <button (click)="closeDetailsModal()" class="btn-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-row">
+        <label>Doctor</label>
+        <p>{{ selectedAppointment.doctorName }}</p>
+      </div>
+      <div class="detail-row">
+        <label>Date & Time</label>
+        <p>{{ selectedAppointment.appointmentDate }} at {{ selectedAppointment.appointmentTime }}</p>
+      </div>
+      <div class="detail-row">
+        <label>Status</label>
+        <p [class]="'status ' + getStatusClass(selectedAppointment.status)">
+          {{ getStatusIcon(selectedAppointment.status) }} {{ selectedAppointment.status }}
+        </p>
+      </div>
+      <div *ngIf="selectedAppointment.notes" class="detail-row">
+        <label>Notes</label>
+        <p>{{ selectedAppointment.notes }}</p>
+      </div>
+      <div class="detail-row">
+        <label>Booked On</label>
+        <p>{{ selectedAppointment.createdAt | date: 'MMM d, yyyy' }}</p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button (click)="closeDetailsModal()" class="btn-secondary">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reschedule Modal -->
+<div *ngIf="showRescheduleModal && selectedAppointment" class="modal-overlay" (click)="closeRescheduleModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Reschedule Appointment</h2>
+      <button (click)="closeRescheduleModal()" class="btn-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form [formGroup]="rescheduleForm" (ngSubmit)="rescheduleAppointment()" class="modal-form">
+      <div class="form-group">
+        <label for="appointmentDate">New Date</label>
+        <input
+          type="date"
+          id="appointmentDate"
+          formControlName="appointmentDate"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="appointmentTime">New Time</label>
+        <input
+          type="time"
+          id="appointmentTime"
+          formControlName="appointmentTime"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="reason">Reason for Rescheduling</label>
+        <textarea
+          id="reason"
+          formControlName="reason"
+          class="form-control"
+          placeholder="Optional"
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary"><i class="fas fa-check"></i> Reschedule</button>
+        <button type="button" (click)="closeRescheduleModal()" class="btn-secondary">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div *ngIf="showCancelModal && selectedAppointment" class="modal-overlay" (click)="closeCancelModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Cancel Appointment</h2>
+      <button (click)="closeCancelModal()" class="btn-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form [formGroup]="cancelForm" (ngSubmit)="cancelAppointment()" class="modal-form">
+      <p class="warning-text"><i class="fas fa-exclamation-triangle"></i> Are you sure you want to cancel this appointment?</p>
+      <div class="form-group">
+        <label for="cancelReason">Reason for Cancellation</label>
+        <textarea
+          id="cancelReason"
+          formControlName="reason"
+          class="form-control"
+          placeholder="Please provide a reason..."
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn-danger"><i class="fas fa-times-circle"></i> Cancel Appointment</button>
+        <button type="button" (click)="closeCancelModal()" class="btn-secondary">Keep Appointment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</div>

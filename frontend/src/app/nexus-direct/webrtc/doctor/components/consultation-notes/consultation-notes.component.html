@@ -1,0 +1,85 @@
+<div class="consultation-notes">
+  <!-- Header with save status -->
+  <div class="notes-header">
+    <div class="header-title">
+      <h3>Consultation Notes</h3>
+      <span class="save-status" [class]="saveStatus">
+        {{ getSaveStatusText() }}
+      </span>
+    </div>
+
+    <div class="header-actions">
+      <button (click)="insertTimestamp()" title="Insert timestamp" [disabled]="isReadOnly" class="icon-btn">
+        ⏰
+      </button>
+      <button (click)="toggleTemplates()" title="Templates" [disabled]="isReadOnly" class="icon-btn">
+        📋
+      </button>
+      <button (click)="copyToClipboard()" title="Copy to clipboard" class="icon-btn">
+        📋
+      </button>
+      <button (click)="exportNote()" title="Export as text" class="icon-btn">
+        💾
+      </button>
+    </div>
+  </div>
+
+  <!-- Templates panel (collapsible) -->
+  <div class="templates-panel" *ngIf="showTemplates && templates.length > 0">
+    <div class="templates-list">
+      <button *ngFor="let template of templates"
+              class="template-btn"
+              (click)="insertTemplate(template)"
+              [disabled]="isReadOnly">
+        {{ template.name }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Note editor -->
+  <textarea #noteEditor
+            class="note-editor"
+            [value]="noteContent"
+            (input)="onContentChange($event.target.value)"
+            [disabled]="isReadOnly"
+            placeholder="Enter your consultation notes here..."
+            spellcheck="true">
+  </textarea>
+
+  <!-- Tags section -->
+  <div class="tags-section" *ngIf="!isReadOnly">
+    <div class="tags-input">
+      <span class="tag-label">Tags:</span>
+      <div class="tags-list">
+        <span *ngFor="let tag of addedTags" class="tag added">
+          {{ tag }}
+          <button (click)="removeTag(tag)" class="tag-remove">×</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="quick-tags">
+      <button *ngFor="let tag of quickTags"
+              (click)="addTag(tag)"
+              [disabled]="addedTags.includes(tag)"
+              class="quick-tag-btn"
+              [class.active]="addedTags.includes(tag)">
+        {{ tag }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer with stats and actions -->
+  <div class="notes-footer">
+    <div class="stats">
+      <span class="stat">{{ characterCount }} characters</span>
+      <span class="stat separator">•</span>
+      <span class="stat">{{ wordCount }} words</span>
+    </div>
+
+    <div class="footer-actions" *ngIf="!isReadOnly">
+      <button (click)="clearNote()" class="btn-text">Clear</button>
+      <button (click)="saveNote()" class="btn-primary">Save Note</button>
+    </div>
+  </div>
+</div>

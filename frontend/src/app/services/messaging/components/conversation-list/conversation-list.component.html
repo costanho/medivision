@@ -1,0 +1,171 @@
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Conversation List Container -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="conversation-list-container">
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Header with Search -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="conversation-list-header">
+    <div class="header-top">
+      <h2 class="header-title">Messages</h2>
+      <button class="btn-icon-small" (click)="refresh()" [disabled]="loading" title="Refresh">
+        <span class="icon">⟳</span>
+      </button>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search conversations..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+        aria-label="Search conversations"
+      />
+      <button
+        *ngIf="searchQuery"
+        class="btn-icon-clear"
+        (click)="clearSearch()"
+        title="Clear search"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Error Message -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div *ngIf="error" class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-content">
+      <p>{{ error }}</p>
+    </div>
+    <button class="btn-icon-small" (click)="dismissError()" title="Close">✕</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Success Message -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    <span class="alert-icon">✓</span>
+    <div class="alert-content">
+      <p>{{ successMessage }}</p>
+    </div>
+    <button class="btn-icon-small" (click)="dismissSuccess()" title="Close">✕</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Loading State -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div *ngIf="loading && conversations.length === 0" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading conversations...</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Empty State -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div *ngIf="noConversations && !loading" class="empty-state">
+    <div class="empty-icon">💬</div>
+    <h3>No Conversations Yet</h3>
+    <p>Start a new conversation to begin messaging</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- No Results State -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div *ngIf="filteredConversations.length === 0 && conversations.length > 0 && !loading" class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <h3>No Results Found</h3>
+    <p>No conversations match "{{ searchQuery }}"</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Conversations List -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div class="conversations-list">
+    <div
+      *ngFor="let conversation of filteredConversations"
+      class="conversation-item"
+      [class.selected]="isSelected(conversation.id)"
+      (click)="selectConversation(conversation)"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="selectConversation(conversation)"
+    >
+      <!-- Avatar -->
+      <div class="conversation-avatar">
+        <div class="avatar-circle" [attr.data-role]="getParticipantRole(conversation)">
+          {{ getAvatarInitials(getParticipantName(conversation)) }}
+        </div>
+        <!-- Unread Badge -->
+        <div *ngIf="conversation.unreadCountForCurrentUser && conversation.unreadCountForCurrentUser > 0" class="unread-badge">
+          {{ conversation.unreadCountForCurrentUser > 99 ? '99+' : conversation.unreadCountForCurrentUser }}
+        </div>
+      </div>
+
+      <!-- Conversation Content -->
+      <div class="conversation-content">
+        <!-- Name and Time -->
+        <div class="conversation-header">
+          <h3 class="conversation-name">
+            {{ getParticipantName(conversation) }}
+          </h3>
+          <span class="conversation-time">
+            {{ getTimeAgo(conversation.lastMessageTime) }}
+          </span>
+        </div>
+
+        <!-- Last Message Preview -->
+        <div class="conversation-preview">
+          <p class="preview-text" [class.unread]="conversation.unreadCountForCurrentUser && conversation.unreadCountForCurrentUser > 0">
+            <span *ngIf="conversation.lastMessage?.senderName" class="sender-name">
+              {{ conversation.lastMessage.senderName }}:
+            </span>
+            {{ conversation.lastMessage?.content || 'No messages yet' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Status Indicator -->
+      <div class="conversation-status">
+        <div
+          *ngIf="conversation.unreadCountForCurrentUser && conversation.unreadCountForCurrentUser > 0"
+          class="status-unread"
+          title="Unread messages"
+        ></div>
+        <div *ngIf="!conversation.unreadCountForCurrentUser || conversation.unreadCountForCurrentUser === 0" class="status-read"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Load More Button -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div *ngIf="hasMore && !loading" class="load-more-container">
+    <button class="btn-load-more" (click)="loadMore()">
+      Load More Conversations
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Loading More State -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <div *ngIf="loading && conversations.length > 0" class="loading-more">
+    <div class="spinner-small"></div>
+    <p>Loading more...</p>
+  </div>
+</div>

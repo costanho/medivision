@@ -1,0 +1,233 @@
+<div class="scrollable-wrapper">
+<div class="dashboard-container">
+  <!-- Modern Header Section with Gradient -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="greeting-section">
+        <h1>{{ getGreeting() }}, {{ patient?.name || currentUser?.fullName || 'User' }}</h1>
+        <p class="subtitle">Let's manage your health today</p>
+      </div>
+      <div class="header-profile-preview">
+        <span class="avatar-small">{{ (currentUser?.email || 'U').charAt(0).toUpperCase() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading your dashboard...</p>
+  </div>
+
+  <div *ngIf="!loading" class="dashboard-content">
+    <!-- Welcome Card with Quick Stats -->
+    <div class="welcome-card">
+      <div class="welcome-content">
+        <div class="welcome-text">
+          <h2>Welcome Back!</h2>
+          <p>You have <span class="highlight">{{ upcomingAppointments.length }}</span> upcoming appointment(s) and <span class="highlight">{{ recentMessages.length }}</span> message(s)</p>
+        </div>
+        <button routerLink="/doctors" class="welcome-btn">Schedule Appointment →</button>
+      </div>
+    </div>
+
+    <!-- Enhanced Stats Section -->
+    <div class="stats-section">
+      <h3 class="section-title">Health Overview</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-details">
+            <h4>{{ upcomingAppointments.length }}</h4>
+            <p>Appointments</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-details">
+            <h4>{{ recentMessages.length }}</h4>
+            <p>Messages</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👨‍⚕️</div>
+          <div class="stat-details">
+            <h4>{{ yourDoctors.length }}</h4>
+            <p>Your Doctors</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-details">
+            <h4>Active</h4>
+            <p>Status</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+      <div class="quick-actions-grid">
+        <button routerLink="/doctors" class="quick-action-btn primary-btn">
+          <span class="icon">👨‍⚕️</span>
+          <span class="label">Find Doctors</span>
+        </button>
+        <button routerLink="/appointments" class="quick-action-btn secondary-btn">
+          <span class="icon">📅</span>
+          <span class="label">Appointments</span>
+        </button>
+        <button routerLink="/messages" class="quick-action-btn secondary-btn">
+          <span class="icon">💬</span>
+          <span class="label">Messages</span>
+        </button>
+        <button class="quick-action-btn secondary-btn">
+          <span class="icon">⚙️</span>
+          <span class="label">Settings</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Health Snapshot Section -->
+    <div class="health-snapshot-section">
+      <div class="section-header">
+        <h2>Health Snapshot</h2>
+      </div>
+      <div class="health-metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">{{ healthMetrics.bloodPressure }}</div>
+          <div class="metric-label">Blood Pressure</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">{{ healthMetrics.heartRate }}</div>
+          <div class="metric-label">Heart Rate</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">{{ healthMetrics.temperature }}</div>
+          <div class="metric-label">Temperature</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">{{ healthMetrics.weight }}</div>
+          <div class="metric-label">Weight</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Your Doctors Section -->
+    <div class="doctors-section">
+      <div class="section-header">
+        <h2>Your Doctors</h2>
+        <a routerLink="/doctors" class="view-all">View All →</a>
+      </div>
+      <div class="doctors-grid">
+        <div *ngFor="let doctor of yourDoctors" class="doctor-card">
+          <div class="doctor-avatar" [style.background-color]="doctor.color">
+            {{ doctor.avatar }}
+          </div>
+          <div class="doctor-info">
+            <h4>{{ doctor.name }}</h4>
+            <p class="specialty">{{ doctor.specialty }}</p>
+          </div>
+          <button class="message-icon">💬</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Appointments Section -->
+    <div class="appointments-section">
+      <div class="section-header">
+        <h2>Upcoming Appointments</h2>
+        <a routerLink="/appointments" class="view-all">View All →</a>
+      </div>
+
+      <div *ngIf="upcomingAppointments.length === 0" class="empty-state">
+        <p>📅 No upcoming appointments</p>
+        <button routerLink="/doctors" class="schedule-btn">Schedule an Appointment</button>
+      </div>
+
+      <div *ngIf="upcomingAppointments.length > 0" class="appointments-list">
+        <div *ngFor="let appointment of upcomingAppointments" class="appointment-card">
+          <div class="appointment-header">
+            <div class="appointment-day">
+              {{ getDayOfWeek(appointment.appointmentDate) }}
+            </div>
+            <span class="appointment-status" [ngClass]="getAppointmentStatusClass(appointment.status)">
+              {{ appointment.status }}
+            </span>
+          </div>
+          <div class="appointment-info">
+            <h3>{{ appointment.doctorName }}</h3>
+            <p class="date-time">{{ appointment.appointmentDate }} at {{ appointment.appointmentTime }}</p>
+            <p class="location">📍 General Checkup</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Messages Section -->
+    <div class="messages-section">
+      <div class="section-header">
+        <h2>Recent Messages</h2>
+        <a routerLink="/messages" class="view-all">View All →</a>
+      </div>
+
+      <div *ngIf="recentMessages.length === 0" class="empty-state">
+        <p>💬 No messages yet</p>
+        <a routerLink="/doctors" class="message-btn">Find a Doctor to Message</a>
+      </div>
+
+      <div *ngIf="recentMessages.length > 0" class="messages-list">
+        <div *ngFor="let message of recentMessages" class="message-card">
+          <div class="message-sender">
+            <div class="sender-avatar">{{ (message.senderName || 'U').charAt(0).toUpperCase() }}</div>
+            <div class="sender-info">
+              <h4>{{ message.senderName || 'Unknown' }}</h4>
+              <p class="timestamp">{{ message.createdAt }}</p>
+            </div>
+          </div>
+          <div class="message-preview">
+            <p>{{ message.content | slice:0:70 }}{{ message.content.length > 70 ? '...' : '' }}</p>
+          </div>
+          <div class="message-status" [ngClass]="{'unread': !message.isRead}"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended Actions Section -->
+    <div class="recommended-actions-section">
+      <div class="section-header">
+        <h2>Recommended Actions</h2>
+      </div>
+      <div class="actions-grid">
+        <div *ngFor="let action of recommendedActions" class="action-item" [ngClass]="'status-' + action.status">
+          <div class="action-icon" [style.color]="getStatusColor(action.status)">{{ action.icon }}</div>
+          <div class="action-content">
+            <h4>{{ action.title }}</h4>
+            <p>{{ action.description }}</p>
+          </div>
+          <span class="action-status" [style.background-color]="getStatusColor(action.status)">
+            {{ action.status }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Tips Section -->
+    <div class="health-tips-section">
+      <div class="section-header">
+        <h2>Health Tips</h2>
+      </div>
+      <div class="tips-grid">
+        <div *ngFor="let tip of healthTips" class="tip-card">
+          <p>{{ tip }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

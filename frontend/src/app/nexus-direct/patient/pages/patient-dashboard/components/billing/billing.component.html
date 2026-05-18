@@ -1,0 +1,430 @@
+<div class="billing-wrapper">
+<div class="billing-container">
+<!-- PAGE HEADER -->
+<div class="billing-header">
+  <div class="header-content">
+    <h1><i class="fas fa-credit-card"></i> Billing & Payments</h1>
+    <p>Manage your bills, payments, and financial records</p>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div *ngIf="successMessage" class="alert alert-success">
+  <span><i class="fas fa-check-circle"></i></span>
+  <div>
+    <strong>Success</strong>
+    <p>{{ successMessage }}</p>
+  </div>
+  <button (click)="clearMessages()">×</button>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-error">
+  <span><i class="fas fa-times-circle"></i></span>
+  <div>
+    <strong>Error</strong>
+    <p>{{ errorMessage }}</p>
+  </div>
+  <button (click)="clearMessages()">×</button>
+</div>
+
+<!-- BILLING STATS CARDS -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-money-bill"></i></div>
+    <div class="stat-content">
+      <h3>Total Billed</h3>
+      <p class="stat-value">{{ formatCurrency(billingStats.totalBilled) }}</p>
+      <p class="stat-meta">All-time</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+    <div class="stat-content">
+      <h3>Total Paid</h3>
+      <p class="stat-value">{{ formatCurrency(billingStats.totalPaid) }}</p>
+      <p class="stat-meta">Completed</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+    <div class="stat-content">
+      <h3>Pending</h3>
+      <p class="stat-value">{{ formatCurrency(billingStats.pendingPayments) }}</p>
+      <p class="stat-meta">Due soon</p>
+    </div>
+  </div>
+
+  <div class="stat-card danger">
+    <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+    <div class="stat-content">
+      <h3>Overdue</h3>
+      <p class="stat-value">{{ formatCurrency(billingStats.totalOverdue) }}</p>
+      <p class="stat-meta">Action needed</p>
+    </div>
+  </div>
+</div>
+
+<!-- TAB NAVIGATION -->
+<div class="tab-navigation">
+  <button
+    class="tab-btn"
+    [class.active]="activeTab === 'overview'"
+    (click)="activeTab = 'overview'">
+    <i class="fas fa-chart-pie"></i> Overview
+  </button>
+  <button
+    class="tab-btn"
+    [class.active]="activeTab === 'payments'"
+    (click)="activeTab = 'payments'">
+    <i class="fas fa-credit-card"></i> Payments
+  </button>
+  <button
+    class="tab-btn"
+    [class.active]="activeTab === 'bills'"
+    (click)="activeTab = 'bills'">
+    <i class="fas fa-file-invoice"></i> Bills
+  </button>
+  <button
+    class="tab-btn"
+    [class.active]="activeTab === 'analytics'"
+    (click)="activeTab = 'analytics'">
+    <i class="fas fa-chart-line"></i> Analytics
+  </button>
+</div>
+
+<!-- OVERVIEW TAB -->
+<div *ngIf="activeTab === 'overview'" class="tab-content">
+  <div class="overview-container">
+
+    <!-- Quick Summary -->
+    <div class="overview-section">
+      <h2>Financial Summary</h2>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h4>Payment Status Overview</h4>
+          <div class="status-distribution">
+            <div class="status-item">
+              <span class="label">Completed</span>
+              <span class="value percentage">{{ (billingStats.totalPaid / billingStats.totalBilled * 100 | number:'1.0-0') }}%</span>
+            </div>
+            <div class="status-item">
+              <span class="label">Pending</span>
+              <span class="value percentage">{{ (billingStats.pendingPayments / billingStats.totalBilled * 100 | number:'1.0-0') }}%</span>
+            </div>
+            <div class="status-item">
+              <span class="label">Overdue</span>
+              <span class="value percentage">{{ (billingStats.totalOverdue / billingStats.totalBilled * 100 | number:'1.0-0') }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h4>Recent Activity</h4>
+          <div class="activity-list">
+            <div class="activity-item">
+              <span class="icon"><i class="fas fa-credit-card"></i></span>
+              <div>
+                <p>Payment Processed</p>
+                <small>2 days ago</small>
+              </div>
+              <span class="amount">+ {{ formatCurrency(500) }}</span>
+            </div>
+            <div class="activity-item">
+              <span class="icon"><i class="fas fa-file-alt"></i></span>
+              <div>
+                <p>New Invoice Generated</p>
+                <small>5 days ago</small>
+              </div>
+              <span class="amount">{{ formatCurrency(1500) }}</span>
+            </div>
+            <div class="activity-item">
+              <span class="icon"><i class="fas fa-exclamation-triangle"></i></span>
+              <div>
+                <p>Payment Overdue</p>
+                <small>1 week ago</small>
+              </div>
+              <span class="amount">{{ formatCurrency(300) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="overview-section">
+      <h2>Quick Actions</h2>
+      <div class="action-buttons">
+        <button class="action-btn primary">
+          <span class="icon"><i class="fas fa-plus"></i></span>
+          <span>Make a Payment</span>
+        </button>
+        <button class="action-btn secondary">
+          <span class="icon"><i class="fas fa-download"></i></span>
+          <span>Download Invoice</span>
+        </button>
+        <button class="action-btn secondary">
+          <span class="icon"><i class="fas fa-envelope"></i></span>
+          <span>Email Receipt</span>
+        </button>
+        <button class="action-btn secondary">
+          <span class="icon"><i class="fas fa-bell"></i></span>
+          <span>Set Reminders</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENTS TAB -->
+<div *ngIf="activeTab === 'payments'" class="tab-content">
+  <div class="payments-container">
+
+    <!-- Filters -->
+    <div class="filter-section">
+      <div class="filter-group">
+        <label>Status Filter:</label>
+        <select [(ngModel)]="paymentStatusFilter" (change)="filterPaymentsByStatus(paymentStatusFilter)">
+          <option value="">All Payments</option>
+          <option value="PENDING">Pending</option>
+          <option value="PROCESSING">Processing</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="FAILED">Failed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Method Filter:</label>
+        <select [(ngModel)]="paymentMethodFilter">
+          <option value="">All Methods</option>
+          <option value="CASH">Cash</option>
+          <option value="CARD">Card</option>
+          <option value="BANK_TRANSFER">Bank Transfer</option>
+          <option value="CHECK">Check</option>
+          <option value="MOBILE_MONEY">Mobile Money</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="table-container">
+      <table class="payments-table">
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Reference</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let payment of payments" [class]="getPaymentStatusClass(payment.paymentStatus)">
+            <td><strong>#{{ payment.id }}</strong></td>
+            <td>{{ formatCurrency(payment.amount) }}</td>
+            <td>{{ payment.paymentMethod }}</td>
+            <td>{{ formatDate(payment.paymentDate) }}</td>
+            <td>
+              <span class="status-badge">
+                {{ getPaymentStatusIcon(payment.paymentStatus) }}
+                {{ payment.paymentStatus }}
+              </span>
+            </td>
+            <td>{{ payment.transactionReference }}</td>
+            <td>
+              <div class="action-icons">
+                <button *ngIf="payment.paymentStatus === 'PENDING'"
+                        (click)="processPayment(payment.id)"
+                        class="icon-btn"
+                        title="Process Payment"><i class="fas fa-sync"></i></button>
+                <button *ngIf="payment.paymentStatus === 'PROCESSING'"
+                        (click)="completePayment(payment.id)"
+                        class="icon-btn"
+                        title="Complete Payment"><i class="fas fa-check"></i></button>
+                <button class="icon-btn" title="View Details"><i class="fas fa-eye"></i></button>
+                <button class="icon-btn" title="Download Receipt"><i class="fas fa-download"></i></button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="payments.length === 0">
+            <td colspan="7" class="empty-state">
+              <p>No payments found</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button (click)="prevPaymentPage()" [disabled]="paymentPage === 0"><i class="fas fa-chevron-left"></i> Previous</button>
+      <span>Page {{ paymentPage + 1 }} of {{ Math.ceil(totalPayments / pageSize) }}</span>
+      <button (click)="nextPaymentPage()" [disabled]="(paymentPage + 1) * pageSize >= totalPayments">Next <i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- BILLS TAB -->
+<div *ngIf="activeTab === 'bills'" class="tab-content">
+  <div class="bills-container">
+
+    <!-- Filters -->
+    <div class="filter-section">
+      <div class="filter-group">
+        <label>Status Filter:</label>
+        <select [(ngModel)]="billStatusFilter" (change)="filterBillsByStatus(billStatusFilter)">
+          <option value="">All Bills</option>
+          <option value="DRAFT">Draft</option>
+          <option value="ISSUED">Issued</option>
+          <option value="PARTIALLY_PAID">Partially Paid</option>
+          <option value="PAID">Paid</option>
+          <option value="OVERDUE">Overdue</option>
+          <option value="WRITTEN_OFF">Written Off</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Bills Grid -->
+    <div class="bills-grid">
+      <div *ngFor="let bill of bills" class="bill-card" [class]="getBillStatusClass(bill.paymentStatus)">
+        <div class="bill-header">
+          <div>
+            <h3>{{ bill.billNumber }}</h3>
+            <p class="bill-period">{{ bill.billingPeriod }}</p>
+          </div>
+          <span class="status-badge">
+            {{ getBillStatusIcon(bill.paymentStatus) }}
+            {{ bill.paymentStatus }}
+          </span>
+        </div>
+
+        <div class="bill-content">
+          <div class="bill-amount">
+            <span class="label">Amount Due</span>
+            <span class="value">{{ formatCurrency(bill.netAmount) }}</span>
+          </div>
+
+          <div class="bill-dates">
+            <div class="date-item">
+              <span class="label">Issue Date</span>
+              <span class="value">{{ formatDate(bill.billDate) }}</span>
+            </div>
+            <div class="date-item">
+              <span class="label">Due Date</span>
+              <span class="value">{{ formatDate(bill.dueDate) }}</span>
+            </div>
+          </div>
+
+          <div class="bill-details">
+            <p><strong>Total Charges:</strong> {{ formatCurrency(bill.totalCharges) }}</p>
+            <p *ngIf="bill.discounts > 0"><strong>Discounts:</strong> -{{ formatCurrency(bill.discounts) }}</p>
+          </div>
+        </div>
+
+        <div class="bill-actions">
+          <button class="btn-small primary" (click)="viewBillDetails(bill.id)">View Details</button>
+          <button class="btn-small secondary" (click)="downloadBillPDF(bill.id)"><i class="fas fa-download"></i> Download</button>
+          <button *ngIf="bill.paymentStatus !== 'PAID'"
+                  class="btn-small success"
+                  (click)="markBillPaid(bill.id)">Pay Now</button>
+        </div>
+
+        <!-- Aging Info -->
+        <div *ngIf="bill.totalOverdue > 0" class="aging-warning">
+          <span class="icon"><i class="fas fa-exclamation-triangle"></i></span>
+          <div>
+            <strong>{{ formatCurrency(bill.totalOverdue) }} Overdue</strong>
+            <small>Days overdue by: {{ bill.thirtyDaysOverdue > 0 ? '30+' : bill.sixtyDaysOverdue > 0 ? '60+' : '90+' }}</small>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="bills.length === 0" class="empty-state">
+        <p>No bills found</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button (click)="prevBillPage()" [disabled]="billPage === 0"><i class="fas fa-chevron-left"></i> Previous</button>
+      <span>Page {{ billPage + 1 }} of {{ Math.ceil(totalBills / pageSize) }}</span>
+      <button (click)="nextBillPage()" [disabled]="(billPage + 1) * pageSize >= totalBills">Next <i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS TAB -->
+<div *ngIf="activeTab === 'analytics'" class="tab-content">
+  <div class="analytics-container">
+    <h2>Financial Analytics</h2>
+    <p class="section-description">View your billing and payment trends</p>
+
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <h3>Payment Trends</h3>
+        <div class="chart-placeholder">
+          <p>📊 Payment history chart</p>
+          <small>Last 6 months overview</small>
+        </div>
+      </div>
+
+      <div class="analytics-card">
+        <h3>Bill Status Distribution</h3>
+        <div class="chart-placeholder">
+          <p>📈 Bill status breakdown</p>
+          <small>Current snapshot</small>
+        </div>
+      </div>
+
+      <div class="analytics-card">
+        <h3>Payment Methods</h3>
+        <div class="chart-placeholder">
+          <p>💳 Preferred payment methods</p>
+          <small>Usage statistics</small>
+        </div>
+      </div>
+
+      <div class="analytics-card">
+        <h3>Aging Analysis</h3>
+        <div class="chart-placeholder">
+          <p>📋 Outstanding balance by age</p>
+          <small>Days overdue</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Metrics -->
+    <div class="metrics-section">
+      <h3>Key Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <span class="metric-label">Average Payment Time</span>
+          <span class="metric-value">12 days</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">On-time Payment Rate</span>
+          <span class="metric-value">95%</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Late Payment Rate</span>
+          <span class="metric-value">5%</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Average Bill Amount</span>
+          <span class="metric-value">{{ formatCurrency(1500) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-overlay">
+  <div class="spinner">Loading...</div>
+</div>
+</div>
+</div>

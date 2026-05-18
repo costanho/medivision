@@ -1,0 +1,258 @@
+<div class="patient-call-screen" #callContainer>
+  <!-- Three-column layout: Doctor selector | Video | Doctor info panel -->
+  <div class="call-container">
+    <!-- Left Panel: Doctor/Admin Selection & Consultation Details -->
+    <div class="left-panel">
+      <div class="panel-content">
+        <!-- Doctor Selection Section -->
+        <div class="section" *ngIf="callPhase === 'select-doctor'">
+          <h3 class="section-title">Select Doctor</h3>
+
+          <!-- Search Input -->
+          <div class="search-container" *ngIf="!isLoadingDoctors && availableDoctors.length > 0">
+            <input
+              type="text"
+              class="search-input"
+              placeholder="🔍 Search by name or specialty..."
+              [(ngModel)]="searchQuery"
+              (input)="onSearchChange(searchQuery)"
+              autocomplete="off">
+            <button
+              *ngIf="searchQuery"
+              (click)="clearSearch()"
+              class="clear-search-btn"
+              title="Clear search">
+              ✕
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div class="loading-state" *ngIf="isLoadingDoctors">
+            <div class="spinner-small"></div>
+            <p>Loading doctors...</p>
+          </div>
+
+          <!-- Error State -->
+          <div class="error-state" *ngIf="doctorLoadError && !isLoadingDoctors">
+            <p>{{ doctorLoadError }}</p>
+          </div>
+
+          <!-- No Results State -->
+          <div class="no-results-state" *ngIf="!isLoadingDoctors && noResultsFound && searchQuery">
+            <p>No doctors or admins matching "{{ searchQuery }}"</p>
+          </div>
+
+          <!-- Doctor List -->
+          <div class="doctor-list" *ngIf="!isLoadingDoctors && filteredDoctors.length > 0">
+            <button
+              *ngFor="let doctor of filteredDoctors"
+              (click)="selectDoctor(doctor)"
+              class="doctor-item">
+              <span class="avatar">{{ doctor.avatar }}</span>
+              <div class="doctor-info">
+                <p class="name">{{ doctor.name }}</p>
+                <p class="specialty">{{ doctor.specialty }}</p>
+                <p class="fee" *ngIf="doctor.consultationFee">₹{{ doctor.consultationFee }}/consultation</p>
+              </div>
+            </button>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="!isLoadingDoctors && availableDoctors.length === 0 && !doctorLoadError">
+            <p>No doctors available</p>
+          </div>
+
+          <!-- Admin Support Section -->
+          <h3 class="section-title" *ngIf="filteredAdmins.length > 0 || !searchQuery">Admin Support</h3>
+          <div class="doctor-list" *ngIf="filteredAdmins.length > 0">
+            <button
+              *ngFor="let admin of filteredAdmins"
+              (click)="selectAdmin(admin)"
+              class="doctor-item">
+              <span class="avatar">{{ admin.avatar }}</span>
+              <div class="doctor-info">
+                <p class="name">{{ admin.name }}</p>
+                <p class="specialty">{{ admin.role }}</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Consultation Details Section (after selecting doctor) -->
+        <div class="section" *ngIf="callPhase !== 'select-doctor' && selectedDoctor">
+          <h3 class="section-title">Reason for Call</h3>
+          <textarea
+            [(ngModel)]="consultationReason"
+            placeholder="Brief description of your concern..."
+            class="textarea-input"></textarea>
+
+          <h3 class="section-title">Symptoms</h3>
+          <div class="symptoms-input">
+            <input
+              type="text"
+              placeholder="e.g., Headache, Fever..."
+              #symptomInput
+              (keyup.enter)="addSymptom(symptomInput.value); symptomInput.value = '';"
+              class="text-input">
+          </div>
+          <div class="symptoms-list">
+            <span
+              *ngFor="let symptom of symptomsList"
+              class="symptom-tag">
+              {{ symptom }}
+              <button (click)="removeSymptom(symptom)" class="remove-btn">×</button>
+            </span>
+          </div>
+
+          <h3 class="section-title">Additional Notes</h3>
+          <textarea
+            [(ngModel)]="consultationNotes"
+            placeholder="Any additional information..."
+            class="textarea-input small"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Video Call Area -->
+    <div class="video-area">
+      <!-- In Call -->
+      <div class="call-active" *ngIf="isCallActive && callPhase === 'in-call'">
+        <app-video-container
+          [localStream]="localStream"
+          [remoteStreams]="remoteStreams"
+          [layout]="currentLayout"
+          [focusedUserId]="focusedUserId"
+          [maxColumns]="2"
+          (focusUser)="onFocusParticipant($event)"
+          (videoError)="handleMediaError($event)">
+        </app-video-container>
+
+        <!-- Layout toggle -->
+        <div class="layout-toggle" *ngIf="remoteStreams.size > 1">
+          <button
+            [class.active]="currentLayout === 'focus'"
+            (click)="switchToFocusLayout()"
+            title="Doctor focused view"
+            class="layout-toggle-btn">
+            👨‍⚕️
+          </button>
+          <button
+            [class.active]="currentLayout === 'grid'"
+            (click)="switchToGridLayout()"
+            title="All participants"
+            class="layout-toggle-btn">
+            👥
+          </button>
+        </div>
+      </div>
+
+      <!-- Waiting for connection -->
+      <div class="call-waiting" *ngIf="callPhase === 'waiting'">
+        <div class="waiting-content">
+          <div class="doctor-avatar-large">{{ selectedDoctor?.avatar }}</div>
+          <p class="doctor-name">{{ selectedDoctor?.name }}</p>
+          <p class="status">Connecting...</p>
+          <div class="spinner"></div>
+          <small>Waiting for {{ selectedDoctor?.name }} to accept your call</small>
+        </div>
+      </div>
+
+      <!-- Call ended -->
+      <div class="call-ended" *ngIf="callPhase === 'ended'">
+        <div class="ended-content">
+          <p>📞 Call Ended</p>
+          <small>Thank you for your consultation</small>
+          <button (click)="callPhase = 'select-doctor'; selectedDoctor = null" class="btn-primary">
+            Start New Call
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Doctor Information & Chat -->
+    <div class="right-panel" *ngIf="selectedDoctor && (callPhase === 'in-call' || callPhase === 'waiting')">
+      <div class="panel-content">
+        <!-- Doctor Header -->
+        <div class="doctor-header">
+          <div class="doctor-avatar">{{ selectedDoctor.avatar }}</div>
+          <h3>{{ selectedDoctor.name }}</h3>
+          <p class="role">{{ selectedDoctor.specialty || selectedDoctor.role }}</p>
+          <div class="status-badge">
+            <span *ngIf="callPhase === 'waiting'" class="status-waiting">🔔 Waiting</span>
+            <span *ngIf="callPhase === 'in-call'" class="status-connected">🟢 Connected</span>
+          </div>
+        </div>
+
+        <!-- Call Duration -->
+        <div class="call-info" *ngIf="callPhase === 'in-call'">
+          <div class="info-item">
+            <span class="label">Duration:</span>
+            <span class="value">{{ callDuration | number: '2.0-0' }}s</span>
+          </div>
+        </div>
+
+        <!-- Consultation Reason Display -->
+        <div class="consultation-summary" *ngIf="consultationReason">
+          <h4>Reason for Visit</h4>
+          <p>{{ consultationReason }}</p>
+        </div>
+
+        <!-- Symptoms Display -->
+        <div class="symptoms-summary" *ngIf="symptomsList.length > 0">
+          <h4>Symptoms</h4>
+          <div class="symptoms-list-display">
+            <span *ngFor="let symptom of symptomsList" class="symptom-badge">
+              ✓ {{ symptom }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Chat Area (placeholder) -->
+        <div class="chat-area">
+          <h4>Chat</h4>
+          <div class="chat-messages">
+            <div class="message doctor-message">
+              <p>How can I help you today?</p>
+              <small>Just now</small>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input type="text" placeholder="Type a message...">
+            <button>Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Call Controls Toolbar -->
+  <div class="toolbar-area" *ngIf="isCallActive && callPhase === 'in-call'">
+    <app-call-toolbar
+      [isAudioEnabled]="isAudioEnabled"
+      [isVideoEnabled]="isVideoEnabled"
+      [isScreenSharing]="isScreenSharing"
+      [isRecording]="false"
+      [callDuration]="callDuration"
+      [showAdvancedOptions]="false"
+      (toggleAudio)="onToggleAudio()"
+      (toggleVideo)="onToggleVideo()"
+      (toggleScreenShare)="onToggleScreenShare()"
+      (endCall)="onEndCall()">
+    </app-call-toolbar>
+  </div>
+
+  <!-- End Call Button for Waiting State -->
+  <div class="toolbar-area" *ngIf="callPhase === 'waiting'">
+    <button (click)="onEndCall()" class="btn-end-call">End Call</button>
+  </div>
+
+  <!-- Incoming call dialog -->
+  <app-incoming-call-dialog
+    [isVisible]="showIncomingDialog"
+    [callerName]="incomingCallInfo?.callerName || 'Unknown'"
+    [callerRole]="incomingCallInfo?.callerRole || 'Doctor'"
+    [callerAvatar]="incomingCallInfo?.callerAvatar || ''"
+    (accept)="onAcceptIncomingCall()"
+    (reject)="onRejectIncomingCall()">
+  </app-incoming-call-dialog>
+</div>

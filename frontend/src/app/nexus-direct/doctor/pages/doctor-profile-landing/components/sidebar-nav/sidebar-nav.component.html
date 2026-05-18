@@ -1,0 +1,65 @@
+<!-- Main Sidebar - Responsive visibility controlled by classes -->
+<aside class="sidebar-left"
+       [class.is-desktop]="!isMobile && !isTablet"
+       [class.is-mobile]="isMobile"
+       [class.is-tablet]="isTablet"
+       [class.collapsed]="sidebarCollapsed"
+       [class.mobile-open]="sidebarOpen && (isMobile || isTablet)">
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <!-- Dynamic Navigation Sections -->
+    <ng-container *ngFor="let section of navSections; let i = index">
+      <!-- Section Divider (skip before first section) -->
+      <div class="nav-divider" *ngIf="i > 0"></div>
+
+      <!-- Navigation Section -->
+      <div class="nav-section">
+        <!-- Section Header (if section has a name) -->
+        <div class="nav-label-header" *ngIf="section.name">
+          {{ section.name }}
+        </div>
+
+        <!-- Navigation Items -->
+        <ng-container *ngFor="let item of section.items">
+          <!-- Expandable Item (has children) -->
+          <div *ngIf="item.children && item.children.length > 0"
+               class="nav-item expandable"
+               [class.expanded]="isCareNexusExpanded"
+               (click)="toggleCareNexus()">
+            <i [ngClass]="item.icon" class="nav-icon"></i>
+            <span class="nav-label">{{ item.label }}</span>
+            <span class="expand-icon" [class.open]="isCareNexusExpanded">▶</span>
+          </div>
+
+          <!-- Submenu (children items) -->
+          <div *ngIf="item.children && item.children.length > 0"
+               class="nav-submenu"
+               [class.visible]="isCareNexusExpanded">
+            <div *ngFor="let child of item.children" class="nav-item sub-item">
+              <i [ngClass]="child.icon" class="nav-icon"></i>
+              <span class="nav-label">{{ child.label }}</span>
+            </div>
+          </div>
+
+          <!-- Regular Item (no children) -->
+          <div *ngIf="!item.children || item.children.length === 0" class="nav-item">
+            <i [ngClass]="item.icon" class="nav-icon"></i>
+            <span class="nav-label">{{ item.label }}</span>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </nav>
+
+  <!-- Chat Button -->
+  <button class="chat-btn">
+    <i class="fas fa-comments"></i>
+    <span class="chat-label">Chat with us</span>
+  </button>
+
+  <!-- Logout Button -->
+  <button class="logout-btn" (click)="logout()">
+    <i class="fas fa-sign-out-alt"></i>
+    <span class="logout-label">Logout</span>
+  </button>
+</aside>

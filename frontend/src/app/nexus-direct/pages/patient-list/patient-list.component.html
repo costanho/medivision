@@ -1,0 +1,135 @@
+<!-- LOADING STATE -->
+<div *ngIf="loading" class="loading-overlay">
+  <div class="spinner-container">
+    <div class="spinner"></div>
+    <p>Loading patients...</p>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="patient-list-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>👥 All Patients</h1>
+      <p class="subtitle">Total: {{ totalElements }} patient(s)</p>
+    </div>
+  </div>
+
+  <!-- ERROR MESSAGE -->
+  <div *ngIf="error" class="error-banner">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- SEARCH SECTION -->
+  <div class="search-section">
+    <div class="search-container">
+      <div class="search-input-group">
+        <select [(ngModel)]="searchType" class="search-type-select">
+          <option value="all">All Patients</option>
+          <option value="name">Search by Name</option>
+          <option value="email">Search by Email</option>
+        </select>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Enter name or email..."
+          (keyup.enter)="onSearch()"
+          class="search-input"
+          [disabled]="searchType === 'all'"
+        />
+      </div>
+      <div class="search-actions">
+        <button (click)="onSearch()" class="btn-search" [disabled]="loading || searchType === 'all' && !searchQuery">
+          🔍 Search
+        </button>
+        <button *ngIf="searchQuery" (click)="clearSearch()" class="btn-clear">
+          ✕ Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATIENTS TABLE -->
+  <div class="table-container" *ngIf="!loading && patients.length > 0">
+    <table class="patients-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Allergies</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let patient of patients" class="patient-row">
+          <td class="patient-name">{{ patient.name }}</td>
+          <td class="patient-email">{{ patient.userEmail || patient.email || 'N/A' }}</td>
+          <td class="patient-age">{{ patient.age || 'N/A' }}</td>
+          <td class="patient-gender">{{ patient.gender || 'N/A' }}</td>
+          <td class="patient-phone">{{ patient.phoneNumber || 'N/A' }}</td>
+          <td class="patient-address">{{ patient.address || 'N/A' }}</td>
+          <td class="patient-allergies" [title]="patient.allergies || 'None'">
+            {{ (patient.allergies || 'None') | slice:0:30 }}{{ (patient.allergies?.length || 0) > 30 ? '...' : '' }}
+          </td>
+          <td class="patient-actions">
+            <button class="btn-view" [routerLink]="['/patient', patient.id, 'profile']" title="View Profile">
+              👁️ View
+            </button>
+            <button class="btn-message" [routerLink]="['/messages', patient.userEmail]" title="Message Patient">
+              💬 Message
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="!loading && patients.length === 0" class="empty-state">
+    <p class="empty-icon">👥</p>
+    <p class="empty-message">{{ searchQuery ? 'No patients found' : 'No patients available' }}</p>
+  </div>
+
+  <!-- PAGINATION -->
+  <div *ngIf="!loading && totalPages > 0" class="pagination-container">
+    <div class="pagination-info">
+      <span>Page {{ currentPage + 1 }} of {{ totalPages }} | Showing {{ patients.length }} of {{ totalElements }} patients</span>
+    </div>
+
+    <div class="pagination-controls">
+      <button
+        (click)="previousPage()"
+        [disabled]="currentPage === 0"
+        class="btn-pagination"
+        title="Previous page"
+      >
+        ◀ Previous
+      </button>
+
+      <div class="page-numbers">
+        <button
+          *ngFor="let page of pageNumbers"
+          (click)="goToPage(page)"
+          [class.active]="page === currentPage"
+          class="page-number"
+        >
+          {{ page + 1 }}
+        </button>
+      </div>
+
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage >= totalPages - 1"
+        class="btn-pagination"
+        title="Next page"
+      >
+        Next ▶
+      </button>
+    </div>
+  </div>
+</div>

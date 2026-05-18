@@ -1,0 +1,98 @@
+<div class="video-call-container" *ngIf="callState.isActive">
+  <div class="video-grid">
+    <!-- Remote Video (Full Screen) -->
+    <div class="remote-video-container">
+      <video
+        #remoteVideo
+        [attr.id]="'remote-video-' + callId"
+        class="video-element"
+        autoplay
+        playsinline
+      ></video>
+      <div class="participant-info">
+        <span class="participant-name">{{ participantName }}</span>
+      </div>
+    </div>
+
+    <!-- Local Video (Picture in Picture) -->
+    <div class="local-video-container">
+      <video
+        #localVideo
+        [attr.id]="'local-video-' + callId"
+        class="video-element"
+        autoplay
+        playsinline
+        muted
+      ></video>
+      <div class="local-label">You</div>
+    </div>
+  </div>
+
+  <!-- Call Header -->
+  <div class="call-header">
+    <div class="call-info">
+      <h3>{{ participantName }}</h3>
+      <span class="call-duration">{{ callDuration }}</span>
+    </div>
+    <div class="participant-count">
+      <span>{{ callState.participantCount }} participants</span>
+    </div>
+  </div>
+
+  <!-- Call Controls -->
+  <div class="call-controls">
+    <!-- Microphone Control -->
+    <button
+      class="control-btn mic-btn"
+      [class.disabled]="callState.isMuted"
+      (click)="toggleAudio()"
+      title="Toggle microphone"
+    >
+      <span *ngIf="!callState.isMuted">🎤</span>
+      <span *ngIf="callState.isMuted">🔇</span>
+    </button>
+
+    <!-- Video Control -->
+    <button
+      class="control-btn video-btn"
+      [class.disabled]="!callState.isVideo"
+      (click)="toggleVideo()"
+      title="Toggle video"
+    >
+      <span *ngIf="callState.isVideo">📹</span>
+      <span *ngIf="!callState.isVideo">📷</span>
+    </button>
+
+    <!-- Screen Share Control -->
+    <button
+      class="control-btn screen-btn"
+      [class.active]="callState.isScreenSharing"
+      (click)="toggleScreenShare()"
+      title="Share screen"
+    >
+      <span>🖥️</span>
+    </button>
+
+    <!-- End Call Control -->
+    <button
+      class="control-btn end-btn"
+      (click)="endCall()"
+      title="End call"
+    >
+      <span>📞</span>
+    </button>
+  </div>
+
+  <!-- Call Status -->
+  <div class="call-status">
+    <div class="status-item" *ngIf="callState.isMuted">
+      <span class="status-badge">Muted</span>
+    </div>
+    <div class="status-item" *ngIf="!callState.isVideo">
+      <span class="status-badge">Video Off</span>
+    </div>
+    <div class="status-item" *ngIf="callState.isScreenSharing">
+      <span class="status-badge">Sharing Screen</span>
+    </div>
+  </div>
+</div>

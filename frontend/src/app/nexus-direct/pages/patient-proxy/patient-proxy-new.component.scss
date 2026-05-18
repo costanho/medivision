@@ -1,0 +1,425 @@
+$primary: #667eea;
+$secondary: #764ba2;
+$text-dark: #333;
+$text-light: #666;
+$bg-light: #f8f9fa;
+$border: #e0e0e0;
+$shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+.header {
+  background: linear-gradient(135deg, $primary, $secondary);
+  color: white;
+  padding: 40px 20px;
+  margin-bottom: 30px;
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 32px;
+    margin: 15px 0 5px;
+  }
+
+  p {
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  .back-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+
+    &:hover {
+      background: rgba(255,255,255,0.3);
+    }
+  }
+}
+
+.stats {
+  padding: 0 20px 30px;
+
+  .stats-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  gap: 15px;
+  box-shadow: $shadow;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .stat-icon {
+    font-size: 32px;
+  }
+
+  .stat-content {
+    flex: 1;
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: $text-light;
+      margin-top: 3px;
+    }
+  }
+}
+
+.tabs-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid $border;
+  overflow-x: auto;
+
+  button {
+    background: none;
+    border: none;
+    padding: 15px 20px;
+    font-weight: 600;
+    color: $text-light;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    white-space: nowrap;
+
+    &:hover {
+      color: $text-dark;
+    }
+
+    &.active {
+      color: $primary;
+      border-bottom-color: $primary;
+    }
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.3s;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+
+  h2 {
+    margin: 0;
+    font-size: 28px;
+  }
+}
+
+.dependents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.dependent-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: $shadow;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+
+  .card-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: flex-start;
+
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      color: white;
+    }
+
+    .header-content {
+      flex: 1;
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 3px 0 0;
+        font-size: 13px;
+        color: $text-light;
+      }
+    }
+
+    .status-badge {
+      background: #e8f5e9;
+      color: #4caf50;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+  }
+
+  .card-info {
+    padding: 15px 0;
+    border-top: 1px solid $border;
+    border-bottom: 1px solid $border;
+    margin: 15px 0;
+
+    p {
+      margin: 0;
+      font-size: 13px;
+
+      strong {
+        color: $text-dark;
+      }
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.health-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.health-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: $shadow;
+
+  .health-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid $border;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .health-score {
+      text-align: center;
+
+      .score-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: $primary;
+      }
+
+      .score-label {
+        font-size: 11px;
+        color: $text-light;
+        display: block;
+      }
+    }
+  }
+
+  .health-details {
+    margin-bottom: 20px;
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      font-size: 13px;
+
+      strong {
+        color: $text-dark;
+      }
+
+      span {
+        color: $text-light;
+      }
+    }
+  }
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.appointment-item {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .appt-left {
+    flex: 1;
+
+    .appt-dependent {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .appt-doctor,
+    .appt-time {
+      font-size: 13px;
+      color: $text-light;
+      margin: 3px 0;
+    }
+  }
+
+  .status-badge {
+    background: #e8f5e9;
+    color: #4caf50;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.record-item {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: $shadow;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .record-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .record-info {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 5px;
+      font-size: 15px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 12px;
+      color: $text-light;
+    }
+  }
+}
+
+.btn-primary,
+.btn-secondary {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: $primary;
+  color: white;
+
+  &:hover {
+    background: darken($primary, 10%);
+  }
+}
+
+.btn-secondary {
+  background: $bg-light;
+  color: $text-dark;
+  border: 1px solid $border;
+
+  &:hover {
+    background: darken($bg-light, 5%);
+  }
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .stats .stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .dependents-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .appointment-item,
+  .record-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

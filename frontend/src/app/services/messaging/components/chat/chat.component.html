@@ -1,0 +1,84 @@
+<!-- Chat Component Template -->
+<!-- Displays messages for selected conversation -->
+
+<div class="chat-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="header-content">
+      <div class="conversation-info">
+        <h2 *ngIf="conversation" class="conversation-title">
+          {{ (authIntegration.getAuthenticatedUser()?.id === conversation.patientId ? conversation.doctorName : conversation.patientName) || 'Unknown' }}
+        </h2>
+        <p *ngIf="conversation" class="conversation-email">
+          {{ (authIntegration.getAuthenticatedUser()?.id === conversation.patientId ? conversation.doctorEmail : conversation.patientEmail) || 'No email' }}
+        </p>
+      </div>
+    </div>
+    <button class="close-btn" (click)="closeChat()" title="Close chat">
+      ✕
+    </button>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="messages-container" (scroll)="onScroll($event)" #messagesContainer>
+    <!-- Load More Button -->
+    <div *ngIf="showLoadMore && !isLoading" class="load-more-container">
+      <button class="load-more-btn" (click)="loadMoreMessages()">
+        Load More Messages
+      </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p class="loading-text">Loading messages...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && messages.length === 0" class="empty-state">
+      <div class="empty-icon">💬</div>
+      <p class="empty-title">No messages yet</p>
+      <p class="empty-subtitle">Start a conversation with this user</p>
+    </div>
+
+    <!-- Messages List -->
+    <div class="messages-list" *ngIf="messages.length > 0">
+      <app-chat-message-item
+        *ngFor="let message of messages"
+        [message]="message"
+        [isSent]="isMessageFromCurrentUser(message.senderId)"
+        (messageViewed)="markAsRead(message)"
+      ></app-chat-message-item>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div *ngIf="showTypingIndicator()" class="typing-indicator">
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <p class="typing-text">{{ getTypingIndicatorText() }}</p>
+    </div>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="error" class="error-alert">
+    <span class="error-icon">⚠️</span>
+    <span class="error-message">{{ error }}</span>
+    <button class="error-close" (click)="dismissError()" title="Close error">✕</button>
+  </div>
+
+  <!-- Message Input Area -->
+  <app-message-input
+    [isSending]="isSending"
+    [isDisabled]="!conversation"
+    placeholder="Type a message..."
+    [maxLength]="5000"
+    [autoFocus]="true"
+    [showCharacterCount]="false"
+    (messageSent)="onMessageSent($event)"
+    (typingStarted)="onTypingStarted()"
+    (typingStopped)="onTypingStopped()"
+  ></app-message-input>
+</div>

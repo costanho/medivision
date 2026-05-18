@@ -1,0 +1,55 @@
+<!-- Message Input Component -->
+<!-- Allows users to compose and send messages -->
+
+<div class="message-input-wrapper">
+  <!-- Character count (optional) -->
+  <div *ngIf="showCharacterCount" class="character-count" [class.warning]="characterCount > maxLength * 0.8" [class.error]="isMessageTooLong()">
+    <span class="count-number">{{ characterCount }}</span>
+    <span class="count-separator">/</span>
+    <span class="count-max">{{ maxLength }}</span>
+  </div>
+
+  <!-- Input container -->
+  <div class="input-container">
+    <!-- Text input -->
+    <textarea
+      #messageInput
+      class="message-textarea"
+      [value]="messageContent"
+      [placeholder]="placeholder"
+      [disabled]="isInputDisabled()"
+      [attr.maxlength]="maxLength"
+      (input)="onInputChange($event)"
+      (keydown)="onKeyDown($event)"
+      rows="1"
+      aria-label="Message input"
+    ></textarea>
+
+    <!-- Send button -->
+    <button
+      [ngClass]="getSendButtonClass()"
+      [disabled]="isSendDisabled()"
+      (click)="sendMessage()"
+      [title]="isSendDisabled() ? 'Enter a message to send' : 'Send message (Enter)'"
+      aria-label="Send message"
+    >
+      <!-- Send icon or spinner -->
+      <span *ngIf="!isSending" class="send-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1.5 10L17.5 2.5L10 18.5L8 10H1.5Z" fill="currentColor" />
+        </svg>
+      </span>
+      <span *ngIf="isSending" class="send-spinner"></span>
+    </button>
+  </div>
+
+  <!-- Helper text (error messages) -->
+  <div *ngIf="isMessageTooLong()" class="error-text">
+    ⚠️ Message exceeds maximum length ({{ characterCount - maxLength }} characters over limit)
+  </div>
+
+  <!-- Hint text -->
+  <div *ngIf="!isMessageTooLong() && messageContent.length > 0" class="hint-text">
+    {{ isSending ? '⏳ Sending...' : showCharacterCount ? 'Press Enter to send' : '' }}
+  </div>
+</div>

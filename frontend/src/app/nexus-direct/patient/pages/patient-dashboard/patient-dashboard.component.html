@@ -1,0 +1,26 @@
+<!-- CONTAINER -->
+<div class="dashboard-container">
+  <!-- TOP NAVBAR -->
+  <app-top-navbar [currentUser]="currentUser" (menuClick)="toggleSidebar()"></app-top-navbar>
+
+  <!-- MAIN WRAPPER -->
+  <div class="dashboard-wrapper">
+    <!-- SIDEBAR -->
+    <app-dashboard-sidebar [currentUser]="currentUser" [showDrawer]="sidebarOpen" (closeDrawer)="closeSidebar()"></app-dashboard-sidebar>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- Show dashboard components only when activeComponent is 'dashboard' -->
+      <ng-container *ngIf="activeComponent === 'dashboard'">
+        <!-- Quick Stats -->
+        <app-quick-stats></app-quick-stats>
+
+        <!-- Recent Activity -->
+        <app-recent-activity></app-recent-activity>
+      </ng-container>
+
+      <!-- Show nested route components (profile, settings, etc.) via router-outlet -->
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

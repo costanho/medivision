@@ -1,0 +1,461 @@
+<div class="scrollable-wrapper">
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="header-content">
+      <h1><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M6 20c0-2 4-3 6-3s6 1 6 3"></path></svg> My Profile</h1>
+      <p class="subtitle">Manage your personal and account information</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="success" class="success-message">
+    {{ success }}
+  </div>
+
+  <!-- Password Error/Success -->
+  <div *ngIf="passwordError" class="error-message">
+    {{ passwordError }}
+  </div>
+
+  <div *ngIf="passwordSuccess" class="success-message">
+    {{ passwordSuccess }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div *ngIf="patient && !loading" class="tab-navigation">
+    <button
+      (click)="selectTab('personal')"
+      [class.active]="activeTab === 'personal'"
+      class="tab-button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"></circle>
+        <path d="M6 20c0-2 4-3 6-3s6 1 6 3"></path>
+      </svg> Personal Information
+    </button>
+    <button
+      (click)="selectTab('security')"
+      [class.active]="activeTab === 'security'"
+      class="tab-button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg> Security & Password
+    </button>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="patient && !loading" class="profile-content">
+    <form *ngIf="editing" [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+      <!-- Email (Read-only) -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          [value]="authUser?.email || patient?.userEmail || ''"
+          class="form-control"
+          disabled
+          readonly
+        />
+        <small class="text-muted">Email cannot be changed</small>
+      </div>
+
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="fullName">Full Name *</label>
+        <input
+          type="text"
+          id="fullName"
+          formControlName="fullName"
+          class="form-control"
+          [class.is-invalid]="submitted && f['fullName'].errors"
+          placeholder="Enter your full name"
+        />
+        <div *ngIf="submitted && f['fullName'].errors" class="error-text">
+          <div *ngIf="f['fullName'].errors['required']">Full name is required</div>
+          <div *ngIf="f['fullName'].errors['minlength']">Full name must be at least 2 characters</div>
+        </div>
+      </div>
+
+      <!-- First Name -->
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input
+          type="text"
+          id="firstName"
+          formControlName="firstName"
+          class="form-control"
+          placeholder="Enter your first name"
+        />
+      </div>
+
+      <!-- Last Name -->
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input
+          type="text"
+          id="lastName"
+          formControlName="lastName"
+          class="form-control"
+          placeholder="Enter your last name"
+        />
+      </div>
+
+      <!-- Phone -->
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input
+          type="tel"
+          id="phone"
+          formControlName="phone"
+          class="form-control"
+          placeholder="+1 (555) 123-4567"
+        />
+      </div>
+
+      <!-- Date of Birth -->
+      <div class="form-group">
+        <label for="dateOfBirth">Date of Birth</label>
+        <input
+          type="date"
+          id="dateOfBirth"
+          formControlName="dateOfBirth"
+          class="form-control"
+        />
+      </div>
+
+      <!-- Gender -->
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender" formControlName="gender" class="form-control">
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <!-- Profile Picture URL -->
+      <div class="form-group">
+        <label for="profilePictureUrl">Profile Picture URL</label>
+        <input
+          type="url"
+          id="profilePictureUrl"
+          formControlName="profilePictureUrl"
+          class="form-control"
+          placeholder="https://example.com/profile-picture.jpg"
+        />
+      </div>
+
+      <!-- Street Address -->
+      <div class="form-group">
+        <label for="streetAddress">Street Address</label>
+        <input
+          type="text"
+          id="streetAddress"
+          formControlName="streetAddress"
+          class="form-control"
+          placeholder="123 Main Street"
+        />
+      </div>
+
+      <!-- City -->
+      <div class="form-group">
+        <label for="city">City</label>
+        <input
+          type="text"
+          id="city"
+          formControlName="city"
+          class="form-control"
+          placeholder="New York"
+        />
+      </div>
+
+      <!-- State -->
+      <div class="form-group">
+        <label for="state">State/Province</label>
+        <input
+          type="text"
+          id="state"
+          formControlName="state"
+          class="form-control"
+          placeholder="NY"
+        />
+      </div>
+
+      <!-- Zip Code -->
+      <div class="form-group">
+        <label for="zipCode">Zip/Postal Code</label>
+        <input
+          type="text"
+          id="zipCode"
+          formControlName="zipCode"
+          class="form-control"
+          placeholder="10001"
+        />
+      </div>
+
+      <!-- Country -->
+      <div class="form-group">
+        <label for="country">Country</label>
+        <input
+          type="text"
+          id="country"
+          formControlName="country"
+          class="form-control"
+          placeholder="United States"
+        />
+      </div>
+
+      <!-- Form Buttons -->
+      <div class="form-actions">
+        <button type="submit" [disabled]="savingProfile" class="btn-primary">
+          <span *ngIf="!savingProfile"><i class="fas fa-save"></i> Save Changes</span>
+          <span *ngIf="savingProfile"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+        </button>
+        <button type="button" (click)="toggleEdit()" [disabled]="savingProfile" class="btn-secondary"><i class="fas fa-times"></i> Cancel</button>
+      </div>
+    </form>
+
+    <!-- PERSONAL INFORMATION TAB -->
+    <div *ngIf="activeTab === 'personal'" class="tab-content">
+      <!-- View Mode -->
+      <div *ngIf="!editing" class="profile-view">
+        <div class="profile-section">
+          <div class="card-header">
+            <h2><i class="fas fa-user"></i> Personal Information</h2>
+            <p class="card-description">Your basic personal details and contact information</p>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Email Address</label>
+              <p>{{ authUser?.email || patient?.userEmail || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Full Name</label>
+              <p>{{ patient?.fullName || patient?.name || authUser?.fullName || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>First Name</label>
+              <p>{{ patient?.firstName || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Last Name</label>
+              <p>{{ patient?.lastName || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Phone Number</label>
+              <p>{{ patient?.phone || patient?.phoneNumber || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Date of Birth</label>
+              <p>{{ patient?.dateOfBirth || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Gender</label>
+              <p>{{ patient?.gender || 'Not provided' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <div class="card-header">
+            <h2><i class="fas fa-image"></i> Profile Picture</h2>
+            <p class="card-description">Your profile picture displayed across the platform</p>
+          </div>
+          <div *ngIf="patient?.profilePictureUrl" class="info-item">
+            <img [src]="patient?.profilePictureUrl" alt="Profile Picture" style="max-width: 200px; border-radius: 8px;">
+          </div>
+          <div *ngIf="!patient?.profilePictureUrl" class="info-item">
+            <p style="color: #999;">No profile picture uploaded</p>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <div class="card-header">
+            <h2><i class="fas fa-map-marker-alt"></i> Address Information</h2>
+            <p class="card-description">Your residential address and location details</p>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Street Address</label>
+              <p>{{ patient?.streetAddress || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>City</label>
+              <p>{{ patient?.city || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>State/Province</label>
+              <p>{{ patient?.state || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Zip/Postal Code</label>
+              <p>{{ patient?.zipCode || 'Not provided' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Country</label>
+              <p>{{ patient?.country || 'Not provided' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons at Bottom -->
+        <div *ngIf="!editing" class="form-actions">
+          <button type="button" (click)="toggleEdit()" class="btn-primary">
+            <i class="fas fa-edit"></i> Edit Profile
+          </button>
+          <button type="button" (click)="goBackToDashboard()" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY & PASSWORD TAB -->
+    <div *ngIf="activeTab === 'security'" class="tab-content">
+      <div class="security-section">
+        <!-- Password Change Card -->
+        <div class="security-card">
+          <div class="card-header">
+            <h2><i class="fas fa-lock"></i> Change Password</h2>
+            <p class="card-description">Keep your account secure by updating your password regularly</p>
+          </div>
+
+          <div *ngIf="!showPasswordForm" class="card-body">
+            <div class="security-info">
+              <div class="info-item">
+                <label>Current Password Status</label>
+                <p>Last changed: Never (consider updating your password)</p>
+              </div>
+            </div>
+            <button (click)="togglePasswordForm()" class="btn-primary">
+              <i class="fas fa-key"></i> Change Password
+            </button>
+          </div>
+
+          <div *ngIf="showPasswordForm" class="password-form-container">
+            <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="password-form">
+              <!-- Current Password -->
+              <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  formControlName="currentPassword"
+                  class="form-control"
+                  placeholder="Enter your current password"
+                  [class.is-invalid]="passwordSubmitted && p['currentPassword'].errors"
+                />
+                <div *ngIf="passwordSubmitted && p['currentPassword'].errors" class="error-text">
+                  <div *ngIf="p['currentPassword'].errors['required']">Current password is required</div>
+                  <div *ngIf="p['currentPassword'].errors['minlength']">Password must be at least 6 characters</div>
+                </div>
+              </div>
+
+              <!-- New Password -->
+              <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  formControlName="newPassword"
+                  class="form-control"
+                  placeholder="Enter new password (min 8 characters)"
+                  [class.is-invalid]="passwordSubmitted && p['newPassword'].errors"
+                />
+                <div *ngIf="passwordSubmitted && p['newPassword'].errors" class="error-text">
+                  <div *ngIf="p['newPassword'].errors['required']">New password is required</div>
+                  <div *ngIf="p['newPassword'].errors['minlength']">Password must be at least 8 characters</div>
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  formControlName="confirmPassword"
+                  class="form-control"
+                  placeholder="Re-enter new password"
+                  [class.is-invalid]="passwordSubmitted && (p['confirmPassword'].errors || passwordForm.errors?.['passwordMismatch'])"
+                />
+                <div *ngIf="passwordSubmitted && getPasswordErrorMessage()" class="error-text">
+                  {{ getPasswordErrorMessage() }}
+                </div>
+              </div>
+
+              <!-- Password Strength Indicator -->
+              <div class="password-strength">
+                <p class="strength-label">Password Strength:</p>
+                <div class="strength-bar">
+                  <div class="strength-fill weak"></div>
+                </div>
+                <p class="strength-text">Use a mix of uppercase, lowercase, numbers, and symbols for better security</p>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <button type="submit" [disabled]="passwordLoading" class="btn-primary">
+                  <span *ngIf="!passwordLoading"><i class="fas fa-save"></i> Update Password</span>
+                  <span *ngIf="passwordLoading"><i class="fas fa-hourglass-end"></i> Updating...</span>
+                </button>
+                <button type="button" (click)="togglePasswordForm()" class="btn-secondary">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Account Security Info -->
+        <div class="security-card">
+          <div class="card-header">
+            <h2><i class="fas fa-shield-alt"></i> Account Security</h2>
+          </div>
+          <div class="card-body">
+            <div class="security-features">
+              <div class="feature">
+                <div class="feature-icon"><i class="fas fa-check"></i></div>
+                <div class="feature-content">
+                  <h3>Two-Factor Authentication</h3>
+                  <p>Add an extra layer of security to your account</p>
+                  <button class="btn-link">Enable 2FA</button>
+                </div>
+              </div>
+              <div class="feature">
+                <div class="feature-icon"><i class="fas fa-check"></i></div>
+                <div class="feature-content">
+                  <h3>Login History</h3>
+                  <p>Review recent logins and active sessions</p>
+                  <button class="btn-link">View Activity</button>
+                </div>
+              </div>
+              <div class="feature">
+                <div class="feature-icon"><i class="fas fa-check"></i></div>
+                <div class="feature-content">
+                  <h3>Connected Devices</h3>
+                  <p>Manage devices with access to your account</p>
+                  <button class="btn-link">Manage Devices</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

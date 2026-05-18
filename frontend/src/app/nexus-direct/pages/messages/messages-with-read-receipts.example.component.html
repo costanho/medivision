@@ -1,0 +1,173 @@
+<!-- Messages Component with Read Receipts Integration Example -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="header-title" *ngIf="selectedConversationId">
+        <span class="participant-name">
+          {{
+            (conversations | find:{ id: selectedConversationId } | async)?.participantName ||
+            'Chat'
+          }}
+        </span>
+        <span class="unread-badge" *ngIf="getUnreadCount() > 0">
+          {{ getUnreadCount() }} unread
+        </span>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Error State -->
+  <ion-card *ngIf="state.error" class="error-card">
+    <ion-card-header>
+      <ion-card-title color="danger">Error</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{ state.error }}
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading State -->
+  <div *ngIf="state.isLoading && messages.length === 0" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading messages...</p>
+  </div>
+
+  <!-- Conversations List (Sidebar/Drawer) -->
+  <div class="conversations-panel" *ngIf="conversations.length > 0">
+    <h3>Conversations</h3>
+    <div class="conversations-list">
+      <div
+        class="conversation-item"
+        *ngFor="let conversation of conversations; trackBy: trackByConversationId"
+        [class.selected]="conversation.id === selectedConversationId"
+        (click)="selectConversation(conversation.id)"
+      >
+        <img
+          *ngIf="conversation.participantProfileImage"
+          [src]="conversation.participantProfileImage"
+          [alt]="conversation.participantName"
+          class="participant-avatar"
+        />
+        <div *ngIf="!conversation.participantProfileImage" class="avatar-placeholder">
+          {{ conversation.participantName[0]?.toUpperCase() || '?' }}
+        </div>
+
+        <div class="conversation-info">
+          <div class="participant-name-header">
+            {{ conversation.participantName }}
+          </div>
+          <div class="last-message-preview">
+            {{ conversation.lastMessage || 'No messages yet' }}
+          </div>
+        </div>
+
+        <div *ngIf="conversation.unreadCount > 0" class="unread-indicator">
+          {{ conversation.unreadCount }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Container -->
+  <div #messagesContainer class="messages-container" *ngIf="selectedConversationId">
+    <!-- Load More Button -->
+    <ion-button
+      *ngIf="state.hasMoreMessages"
+      (click)="loadMoreMessages()"
+      [disabled]="state.isLoadingMore"
+      expand="block"
+      class="load-more-btn"
+    >
+      <ion-spinner name="crescent" *ngIf="state.isLoadingMore"></ion-spinner>
+      <span *ngIf="!state.isLoadingMore">Load earlier messages</span>
+    </ion-button>
+
+    <!-- Messages List -->
+    <div
+      class="message"
+      *ngFor="let message of messages; trackBy: trackByMessageId"
+      [class.own-message]="isOwnMessage(message)"
+      appMessageVisibility
+      [messageId]="message.id"
+      [conversationId]="message.conversationId"
+      [visibilityThreshold]="0.5"
+    >
+      <!-- Message Content -->
+      <div class="message-bubble">
+        <!-- Sender Info (for other users' messages) -->
+        <div class="message-sender" *ngIf="!isOwnMessage(message)">
+          <img
+            *ngIf="message.senderProfileImage"
+            [src]="message.senderProfileImage"
+            [alt]="message.senderName"
+            class="sender-avatar"
+          />
+          <strong>{{ message.senderName }}</strong>
+        </div>
+
+        <!-- Message Content -->
+        <div class="message-text">
+          {{ message.content }}
+        </div>
+
+        <!-- Message Footer with Time and Read Status -->
+        <div class="message-footer">
+          <!-- Timestamp -->
+          <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+
+          <!-- Read Status (only for own messages) -->
+          <span
+            *ngIf="isOwnMessage(message)"
+            class="read-status"
+            [class.unread]="!isMessageRead(message.id)"
+            [class.read]="isMessageRead(message.id)"
+            title="Read status"
+          >
+            <span *ngIf="!isMessageRead(message.id)" class="checkmark">✓</span>
+            <span *ngIf="isMessageRead(message.id)" class="checkmark double">✓✓</span>
+          </span>
+        </div>
+
+        <!-- Read Time (optional: show when message is read) -->
+        <div class="read-time" *ngIf="isOwnMessage(message) && isMessageRead(message.id)">
+          Read at {{ formatReadTime(getReadTime(message.id)!) }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!selectedConversationId && !state.isLoading" class="empty-state">
+    <ion-icon name="chatbubbles-outline"></ion-icon>
+    <h2>No Conversation Selected</h2>
+    <p>Select a conversation from the list to start messaging</p>
+  </div>
+</ion-content>
+
+<!-- Message Input Footer -->
+<ion-footer *ngIf="selectedConversationId">
+  <div class="message-input-container">
+    <ion-item>
+      <ion-input
+        [(ngModel)]="newMessageContent"
+        placeholder="Type a message..."
+        (keydown.enter)="sendMessage()"
+        class="message-input"
+      ></ion-input>
+      <ion-button
+        (click)="sendMessage()"
+        [disabled]="!newMessageContent.trim()"
+        slot="end"
+        color="primary"
+      >
+        <ion-icon name="send"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </div>
+</ion-footer>

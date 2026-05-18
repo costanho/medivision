@@ -1,0 +1,170 @@
+// Color Variables
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$text-dark: #1a1a1a;
+$text-main: #333;
+$text-light: #666;
+$text-lighter: #999;
+$bg-white: #fff;
+$bg-light: #f8f9fa;
+$border-color: #e0e0e0;
+$success-color: #4caf50;
+$warning-color: #ff9800;
+$info-color: #00bcd4;
+
+// ─────────────────────────────────────────────────────────────────────────
+// RECENT ACTIVITY SECTION
+// ─────────────────────────────────────────────────────────────────────────
+
+.recent-activity-section {
+  padding: 30px;
+  background: $bg-light;
+
+  .section-header {
+    margin-bottom: 30px;
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: $text-light;
+      margin: 0;
+    }
+  }
+
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: $bg-white;
+  border-radius: 8px;
+  border-left: 4px solid $border-color;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-left-color: $primary-color;
+  }
+
+  &[data-status='confirmed'] {
+    border-left-color: $success-color;
+
+    .activity-icon {
+      color: $success-color;
+      background: rgba($success-color, 0.1);
+    }
+  }
+
+  &[data-status='new'] {
+    border-left-color: $info-color;
+
+    .activity-icon {
+      color: $info-color;
+      background: rgba($info-color, 0.1);
+    }
+  }
+
+  &[data-status='scheduled'] {
+    border-left-color: $primary-color;
+
+    .activity-icon {
+      color: $primary-color;
+      background: rgba($primary-color, 0.1);
+    }
+  }
+
+  .activity-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .activity-content {
+    flex: 1;
+
+    .activity-title {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-main;
+    }
+
+    .activity-description {
+      margin: 0 0 4px 0;
+      font-size: 13px;
+      color: $text-light;
+    }
+
+    .activity-date {
+      font-size: 12px;
+      color: $text-lighter;
+      font-weight: 500;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// RESPONSIVE
+// ─────────────────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .recent-activity-section {
+    padding: 20px;
+
+    .section-header {
+      margin-bottom: 20px;
+
+      h2 {
+        font-size: 20px;
+      }
+
+      p {
+        font-size: 13px;
+      }
+    }
+  }
+
+  .activity-item {
+    padding: 12px;
+    gap: 12px;
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    }
+
+    .activity-content {
+      .activity-title {
+        font-size: 13px;
+      }
+
+      .activity-description {
+        font-size: 12px;
+      }
+
+      .activity-date {
+        font-size: 11px;
+      }
+    }
+  }
+}

@@ -1,0 +1,294 @@
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { PatientService } from '../../../../services/patient.service';
+
+// Import shared WebRTC components
+import {
+  VideoContainerComponent,
+  CallToolbarComponent,
+  ParticipantListComponent,
+  IncomingCallDialogComponent
+} from '../../../shared/index';
+
+/**
+ * DoctorCallScreenComponent
+ * Doctor's consultation interface for managing patient calls
+ * Displays patient information, medical history, and consultation details
+ * Full controls for call management
+ */
+
+@Component({
+  selector: 'app-doctor-call-screen',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    VideoContainerComponent,
+    CallToolbarComponent,
+    ParticipantListComponent,
+    IncomingCallDialogComponent
+  ],
+  providers: [PatientService],
+  templateUrl: './doctor-call-screen.component.html',
+  styleUrls: ['./doctor-call-screen.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class DoctorCallScreenComponent implements OnInit, OnDestroy {
+  @Input() patientId: string = '';
+  @Input() consultationId: string = '';
+
+  // Call state
+  isCallActive = false;
+  isAudioEnabled = true;
+  isVideoEnabled = true;
+  isScreenSharing = false;
+  isRecording = false;
+  callDuration = 0;
+  callStartTime: Date | null = null;
+
+  // Media streams
+  localStream: MediaStream | null = null;
+  remoteStreams = new Map<string, MediaStream>();
+
+  // Call participants and patient info
+  selectedPatient: any = null;
+  participants: any[] = [];
+  incomingCallInfo: any = null;
+  showIncomingDialog = false;
+
+  // Available patients and patient queue
+  availablePatients: any[] = [];
+  isLoadingPatients = true;
+  patientLoadError = '';
+
+  // Search functionality
+  searchQuery: string = '';
+  filteredPatients: any[] = [];
+  noResultsFound = false;
+
+  // Consultation details
+  consultationReason: string = '';
+  consultationNotes: string = '';
+  prescriptionNotes: string = '';
+
+  // UI state
+  currentLayout: 'grid' | 'focus' = 'focus';
+  focusedUserId: string | null = null;
+  showParticipantList = true;
+  showPatientSelector = false;
+  callPhase: 'select-patient' | 'waiting' | 'in-call' | 'ended' = 'select-patient';
+
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private patientService: PatientService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadPatients();
+    if (this.patientId) {
+      this.focusedUserId = this.patientId;
+    }
+  }
+
+  /**
+   * Load patients from database
+   */
+  private loadPatients(): void {
+    this.isLoadingPatients = true;
+    this.patientLoadError = '';
+
+    this.patientService
+      .getAllPatients(0, 50)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.availablePatients = (response.content || []).map((patient: any) => ({
+            id: patient.id,
+            name: patient.name || 'Unknown Patient',
+            email: patient.email || '',
+            phone: patient.phone || '',
+            age: patient.age || 'N/A',
+            gender: patient.gender || 'Not specified',
+            lastVisit: patient.lastVisitDate || 'Never',
+            medicalHistory: patient.medicalHistory || [],
+            avatar: this.getPatientInitials(patient.name || 'Patient')
+          }));
+          // Initialize filtered list with all patients
+          this.filteredPatients = this.availablePatients;
+          this.isLoadingPatients = false;
+          this.changeDetectorRef.markForCheck();
+        },
+        error: (error: any) => {
+          console.error('Error loading patients:', error);
+          this.patientLoadError = 'Failed to load patients. Please try again.';
+          this.isLoadingPatients = false;
+          this.changeDetectorRef.markForCheck();
+        }
+      });
+  }
+
+  /**
+   * Generate initials avatar from patient name
+   */
+  private getPatientInitials(name: string): string {
+    const parts = name.split(' ').filter(p => p);
+    return parts.slice(0, 2).map(p => p.charAt(0).toUpperCase()).join('');
+  }
+
+  /**
+   * Search patients by name, email, or phone
+   */
+  onSearchChange(query: string): void {
+    this.searchQuery = query.toLowerCase().trim();
+
+    if (!this.searchQuery) {
+      // Reset to show all if search is empty
+      this.filteredPatients = this.availablePatients;
+      this.noResultsFound = false;
+      this.changeDetectorRef.markForCheck();
+      return;
+    }
+
+    // Filter patients by name, email, or phone
+    this.filteredPatients = this.availablePatients.filter((patient: any) =>
+      patient.name.toLowerCase().includes(this.searchQuery) ||
+      patient.email.toLowerCase().includes(this.searchQuery) ||
+      (patient.phone && patient.phone.includes(this.searchQuery))
+    );
+
+    // Check if no results found
+    this.noResultsFound = this.filteredPatients.length === 0;
+    this.changeDetectorRef.markForCheck();
+  }
+
+  /**
+   * Clear search and reset to show all
+   */
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.filteredPatients = this.availablePatients;
+    this.noResultsFound = false;
+    this.changeDetectorRef.markForCheck();
+  }
+
+  /**
+   * Select a patient and initiate call
+   */
+  selectPatient(patient: any): void {
+    this.selectedPatient = patient;
+    this.callPhase = 'waiting';
+    this.isCallActive = true;
+    this.callStartTime = new Date();
+  }
+
+  /**
+   * Handle audio toggle (doctor can mute themselves)
+   */
+  onToggleAudio(): void {
+    this.isAudioEnabled = !this.isAudioEnabled;
+  }
+
+  /**
+   * Handle video toggle (doctor can disable video)
+   */
+  onToggleVideo(): void {
+    this.isVideoEnabled = !this.isVideoEnabled;
+  }
+
+  /**
+   * Handle screen share toggle
+   */
+  onToggleScreenShare(): void {
+    this.isScreenSharing = !this.isScreenSharing;
+  }
+
+  /**
+   * Handle recording toggle
+   */
+  onToggleRecording(): void {
+    this.isRecording = !this.isRecording;
+  }
+
+  /**
+   * Handle end call
+   */
+  onEndCall(): void {
+    if (confirm('Are you sure you want to end the consultation?')) {
+      this.isCallActive = false;
+      this.callPhase = 'ended';
+      this.selectedPatient = null;
+      this.consultationNotes = '';
+      this.prescriptionNotes = '';
+    }
+  }
+
+  /**
+   * Handle incoming call accept
+   */
+  onAcceptIncomingCall(): void {
+    this.showIncomingDialog = false;
+  }
+
+  /**
+   * Handle incoming call reject
+   */
+  onRejectIncomingCall(): void {
+    this.showIncomingDialog = false;
+    this.incomingCallInfo = null;
+  }
+
+  /**
+   * Focus on a specific participant
+   */
+  onFocusParticipant(userId: string): void {
+    this.focusedUserId = userId;
+  }
+
+  /**
+   * Toggle participant list visibility
+   */
+  toggleParticipantList(): void {
+    this.showParticipantList = !this.showParticipantList;
+  }
+
+  /**
+   * Switch to grid layout
+   */
+  switchToGridLayout(): void {
+    this.currentLayout = 'grid';
+  }
+
+  /**
+   * Switch to focus layout
+   */
+  switchToFocusLayout(): void {
+    this.currentLayout = 'focus';
+    if (this.patientId) {
+      this.focusedUserId = this.patientId;
+    }
+  }
+
+  /**
+   * Handle media errors
+   */
+  handleMediaError(error: any): void {
+    console.error('Media error:', error);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}

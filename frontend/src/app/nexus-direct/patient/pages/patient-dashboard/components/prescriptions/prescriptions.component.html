@@ -1,0 +1,59 @@
+<div class="prescriptions-wrapper">
+  <!-- Debug: Component is loaded -->
+  <div style="background: #e3f2fd; padding: 10px; margin-bottom: 10px; border-radius: 4px; color: #1976d2;">
+    ✓ Prescriptions Component Loaded - {{prescriptions.length}} prescriptions found
+  </div>
+
+  <!-- Header -->
+  <div class="content-header">
+    <h2><i class="fas fa-pills"></i> Prescriptions</h2>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="success" class="success-message">{{ success }}</div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <p>Loading prescriptions...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && prescriptions.length === 0" class="empty-state">
+    <p>No prescriptions on file</p>
+  </div>
+
+  <!-- Prescriptions Table -->
+  <div *ngIf="!loading && prescriptions.length > 0" class="prescriptions-table">
+    <div class="table-header">
+      <div class="col-id">ID</div>
+      <div class="col-patient">Patient</div>
+      <div class="col-medication">Medication</div>
+      <div class="col-strength">Strength</div>
+      <div class="col-dosage">Dosage</div>
+      <div class="col-frequency">Frequency</div>
+      <div class="col-route">Route</div>
+      <div class="col-qty">Qty</div>
+      <div class="col-days">Days</div>
+      <div class="col-status">Status</div>
+      <div class="col-issued">Issued Date</div>
+    </div>
+    <div *ngFor="let prescription of prescriptions" class="table-row" [class]="'status-' + (prescription.status | lowercase)">
+      <div class="col-id">{{ prescription.id }}</div>
+      <div class="col-patient">{{ prescription.patientName || 'N/A' }}</div>
+      <div class="col-medication">{{ prescription.medicationName || prescription.medication || '—' }}</div>
+      <div class="col-strength">{{ prescription.strength || '—' }}</div>
+      <div class="col-dosage">{{ prescription.dosageAmount || prescription.dosage || '—' }}</div>
+      <div class="col-frequency">{{ prescription.frequency || 'N/A' }}</div>
+      <div class="col-route">{{ prescription.route || '—' }}</div>
+      <div class="col-qty">{{ prescription.quantity || '—' }}</div>
+      <div class="col-days">{{ prescription.days || prescription.durationDays || '—' }}</div>
+      <div class="col-status">
+        <span [class]="'status ' + getStatusClass(prescription.status)">
+          {{ getStatusIcon(prescription.status) }} {{ (prescription.status || '') | uppercase }}
+        </span>
+      </div>
+      <div class="col-issued">{{ prescription.issuedAt ? (prescription.issuedAt | date:'short') : (prescription.startDate | date:'short') }}</div>
+    </div>
+  </div>
+</div>

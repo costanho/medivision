@@ -1,0 +1,85 @@
+<div class="call-toolbar">
+  <!-- Left: Call info -->
+  <div class="call-info">
+    <span class="duration" [title]="'Call duration: ' + displayDuration">
+      ⏱ {{ displayDuration }}
+    </span>
+  </div>
+
+  <!-- Center: Main controls -->
+  <div class="controls-main">
+    <!-- Audio toggle -->
+    <button class="btn-control btn-audio"
+            [class.active]="!isAudioEnabled"
+            [title]="isAudioEnabled ? 'Mute microphone' : 'Unmute microphone'"
+            (click)="onToggleAudio()"
+            type="button">
+      <span class="icon">🎤</span>
+      <span *ngIf="!isAudioEnabled" class="badge off">OFF</span>
+    </button>
+
+    <!-- Video toggle -->
+    <button class="btn-control btn-video"
+            [class.active]="!isVideoEnabled"
+            [title]="isVideoEnabled ? 'Stop video' : 'Start video'"
+            (click)="onToggleVideo()"
+            type="button">
+      <span class="icon">📹</span>
+      <span *ngIf="!isVideoEnabled" class="badge off">OFF</span>
+    </button>
+
+    <!-- Screen share -->
+    <button class="btn-control btn-screen"
+            [class.active]="isScreenSharing"
+            [title]="isScreenSharing ? 'Stop sharing screen' : 'Share screen'"
+            (click)="onToggleScreenShare()"
+            type="button">
+      <span class="icon">💻</span>
+      <span *ngIf="isScreenSharing" class="badge on">SHARING</span>
+    </button>
+
+    <!-- Recording -->
+    <button class="btn-control btn-record"
+            [class.recording]="isRecording"
+            [title]="isRecording ? 'Stop recording' : 'Start recording'"
+            (click)="onToggleRecording()"
+            type="button">
+      <span class="icon" *ngIf="!isRecording">⭕</span>
+      <span class="icon recording" *ngIf="isRecording">🔴</span>
+      <span *ngIf="isRecording" class="badge recording">REC</span>
+    </button>
+
+    <!-- Spacer -->
+    <div class="spacer"></div>
+
+    <!-- Add participant (if advanced options) -->
+    <button *ngIf="showAdvancedOptions"
+            class="btn-control btn-add-participant"
+            title="Add participant"
+            (click)="onAddParticipant()"
+            type="button">
+      <span class="icon">👥</span>
+    </button>
+
+    <!-- Settings (if advanced options) -->
+    <button *ngIf="showAdvancedOptions"
+            class="btn-control btn-settings"
+            title="Settings"
+            (click)="onOpenSettings()"
+            type="button">
+      <span class="icon">⚙️</span>
+    </button>
+
+    <!-- End call -->
+    <button class="btn-end-call"
+            title="End call"
+            (click)="onEndCall()"
+            type="button">
+      <span class="icon">☎️</span>
+      <span>End Call</span>
+    </button>
+  </div>
+
+  <!-- Right: Empty for balance -->
+  <div class="spacer-right"></div>
+</div>

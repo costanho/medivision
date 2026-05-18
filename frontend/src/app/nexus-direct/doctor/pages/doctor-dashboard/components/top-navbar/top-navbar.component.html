@@ -1,0 +1,75 @@
+<nav class="top-navbar" [class.ionic-navbar]="isIonic">
+  <div class="navbar-left">
+    <!-- Mobile & Tablet Menu Toggle -->
+    <button type="button" class="menu-toggle" (click)="toggleMobileMenu()" *ngIf="isMobile || isTablet">
+      <i [class]="isMobileMenuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
+    </button>
+
+    <!-- Brand Logo & Text -->
+    <div class="navbar-brand">
+      <img src="assets/images/carenexus-logo.svg" alt="CareNexus Logo" class="brand-logo-img">
+      <span class="brand-text" *ngIf="!isMobile || !isMobileMenuOpen">CareNexus</span>
+    </div>
+  </div>
+
+  <!-- Center: Search Bar (Desktop & Tablet) -->
+  <div class="navbar-center" *ngIf="!isMobile || isSearchOpen">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search..."
+             (keyup.escape)="isSearchOpen = false">
+    </div>
+  </div>
+
+  <!-- Right: Actions & Profile -->
+  <div class="navbar-right">
+    <!-- Search Toggle for Mobile -->
+    <button type="button" class="search-toggle" (click)="toggleSearch()" *ngIf="isMobile && !isSearchOpen">
+      <i class="fas fa-search"></i>
+    </button>
+
+    <!-- Notification Badges (Desktop & Tablet) -->
+    <div class="notification-badges" *ngIf="!isMobile">
+      <button type="button" class="icon-btn notification" title="Appointments" (click)="navigateToAppointments()">
+        <span class="badge">{{ appointmentBadge }}</span>
+        <i class="fas fa-calendar"></i>
+        <span class="label">Appointment</span>
+      </button>
+      <button type="button" class="icon-btn" title="Messages" (click)="navigateToMessages()">
+        <span class="badge">{{ messageBadge }}</span>
+        <i class="fas fa-envelope"></i>
+        <span class="label">Messages</span>
+      </button>
+    </div>
+
+    <!-- Mobile Notification Icons (Compact) -->
+    <div class="notification-compact" *ngIf="isMobile && !isSearchOpen">
+      <button type="button" class="icon-compact" title="Appointments" (click)="navigateToAppointments()">
+        <span class="badge" *ngIf="appointmentBadge > 0">{{ appointmentBadge }}</span>
+        <i class="fas fa-calendar"></i>
+      </button>
+      <button type="button" class="icon-compact" title="Messages" (click)="navigateToMessages()">
+        <span class="badge" *ngIf="messageBadge > 0">{{ messageBadge }}</span>
+        <i class="fas fa-envelope"></i>
+      </button>
+    </div>
+
+    <!-- User Profile Section -->
+    <div class="user-profile-header">
+      <div class="user-avatar" [style.background-color]="getAvatarColor()">
+        {{ getInitials() }}
+      </div>
+      <div class="user-info" *ngIf="!isMobile">
+        <p class="user-name">{{ currentUser?.fullName }}</p>
+        <p class="user-role">Doctor</p>
+        <button type="button" class="logout-btn-inline" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" *ngIf="isMobileMenuOpen && isMobile" (click)="closeMobileMenu()"></div>
+</nav>

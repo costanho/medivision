@@ -1,0 +1,228 @@
+<div class="admin-layout">
+  <!-- Admin Header -->
+  <app-admin-header
+    [currentUser]="currentUser"
+    [notificationBadge]="0"
+    [alertBadge]="0"
+    (sidebarToggle)="toggleSidebar()"
+    (menuClick)="toggleSidebar()">
+  </app-admin-header>
+
+  <!-- Admin Sidebar -->
+  <app-admin-sidebar
+    [showDrawer]="showSidebar">
+  </app-admin-sidebar>
+
+  <!-- Main Content -->
+  <main class="admin-content">
+    <div class="patient-management-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="header-content">
+          <h1>Patient Management</h1>
+          <p class="subtitle">Manage all registered patients in the system</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-refresh" (click)="refreshData()" [disabled]="loading">
+            <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+            Refresh
+          </button>
+          <button class="btn-export" (click)="exportToCSV()" [disabled]="loading">
+            <i class="fas fa-download"></i>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Success/Error Messages -->
+      <div class="alert alert-success" *ngIf="success">
+        <i class="fas fa-check-circle"></i>
+        {{ success }}
+      </div>
+      <div class="alert alert-error" *ngIf="error">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ error }}
+      </div>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Search by email, name, surname, or phone..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()">
+        </div>
+
+        <div class="filter-group">
+          <label>Status:</label>
+          <select [(ngModel)]="filterVerified" (change)="onFilterChange()">
+            <option value="all">All Verification</option>
+            <option value="verified">Verified</option>
+            <option value="unverified">Unverified</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Active:</label>
+          <select [(ngModel)]="filterActive" (change)="onFilterChange()">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Bulk Actions -->
+      <div class="bulk-actions" *ngIf="selectedPatients.size > 0">
+        <span class="selection-count">{{ selectedPatients.size }} selected</span>
+        <div class="action-buttons">
+          <button class="btn-bulk" (click)="bulkVerify()" [disabled]="actionLoading">
+            <i class="fas fa-check-circle"></i>
+            Verify Selected
+          </button>
+          <button class="btn-bulk" (click)="bulkActivate()" [disabled]="actionLoading">
+            <i class="fas fa-toggle-on"></i>
+            Activate Selected
+          </button>
+          <button class="btn-bulk btn-danger" (click)="bulkDeactivate()" [disabled]="actionLoading">
+            <i class="fas fa-toggle-off"></i>
+            Deactivate Selected
+          </button>
+        </div>
+      </div>
+
+      <!-- Patients Table -->
+      <div class="table-container">
+        <div class="loading-overlay" *ngIf="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Loading patients...</p>
+        </div>
+
+        <table class="patients-table" *ngIf="!loading">
+          <thead>
+            <tr>
+              <th class="checkbox-col">
+                <input
+                  type="checkbox"
+                  [checked]="selectAll"
+                  (change)="toggleSelectAll()">
+              </th>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Surname</th>
+              <th>Sex</th>
+              <th>Phone</th>
+              <th>Date of Birth</th>
+              <th>Verified</th>
+              <th>Active</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="paginatedPatients.length === 0">
+              <td colspan="10" class="no-data">
+                <i class="fas fa-users"></i>
+                <p>No patients found</p>
+              </td>
+            </tr>
+            <tr *ngFor="let patient of paginatedPatients">
+              <td class="checkbox-col">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(patient.email)"
+                  (change)="toggleSelect(patient.email)">
+              </td>
+              <td class="email-col">{{ patient.email }}</td>
+              <td>{{ patient.name || '-' }}</td>
+              <td>{{ patient.surname || '-' }}</td>
+              <td>{{ patient.sex || '-' }}</td>
+              <td>{{ patient.phone || '-' }}</td>
+              <td>{{ patient.dateOfBirth || '-' }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="patient.verified" [class.badge-warning]="!patient.verified">
+                  <i class="fas" [ngClass]="patient.verified ? 'fa-check-circle' : 'fa-clock'"></i>
+                  {{ patient.verified ? 'Verified' : 'Pending' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [class.badge-success]="patient.active" [class.badge-danger]="!patient.active">
+                  <i class="fas" [ngClass]="patient.active ? 'fa-check' : 'fa-times'"></i>
+                  {{ patient.active ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="actions-col">
+                <div class="action-buttons-cell">
+                  <button
+                    *ngIf="!patient.verified"
+                    class="btn-action btn-verify"
+                    (click)="verifyPatient(patient)"
+                    [disabled]="actionLoading"
+                    title="Verify Patient">
+                    <i class="fas fa-check-circle"></i>
+                  </button>
+                  <button
+                    *ngIf="!patient.active"
+                    class="btn-action btn-activate"
+                    (click)="activatePatient(patient)"
+                    [disabled]="actionLoading"
+                    title="Activate Patient">
+                    <i class="fas fa-toggle-on"></i>
+                  </button>
+                  <button
+                    *ngIf="patient.active"
+                    class="btn-action btn-deactivate"
+                    (click)="deactivatePatient(patient)"
+                    [disabled]="actionLoading"
+                    title="Deactivate Patient">
+                    <i class="fas fa-toggle-off"></i>
+                  </button>
+                  <button
+                    class="btn-action btn-delete"
+                    (click)="deletePatient(patient)"
+                    [disabled]="actionLoading"
+                    title="Delete Patient">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="!loading && totalPages > 0">
+        <div class="pagination-info">
+          Showing {{ (currentPage * pageSize) + 1 }} to {{ Math.min((currentPage + 1) * pageSize, totalElements) }} of {{ totalElements }} patients
+        </div>
+        <div class="pagination-controls">
+          <button
+            class="btn-page"
+            (click)="previousPage()"
+            [disabled]="currentPage === 0">
+            <i class="fas fa-chevron-left"></i>
+            Previous
+          </button>
+          <div class="page-numbers">
+            <button
+              *ngFor="let page of [].constructor(totalPages); let i = index"
+              class="btn-page-num"
+              [class.active]="i === currentPage"
+              (click)="goToPage(i)">
+              {{ i + 1 }}
+            </button>
+          </div>
+          <button
+            class="btn-page"
+            (click)="nextPage()"
+            [disabled]="currentPage >= totalPages - 1">
+            Next
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

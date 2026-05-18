@@ -1,0 +1,146 @@
+// System Color Variables
+$primary: #667eea;
+$primary-dark: #764ba2;
+$success: #10b981;
+$danger: #ef4444;
+$warning: #f59e0b;
+$info: #3b82f6;
+$bg-white: #fff;
+$bg-light: #f8f9fa;
+$bg-lighter: #fafbfc;
+$text-dark: #1a1a1a;
+$text-main: #333;
+$text-light: #666;
+$border: #e0e0e0;
+
+// Admin Layout
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: $bg-lighter;
+}
+
+// Main Content
+.admin-content {
+  margin-left: 280px; // Sidebar width
+  margin-top: 0;
+  padding-top: 132px; // Fixed header height (100px) + spacing (32px)
+  padding-left: 32px;
+  padding-right: 32px;
+  padding-bottom: 32px;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: margin-left 0.3s ease;
+
+  // Smooth scrolling
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg-light;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border;
+    border-radius: 4px;
+
+    &:hover {
+      background: darken($border, 10%);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    margin-left: 0; // No sidebar on tablet/mobile (overlay instead)
+    padding-top: 114px; // 90px header + 24px spacing
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 24px;
+  }
+
+  @media (max-width: 768px) {
+    padding-top: 96px; // 80px header + 16px spacing
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+  }
+}
+
+// Dashboard Container
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Page Header
+.page-header {
+  margin-bottom: 32px;
+  padding: 24px 32px;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba($primary, 0.25);
+  position: relative;
+  overflow: hidden;
+
+  // Decorative gradient overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 800;
+    color: $bg-white;
+    margin: 0 0 8px 0;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    @media (max-width: 768px) {
+      font-size: 28px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 24px;
+    }
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: rgba($bg-white, 0.95);
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+
+    @media (max-width: 480px) {
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 24px;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 16px 20px;
+  }
+}
+
+// Styles moved to individual components (stats-grid, recent-activity, quick-actions)

@@ -1,0 +1,43 @@
+<div class="pending-consultations">
+  <div class="section-header">
+    <h2><i class="fas fa-stethoscope"></i> Pending Consultations</h2>
+    <a href="/doctor/nexus-direct/consultations" class="view-all-link">View All</a>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading consultations...</p>
+  </div>
+
+  <div *ngIf="!loading && consultations.length > 0" class="consultations-list">
+    <div *ngFor="let consultation of consultations; let last = last" class="consultation-item" [class.last]="last">
+      <div class="priority-indicator" [style.backgroundColor]="getPriorityColor(consultation.priority)"></div>
+
+      <div class="consultation-content">
+        <div class="consultation-header">
+          <h4>{{ consultation.patientName }}</h4>
+          <span class="priority-badge" [style.backgroundColor]="getPriorityColor(consultation.priority)">
+            {{ consultation.priority | titlecase }}
+          </span>
+        </div>
+
+        <p class="reason">{{ consultation.reason }}</p>
+        <div class="consultation-meta">
+          <span class="email">{{ consultation.patientEmail }}</span>
+          <span class="separator">•</span>
+          <span class="time">{{ consultation.submittedDate }}</span>
+        </div>
+      </div>
+
+      <div class="consultation-actions">
+        <button class="action-btn primary">Review</button>
+        <button class="action-btn secondary">Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && consultations.length === 0" class="empty-state">
+    <div class="empty-icon"><i class="fas fa-check-circle"></i></div>
+    <p>All caught up! No pending consultations</p>
+  </div>
+</div>

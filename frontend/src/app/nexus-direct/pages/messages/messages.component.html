@@ -1,0 +1,276 @@
+<div class="scrollable-wrapper">
+<!-- Animated background decorations -->
+<div class="animated-bg">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<div class="messages-container">
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+
+  <!-- Call Modal Overlay -->
+  <div *ngIf="callInProgress" class="call-modal-overlay">
+    <div class="call-modal">
+      <div class="call-header">
+        <h2>{{ callType === 'video' ? '📹 Video Call' : '📞 Audio Call' }} with {{ currentCallParticipant }}</h2>
+        <button (click)="onCallEnd()" class="btn-close" title="End call">✕</button>
+      </div>
+      <div class="call-content">
+        <div *ngIf="callType === 'video'" class="video-container">
+          <div class="video-placeholder">
+            <p>📹 Video call with {{ currentCallParticipant }}</p>
+            <p class="small-text">Call in progress...</p>
+          </div>
+        </div>
+        <div *ngIf="callType === 'audio'" class="audio-container">
+          <div class="audio-placeholder">
+            <div class="audio-waves">
+              <div class="wave"></div>
+              <div class="wave"></div>
+              <div class="wave"></div>
+            </div>
+            <p>🎧 Audio call with {{ currentCallParticipant }}</p>
+            <p class="small-text">Call in progress...</p>
+          </div>
+        </div>
+      </div>
+      <div class="call-controls">
+        <button (click)="onCallEnd()" class="btn-end-call">End Call</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversation View -->
+  <div *ngIf="!showConversationList" class="conversation-view">
+    <!-- Conversation Header -->
+    <div class="conversation-header">
+      <button (click)="backToConversationList()" class="back-btn">← Back</button>
+      <div class="conversation-title">
+        <h2>{{ selectedConversation?.name || 'Conversation' }}</h2>
+        <span *ngIf="selectedConversation?.isOnline" class="online-status">🟢 Online</span>
+        <span *ngIf="!selectedConversation?.isOnline && selectedConversation?.lastSeen" class="last-seen-status">🔴 Offline - Last seen {{ selectedConversation?.lastSeen | date: 'short' }}</span>
+      </div>
+      <div class="call-buttons">
+        <button (click)="onVideoCallStart()" class="btn-video-call" title="Start video call">📹 Video</button>
+        <button (click)="onAudioCallStart()" class="btn-audio-call" title="Start audio call">📞 Audio</button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      <span>{{ error }}</span>
+      <button (click)="clearError()" class="btn-close-error" title="Dismiss">✕</button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading messages...</p>
+    </div>
+
+    <!-- Online Status in Chat -->
+    <div class="chat-status-banner">
+      <span *ngIf="selectedConversation?.isOnline" class="status-online">🟢 Online</span>
+      <span *ngIf="!selectedConversation?.isOnline" class="status-offline">🔴 Offline</span>
+    </div>
+
+    <!-- Messages List -->
+    <div *ngIf="!loading && conversationMessages.length > 0" class="messages-list">
+      <div *ngFor="let msg of conversationMessages" class="message-item" [ngClass]="getMessageAlignmentClass(msg)">
+        <div class="message-bubble" [ngClass]="getMessageBubbleClass(msg)">
+          <p>{{ msg.content }}</p>
+          <span class="timestamp">{{ msg.createdAt | date: 'short' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Conversation State -->
+    <div *ngIf="!loading && conversationMessages.length === 0" class="empty-conversation">
+      <p>No messages yet. Start the conversation!</p>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-area">
+      <textarea
+        [(ngModel)]="currentMessage"
+        placeholder="Type your message here..."
+        (keyup.enter)="sendMessage()"
+        class="message-input"
+        rows="2"
+      ></textarea>
+      <button (click)="sendMessage()" [disabled]="!currentMessage.trim() || loading" class="btn-send">
+        Send
+      </button>
+    </div>
+  </div>
+
+  <!-- Conversation List View -->
+  <div *ngIf="showConversationList" class="conversation-list-view">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="header-icon">
+          💬
+        </div>
+        <div class="header-text">
+          <h1>{{ pageTitle }}</h1>
+          <p class="subtitle">{{ pageSubtitle }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div *ngIf="!loading && conversations.length > 0" class="search-filter-container">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search by name, email, or specialty..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange(searchQuery)"
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <div class="filter-controls">
+        <button
+          (click)="toggleAppointmentFilter()"
+          [class.active]="filterByAppointment"
+          class="filter-btn appointment-filter"
+          title="Show only contacts with appointments"
+        >
+          📅 Has Appointment{{ filterByAppointment ? ' ✓' : '' }}
+        </button>
+
+        <div class="status-filter-group">
+          <button
+            (click)="setStatusFilter('ALL')"
+            [class.active]="filterByStatus === 'ALL'"
+            class="filter-btn status-filter"
+          >
+            All
+          </button>
+          <button
+            (click)="setStatusFilter('SCHEDULED')"
+            [class.active]="filterByStatus === 'SCHEDULED'"
+            class="filter-btn status-filter scheduled"
+          >
+            Scheduled
+          </button>
+          <button
+            (click)="setStatusFilter('COMPLETED')"
+            [class.active]="filterByStatus === 'COMPLETED'"
+            class="filter-btn status-filter completed"
+          >
+            Completed
+          </button>
+          <button
+            (click)="setStatusFilter('CANCELLED')"
+            [class.active]="filterByStatus === 'CANCELLED'"
+            class="filter-btn status-filter cancelled"
+          >
+            Cancelled
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-info">
+        <p>Showing {{ filteredConversations.length }} of {{ conversations.length }} contacts</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading conversations...</p>
+    </div>
+
+    <!-- Conversations List -->
+    <div *ngIf="!loading && filteredConversations.length > 0" class="conversations-list">
+      <div
+        *ngFor="let conversation of filteredConversations"
+        (click)="selectConversation(conversation)"
+        class="conversation-item"
+        [ngClass]="{'unread': conversation.unreadCount && conversation.unreadCount > 0}"
+      >
+        <div class="conversation-avatar">
+          👤
+          <span *ngIf="conversation.isOnline" class="online-indicator" title="Online"></span>
+          <span *ngIf="conversation.unreadCount && conversation.unreadCount > 0" class="unread-badge">{{ conversation.unreadCount }}</span>
+        </div>
+        <div class="conversation-info">
+          <div class="doctor-header">
+            <h3 [ngClass]="{'bold': conversation.unreadCount && conversation.unreadCount > 0}">{{ conversation.name }}</h3>
+            <span *ngIf="conversation.isOnline" class="online-badge">Online</span>
+            <span *ngIf="conversation.hasAppointment && conversation.appointmentStatus"
+                  [ngClass]="'appointment-badge ' + (conversation.appointmentStatus | lowercase)">
+              {{ conversation.appointmentStatus }}
+            </span>
+          </div>
+          <p class="preview">{{ conversation.specialization || conversation.email || 'No details' }}</p>
+          <p *ngIf="!conversation.isOnline && conversation.lastSeen" class="last-seen">
+            Last seen {{ conversation.lastSeen | date: 'short' }}
+          </p>
+          <p *ngIf="conversation.hasAppointment && conversation.appointmentDate" class="appointment-info">
+            📅 Appointment: {{ conversation.appointmentDate }}
+          </p>
+        </div>
+        <div class="conversation-meta">
+          <p class="timestamp" [ngClass]="{'online-text': conversation.isOnline, 'offline-text': !conversation.isOnline}">
+            {{ conversation.isOnline ? '🟢 Online' : '🔴 Offline' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State - No Contacts -->
+    <div *ngIf="!loading && conversations.length === 0" class="empty-state">
+      <div class="empty-icon">💬</div>
+      <h2>{{ userRole === 'doctor' ? 'No patients available' : 'No doctors available' }}</h2>
+      <p>{{ userRole === 'doctor' ? 'You can start a conversation with any patient' : 'You can start a conversation with any doctor' }}</p>
+    </div>
+
+    <!-- Empty State - No Filtered Results -->
+    <div *ngIf="!loading && conversations.length > 0 && filteredConversations.length === 0" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h2>No matches found</h2>
+      <p *ngIf="searchQuery">
+        No contacts match your search for "{{ searchQuery }}"
+      </p>
+      <p *ngIf="!searchQuery && (filterByAppointment || filterByStatus !== 'ALL')">
+        No contacts match your filter criteria
+      </p>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading && totalPages > 1" class="pagination">
+      <button
+        (click)="previousPage()"
+        [disabled]="currentPage === 0"
+        class="btn-pagination"
+      >
+        ← Previous
+      </button>
+      <span class="page-info">
+        Page {{ currentPage + 1 }} of {{ totalPages }}
+      </span>
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages - 1"
+        class="btn-pagination"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+</div>
+</div>

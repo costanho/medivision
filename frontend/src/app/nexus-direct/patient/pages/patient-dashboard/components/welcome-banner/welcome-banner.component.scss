@@ -1,0 +1,152 @@
+// Color Variables
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$text-white: #fff;
+$banner-gradient: linear-gradient(135deg, #f5a962 0%, #f093fb 50%, $primary-color 100%);
+
+// ─────────────────────────────────────────────────────────────────────────
+// WELCOME BANNER
+// ─────────────────────────────────────────────────────────────────────────
+
+.welcome-banner {
+  background: $banner-gradient;
+  padding: 40px 30px;
+  margin: 30px;
+  color: $text-white;
+  position: relative;
+  border-radius: 12px;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+
+    .banner-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+
+      .banner-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $text-white;
+        font-weight: 700;
+        font-size: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        flex-shrink: 0;
+      }
+
+      .banner-text {
+        flex: 1;
+
+        h1 {
+          font-size: 24px;
+          font-weight: 700;
+          margin: 0 0 8px 0;
+          color: $text-white;
+        }
+
+        p {
+          font-size: 14px;
+          margin: 0;
+          color: rgba(255, 255, 255, 0.9);
+        }
+      }
+    }
+
+    .banner-stats {
+      display: flex;
+      gap: 15px;
+      flex-shrink: 0;
+
+      .stat-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 16px 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        min-width: 100px;
+
+        .stat-number {
+          font-size: 24px;
+          font-weight: 700;
+          color: $text-white;
+        }
+
+        .stat-label {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.8);
+          text-transform: uppercase;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+        }
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// RESPONSIVE
+// ─────────────────────────────────────────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .welcome-banner {
+    padding: 30px 20px;
+    margin: 20px;
+
+    .banner-content {
+      gap: 24px;
+
+      .banner-left {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .banner-stats {
+        width: 100%;
+        flex-direction: row;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-banner {
+    padding: 20px;
+    margin: 15px;
+
+    .banner-content {
+      flex-direction: column;
+      gap: 20px;
+
+      .banner-left {
+        gap: 15px;
+      }
+
+      .banner-stats {
+        flex-direction: row;
+        width: 100%;
+        gap: 10px;
+
+        .stat-box {
+          flex: 1;
+          padding: 12px;
+
+          .stat-number {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+}

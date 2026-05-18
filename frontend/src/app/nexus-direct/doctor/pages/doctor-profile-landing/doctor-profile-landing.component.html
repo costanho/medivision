@@ -1,0 +1,18 @@
+<div class="doctor-profile-content">
+  <!-- CHILD ROUTES (Profile Details) -->
+  <router-outlet></router-outlet>
+
+  <!-- WELCOME BANNER (shown when no child route is active) -->
+  <div *ngIf="!hasChildRoute" class="welcome-section">
+    <app-welcome-banner
+      [currentUser]="currentUser"
+      [stats]="stats">
+    </app-welcome-banner>
+
+    <!-- SERVICES GRID -->
+    <app-services-grid
+      [availableServices]="availableServices"
+      (serviceSelected)="selectService($event)">
+    </app-services-grid>
+  </div>
+</div>

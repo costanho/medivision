@@ -1,0 +1,35 @@
+<div class="quick-messages">
+  <div class="section-header">
+    <h2><i class="fas fa-envelope"></i> Recent Messages</h2>
+    <div class="header-right">
+      <span class="unread-count" *ngIf="getUnreadCount() > 0">{{ getUnreadCount() }} new</span>
+      <a routerLink="/doctor/nexus-direct/messages" class="view-all-link">View All</a>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading messages...</p>
+  </div>
+
+  <div *ngIf="!loading && messages.length > 0" class="messages-list">
+    <div *ngFor="let message of messages; let last = last" class="message-item" [class.last]="last" [class.unread]="!message.read">
+      <div class="message-avatar">{{ message.senderAvatar }}</div>
+
+      <div class="message-content">
+        <div class="message-header">
+          <h4>{{ message.senderName }}</h4>
+          <span class="timestamp">{{ message.timestamp }}</span>
+        </div>
+        <p class="message-preview">{{ message.preview }}</p>
+      </div>
+
+      <div *ngIf="!message.read" class="unread-dot"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && messages.length === 0" class="empty-state">
+    <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+    <p>No recent messages</p>
+  </div>
+</div>

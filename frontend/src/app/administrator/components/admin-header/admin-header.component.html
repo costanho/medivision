@@ -1,0 +1,54 @@
+<!-- ADMIN TOP NAVIGATION BAR -->
+<nav class="admin-navbar">
+  <div class="navbar-left">
+    <button class="menu-btn" (click)="toggleMobileMenu()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="navbar-brand" (click)="navigateToDashboard()">
+      <img src="assets/images/carenexus-logo.svg" alt="CareNexus Logo" class="brand-logo-img">
+      <div class="brand-content">
+        <span class="brand-text">CareNexus</span>
+        <span class="brand-subtitle">Admin Panel</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="navbar-center">
+    <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" placeholder="Search users, logs, or records...">
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <div class="notification-badges">
+      <!-- System Alerts -->
+      <button class="icon-btn alert" (click)="navigateToAlerts()" title="System Alerts">
+        <span class="badge" *ngIf="alertBadge > 0">{{ alertBadge }}</span>
+        <i class="fas fa-exclamation-triangle"></i>
+        <span class="label">Alerts</span>
+      </button>
+
+      <!-- Notifications -->
+      <button class="icon-btn notification" (click)="navigateToNotifications()" title="Notifications">
+        <span class="badge" *ngIf="notificationBadge > 0">{{ notificationBadge }}</span>
+        <i class="fas fa-bell"></i>
+        <span class="label">Notifications</span>
+      </button>
+    </div>
+
+    <div class="user-profile-header">
+      <div class="user-avatar" [style.background-color]="getAvatarColor()">
+        {{ getInitials() }}
+      </div>
+      <div class="user-info">
+        <p class="user-name">{{ currentUser?.fullName }}</p>
+        <p class="user-role">Administrator</p>
+        <button class="logout-btn-inline" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

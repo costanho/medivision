@@ -1,0 +1,240 @@
+<div class="scrollable-wrapper">
+<!-- HEADER NAVIGATION -->
+<header class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <img src="assets/images/carenexus-logo.svg" alt="CareNexus Logo" class="brand-logo-img">
+      <span class="brand-text">CareNexus</span>
+    </div>
+    <nav class="navbar-nav">
+      <a href="#" class="nav-link">Home</a>
+      <a href="#" class="nav-link">Features</a>
+      <a href="#" class="nav-link">About</a>
+      <a href="#" class="nav-link">Contact</a>
+      <a routerLink="/login" class="nav-btn">Sign In</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO SECTION WITH PARTICLES AND CAROUSEL -->
+<section class="hero">
+  <!-- Image Carousel Background -->
+  <div class="carousel-container">
+    <div class="carousel-track">
+      <div *ngFor="let image of heroImages; let i = index"
+           class="carousel-slide"
+           [class.active]="i === currentImageIndex">
+        <img [src]="image.url" [alt]="image.alt" class="carousel-image">
+        <div class="carousel-overlay"></div>
+      </div>
+    </div>
+
+    <!-- Carousel Navigation Controls -->
+    <button class="carousel-btn carousel-btn-prev" (click)="previousImage()" aria-label="Previous image">
+      <span>&#10094;</span>
+    </button>
+    <button class="carousel-btn carousel-btn-next" (click)="nextImage()" aria-label="Next image">
+      <span>&#10095;</span>
+    </button>
+
+    <!-- Carousel Indicators -->
+    <div class="carousel-indicators">
+      <button *ngFor="let image of heroImages; let i = index"
+              class="indicator"
+              [class.active]="i === currentImageIndex"
+              (click)="currentImageIndex = i"
+              [attr.aria-label]="'Go to image ' + (i + 1)">
+      </button>
+    </div>
+  </div>
+
+  <!-- Animated Particles Background -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="hero-content">
+    <h1 class="hero-title">Welcome to CareNexus</h1>
+    <p class="hero-subtitle">Your trusted platform for connecting with healthcare providers</p>
+    <p class="hero-description">Access quality healthcare services anytime, anywhere. Schedule appointments, communicate with doctors, and manage your health records all in one place.</p>
+    <div class="cta-buttons">
+      <a routerLink="/register" class="btn btn-primary">Get Started</a>
+      <a routerLink="/login" class="btn btn-secondary">Sign In</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about">
+  <div class="about-container">
+    <div class="about-wrapper">
+      <!-- Left Image -->
+      <div class="about-image-container left">
+        <img src="assets/images/hero-image-3.jpeg" alt="Patient Care" class="about-image">
+      </div>
+
+      <!-- Center Content -->
+      <div class="about-content">
+        <h2 class="about-title">{{ aboutText.title }}</h2>
+        <p class="about-subtitle">{{ aboutText.subtitle }}</p>
+        <p class="about-description">{{ aboutText.description }}</p>
+      </div>
+
+      <!-- Right Image -->
+      <div class="about-image-container right">
+        <img src="assets/images/hero-image-5.jpeg" alt="Doctor Consultation" class="about-image">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section class="features">
+  <div class="features-container">
+    <div class="features-header">
+      <h2>Our Ecosystem</h2>
+      <p class="features-subtitle">Comprehensive healthcare solutions for modern patient care</p>
+    </div>
+
+    <div class="features-grid-wrapper">
+      <!-- Feature Cards arranged around center -->
+      <div *ngFor="let feature of features; let i = index"
+           class="feature-card"
+           [class.active]="selectedFeatureIndex === i"
+           [attr.data-position]="i"
+           [style.--card-index]="i"
+           [style.--card-color]="feature.color"
+           (click)="selectedFeatureIndex = i"
+           (mouseenter)="selectedFeatureIndex = i">
+        <div class="feature-card-inner">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon">{{ feature.icon }}</div>
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+        </div>
+      </div>
+
+      <!-- Center Showcase -->
+      <div class="features-showcase">
+        <div class="showcase-image-wrapper">
+          <img [src]="features[selectedFeatureIndex].previewImage"
+               [alt]="features[selectedFeatureIndex].title"
+               class="showcase-image"
+               [style.--feature-color]="features[selectedFeatureIndex].color">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="cta-final">
+  <div class="cta-container">
+    <h2>Ready to Get Started?</h2>
+    <p>Join thousands of patients already using CareNexus</p>
+    <a routerLink="/register" class="btn btn-primary btn-large">Create Account Now</a>
+  </div>
+</section>
+
+<!-- BENEFITS SECTION -->
+<section class="benefits">
+  <div class="benefits-container">
+    <!-- Benefits Header -->
+    <div class="benefits-header">
+      <h2>Benefits of Using CareNexus</h2>
+      <p class="benefits-subtitle">Discover how CareNexus empowers every stakeholder in the healthcare ecosystem</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="benefits-tabs">
+      <button *ngFor="let benefit of benefits; let i = index"
+              class="tab-link"
+              [class.active]="selectedBenefitTab === i"
+              (click)="selectedBenefitTab = i">
+        {{ benefit.title }}
+      </button>
+    </div>
+
+    <!-- Tab Content with Hero Image -->
+    <div class="benefits-content-wrapper" *ngIf="selectedBenefitTab >= 0">
+      <div class="benefits-hero">
+        <div class="hero-text">
+          <p>{{ benefits[selectedBenefitTab].tagline }}</p>
+        </div>
+      </div>
+
+      <!-- Benefits Grid -->
+      <div class="benefits-grid">
+        <div *ngFor="let item of benefits[selectedBenefitTab].benefitsList" class="benefit-card">
+          <div class="benefit-icon">{{ item.icon }}</div>
+          <h3 class="benefit-title">{{ item.title }}</h3>
+          <p class="benefit-description">{{ item.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS SECTION -->
+<section class="testimonials">
+  <div class="testimonials-container">
+    <h2>What Our Users Say</h2>
+    <p class="testimonials-subtitle">Join thousands of satisfied patients and healthcare providers</p>
+    <div class="testimonials-grid">
+      <div *ngFor="let testimonial of testimonials; let i = index" class="testimonial-card" [style.animation-delay]="(0.1 + i * 0.15) + 's'">
+        <div class="testimonial-star">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"{{ testimonial.text }}"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">{{ testimonial.avatar }}</div>
+          <div class="author-info">
+            <strong>{{ testimonial.author }}</strong>
+            <span>{{ testimonial.role }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATISTICS SECTION -->
+<section class="statistics">
+  <div class="statistics-container">
+    <div class="statistics-grid">
+      <div *ngFor="let stat of statistics" class="stat-card" [style.--stat-color]="stat.color">
+        <div class="stat-icon">{{ stat.icon }}</div>
+        <div class="stat-number">{{ stat.number }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>CareNexus</h4>
+      <p>Connecting patients with healthcare professionals</p>
+    </div>
+    <div class="footer-section">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a routerLink="/login">Sign In</a></li>
+        <li><a routerLink="/register">Register</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4>Contact</h4>
+      <p>support@carenexus.com</p>
+      <p>+1 (555) 123-4567</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 CareNexus. All rights reserved.</p>
+  </div>
+</footer>
+</div>

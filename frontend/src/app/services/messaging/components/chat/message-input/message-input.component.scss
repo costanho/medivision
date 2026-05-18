@@ -1,0 +1,418 @@
+/**
+ * Message Input Component Styles
+ * Styling for message composition and sending
+ *
+ * Features:
+ * - Textarea input with auto-expand
+ * - Send button with loading state
+ * - Character counter
+ * - Error messages
+ * - Responsive design
+ * - Dark mode support
+ * - Accessibility features
+ */
+
+.message-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+
+  // ═══════════════════════════════════════════════════════════════
+  // Character Count
+  // ═══════════════════════════════════════════════════════════════
+
+  .character-count {
+    font-size: 12px;
+    color: #999;
+    text-align: right;
+    transition: color 0.3s ease;
+
+    .count-number {
+      font-weight: 600;
+    }
+
+    .count-separator {
+      margin: 0 2px;
+      opacity: 0.5;
+    }
+
+    .count-max {
+      opacity: 0.7;
+    }
+
+    // Warning when approaching limit
+    &.warning {
+      color: #ff9800;
+
+      .count-number {
+        font-weight: 700;
+      }
+    }
+
+    // Error when exceeded
+    &.error {
+      color: #f44336;
+
+      .count-number {
+        font-weight: 700;
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Input Container
+  // ═══════════════════════════════════════════════════════════════
+
+  .input-container {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    border-radius: 24px;
+    background-color: #f5f5f5;
+    padding: 10px 14px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+
+    &:focus-within {
+      border-color: #667eea;
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    &:has(textarea:disabled) {
+      background-color: #efefef;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Textarea Input
+  // ═══════════════════════════════════════════════════════════════
+
+  .message-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    resize: none;
+    overflow: hidden;
+    min-height: 20px;
+    max-height: 120px;
+    padding: 0;
+
+    &::placeholder {
+      color: #999;
+    }
+
+    &:disabled {
+      color: #ccc;
+      cursor: not-allowed;
+
+      &::placeholder {
+        color: #ddd;
+      }
+    }
+
+    // Auto-expand on content
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Send Button
+  // ═══════════════════════════════════════════════════════════════
+
+  .send-btn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-weight: 500;
+
+    &:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+    }
+
+    &:disabled {
+      background: linear-gradient(135deg, #b0b8d4 0%, #a89ac0 100%);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &.sending {
+      pointer-events: none;
+    }
+
+    // Send icon
+    .send-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    // Sending spinner
+    .send-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Helper Text
+  // ═══════════════════════════════════════════════════════════════
+
+  .error-text {
+    font-size: 12px;
+    color: #f44336;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: slideDown 0.3s ease;
+  }
+
+  .hint-text {
+    font-size: 12px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Responsive Design
+  // ═══════════════════════════════════════════════════════════════
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    gap: 6px;
+
+    .input-container {
+      padding: 8px 12px;
+      gap: 6px;
+    }
+
+    .message-textarea {
+      font-size: 13px;
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+
+      .send-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .send-spinner {
+        width: 14px;
+        height: 14px;
+        border-width: 2px;
+      }
+    }
+
+    .character-count {
+      font-size: 11px;
+    }
+
+    .error-text,
+    .hint-text {
+      font-size: 11px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 8px 10px;
+    gap: 4px;
+
+    .input-container {
+      padding: 6px 10px;
+      gap: 4px;
+      border-radius: 20px;
+    }
+
+    .message-textarea {
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+    .send-btn {
+      width: 32px;
+      height: 32px;
+
+      .send-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .send-spinner {
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Dark Mode
+  // ═══════════════════════════════════════════════════════════════
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #2a2a2a;
+    border-top-color: #3a3a3a;
+
+    .character-count {
+      color: #666;
+
+      &.warning {
+        color: #ffb74d;
+      }
+
+      &.error {
+        color: #ef5350;
+      }
+    }
+
+    .input-container {
+      background-color: #1e1e1e;
+      border-color: transparent;
+
+      &:focus-within {
+        border-color: #667eea;
+        background-color: #2a2a2a;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+      }
+
+      &:has(textarea:disabled) {
+        background-color: #1a1a1a;
+      }
+    }
+
+    .message-textarea {
+      color: white;
+
+      &::placeholder {
+        color: #666;
+      }
+
+      &:disabled {
+        color: #555;
+
+        &::placeholder {
+          color: #444;
+        }
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.1);
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+      }
+    }
+
+    .send-btn {
+      &:disabled,
+      &.disabled {
+        background: linear-gradient(135deg, #4a4a4a 0%, #3a3a3a 100%);
+      }
+
+      &:hover:not(:disabled) {
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      &:active:not(:disabled) {
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+      }
+    }
+
+    .error-text {
+      color: #ef5350;
+    }
+
+    .hint-text {
+      color: #666;
+    }
+  }
+}

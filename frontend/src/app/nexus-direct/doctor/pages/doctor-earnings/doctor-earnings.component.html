@@ -1,0 +1,275 @@
+<div class="scrollable-wrapper">
+  <div class="earnings-container">
+    <!-- Header -->
+    <div class="section-header">
+      <h1><i class="fas fa-chart-line"></i> Earnings & Billing</h1>
+      <button class="btn-primary" (click)="requestWithdrawal()" [disabled]="earningsData.pending_balance <= 0 || loading">
+        <i class="fas fa-arrow-down"></i> Withdraw Earnings
+      </button>
+    </div>
+
+    <!-- Error & Success Messages -->
+    <div *ngIf="error" class="alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ error }}</span>
+      <button class="close-btn" (click)="clearError()">×</button>
+    </div>
+
+    <div *ngIf="successMessage" class="alert-success">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
+
+    <div *ngIf="!loading">
+      <!-- Earnings Overview Cards -->
+      <div class="earnings-overview">
+        <div class="overview-card">
+          <div class="card-icon total">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">Total Earned</p>
+            <h2 class="card-value">${{ earningsData.total_earned.toFixed(2) }}</h2>
+            <p class="card-meta">All time earnings</p>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <div class="card-icon month">
+            <i class="fas fa-calendar"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">This Month</p>
+            <h2 class="card-value">${{ earningsData.current_month_earned.toFixed(2) }}</h2>
+            <p class="card-meta">Current month earnings</p>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <div class="card-icon pending">
+            <i class="fas fa-hourglass-half"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">Pending Balance</p>
+            <h2 class="card-value">${{ earningsData.pending_balance.toFixed(2) }}</h2>
+            <p class="card-meta">Ready to withdraw</p>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <div class="card-icon avg">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">Avg. Fee</p>
+            <h2 class="card-value">${{ earningsData.average_consultation_fee.toFixed(2) }}</h2>
+            <p class="card-meta">Average consultation fee</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-item">
+          <i class="fas fa-video"></i>
+          <div class="stat-content">
+            <p class="stat-label">Consultations</p>
+            <h3>{{ earningsData.total_consultations }}</h3>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-calendar-check"></i>
+          <div class="stat-content">
+            <p class="stat-label">Appointments</p>
+            <h3>{{ earningsData.total_appointments }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription Section -->
+      <div class="subscription-section">
+        <div class="subscription-card" [ngClass]="'status-' + getSubscriptionStatusClass()">
+          <div class="subscription-header">
+            <h3>
+              <i class="fas fa-crown"></i>
+              Current Plan: {{ subscription?.plan_name || 'No Active Subscription' }}
+            </h3>
+            <div class="subscription-status-badge" [ngClass]="getSubscriptionStatusClass()">
+              {{ subscription?.status || 'No Plan' | uppercase }}
+            </div>
+          </div>
+
+          <div *ngIf="subscription" class="subscription-details">
+            <div class="detail-item">
+              <span class="detail-label">Subscription Start:</span>
+              <span class="detail-value">{{ subscription.start_date | date: 'MMM d, yyyy' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Renewal Date:</span>
+              <span class="detail-value">{{ subscription.renewal_date | date: 'MMM d, yyyy' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Auto-Renewal:</span>
+              <span class="detail-value">
+                <label class="toggle-switch">
+                  <input type="checkbox" [checked]="subscription.is_auto_renew" (change)="toggleAutoRenew()">
+                  <span class="toggle-slider"></span>
+                </label>
+                {{ subscription.is_auto_renew ? 'Enabled' : 'Disabled' }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="!subscription || subscription.status === 'inactive' || subscription.status === 'expired'" class="no-subscription-message">
+            <p>You don't have an active subscription. Upgrade now to unlock premium features!</p>
+          </div>
+
+          <div class="subscription-actions">
+            <button
+              *ngIf="!subscription || subscription.status === 'inactive' || subscription.status === 'expired'"
+              class="btn-primary"
+              (click)="openSubscriptionModal(availablePlans[1])">
+              <i class="fas fa-star"></i> Upgrade Now
+            </button>
+
+            <button
+              *ngIf="subscription && subscription.status === 'active'"
+              class="btn-secondary upgrade"
+              (click)="openSubscriptionModal(availablePlans[2])">
+              <i class="fas fa-arrow-up"></i> Upgrade Plan
+            </button>
+
+            <button
+              *ngIf="subscription && subscription.status === 'expired'"
+              class="btn-primary"
+              (click)="renewSubscription()">
+              <i class="fas fa-redo"></i> Renew Subscription
+            </button>
+
+            <button
+              *ngIf="subscription && subscription.status === 'active'"
+              class="btn-danger"
+              (click)="cancelSubscription()">
+              <i class="fas fa-times"></i> Cancel Subscription
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction Filters -->
+      <div class="transactions-section">
+        <div class="section-title">
+          <h3>Transaction History</h3>
+        </div>
+
+        <div class="transaction-filters">
+          <div class="filter-group">
+            <label>Period:</label>
+            <select [(ngModel)]="selectedPeriod" (change)="applyTransactionFilters()">
+              <option value="7days">Last 7 Days</option>
+              <option value="30days">Last 30 Days</option>
+              <option value="90days">Last 90 Days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Transaction Type:</label>
+            <select [(ngModel)]="transactionFilter" (change)="applyTransactionFilters()">
+              <option value="all">All Transactions</option>
+              <option value="consultation">Consultations</option>
+              <option value="appointment">Appointments</option>
+              <option value="subscription">Subscription</option>
+              <option value="refund">Refunds</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Transaction List -->
+        <div *ngIf="filteredTransactions.length > 0" class="transaction-list">
+          <div *ngFor="let transaction of filteredTransactions; let last = last" class="transaction-item" [class.last]="last">
+            <div class="transaction-icon">
+              <i [class]="getTransactionIcon(transaction.type)" [style.color]="getTransactionColor(transaction.type)"></i>
+            </div>
+
+            <div class="transaction-info">
+              <p class="transaction-description">{{ transaction.description }}</p>
+              <p class="transaction-date">{{ transaction.date | date: 'MMM d, yyyy' }}</p>
+            </div>
+
+            <div class="transaction-status">
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(transaction.status)">
+                {{ transaction.status | uppercase }}
+              </span>
+            </div>
+
+            <div class="transaction-amount" [ngClass]="transaction.amount >= 0 ? 'positive' : 'negative'">
+              <span class="amount">{{ transaction.amount >= 0 ? '+' : '' }}${{ Math.abs(transaction.amount).toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredTransactions.length === 0" class="empty-state">
+          <div class="empty-icon">📊</div>
+          <h3>No transactions found</h3>
+          <p>Try adjusting your filters or check back later</p>
+        </div>
+      </div>
+
+      <!-- Subscription Plans Modal -->
+      <div *ngIf="showSubscriptionModal && selectedPlan" class="modal-overlay" (click)="closeSubscriptionModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Upgrade Your Plan</h2>
+            <button class="close-btn" (click)="closeSubscriptionModal()">×</button>
+          </div>
+
+          <div class="modal-body">
+            <div class="plan-comparison">
+              <!-- Current Plan (if exists) -->
+              <div *ngIf="subscription" class="plan-card current">
+                <div class="plan-header">
+                  <h3>{{ subscription.plan_name }}</h3>
+                  <span class="plan-badge current">Current</span>
+                </div>
+                <p class="plan-price">Active</p>
+              </div>
+
+              <!-- Selected Plan -->
+              <div class="plan-card selected">
+                <div class="plan-header">
+                  <h3>{{ selectedPlan.name }}</h3>
+                  <span class="plan-badge">Upgrade To</span>
+                </div>
+                <p class="plan-price">${{ selectedPlan.price }}<span class="period">/{{ selectedPlan.billing_cycle }}</span></p>
+                <ul class="plan-features">
+                  <li *ngFor="let feature of selectedPlan.features">
+                    <i class="fas fa-check"></i> {{ feature }}
+                  </li>
+                </ul>
+                <div class="plan-limits">
+                  <p><strong>Consultation Fee Limit:</strong> ${{ selectedPlan.consultation_fee_limit }}</p>
+                  <p><strong>Appointment Limit:</strong> {{ selectedPlan.appointment_limit }} per month</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-secondary" (click)="closeSubscriptionModal()">Cancel</button>
+              <button type="button" class="btn-primary" (click)="upgradeSubscription()" [disabled]="loading">
+                <i class="fas fa-credit-card"></i> Upgrade for ${{ selectedPlan.price }}/{{ selectedPlan.billing_cycle }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

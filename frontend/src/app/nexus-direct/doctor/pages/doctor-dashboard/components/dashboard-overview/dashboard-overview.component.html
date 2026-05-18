@@ -1,0 +1,98 @@
+<div class="dashboard-overview">
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="banner-content">
+      <h1>{{ getGreeting() }}, {{ currentUser?.fullName || 'Doctor' }}! 👋</h1>
+      <p class="subtitle">Here's what's happening with your practice today</p>
+    </div>
+    <div class="banner-date">
+      {{ today | date: 'EEEE, MMMM d, y' }}
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <!-- Appointments Today -->
+    <div class="stat-card appointments">
+      <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+      <div class="stat-content">
+        <h3>Appointments Today</h3>
+        <p class="stat-value">{{ stats.appointmentsToday }}</p>
+        <span class="stat-label">Scheduled</span>
+      </div>
+    </div>
+
+    <!-- Pending Consultations -->
+    <div class="stat-card consultations">
+      <div class="stat-icon"><i class="fas fa-stethoscope"></i></div>
+      <div class="stat-content">
+        <h3>Pending Consultations</h3>
+        <p class="stat-value">{{ stats.pendingConsultations }}</p>
+        <span class="stat-label">Awaiting Action</span>
+      </div>
+    </div>
+
+    <!-- New Messages -->
+    <div class="stat-card messages">
+      <div class="stat-icon"><i class="fas fa-comments"></i></div>
+      <div class="stat-content">
+        <h3>New Messages</h3>
+        <p class="stat-value">{{ stats.newMessages }}</p>
+        <span class="stat-label">Unread</span>
+      </div>
+    </div>
+
+    <!-- Total Patients -->
+    <div class="stat-card patients">
+      <div class="stat-icon"><i class="fas fa-users"></i></div>
+      <div class="stat-content">
+        <h3>Total Patients</h3>
+        <p class="stat-value">{{ stats.totalPatients }}</p>
+        <span class="stat-label">Active</span>
+      </div>
+    </div>
+
+    <!-- Rating -->
+    <div class="stat-card rating">
+      <div class="stat-icon"><i class="fas fa-star"></i></div>
+      <div class="stat-content">
+        <h3>Your Rating</h3>
+        <p class="stat-value">{{ stats.avgRating }}</p>
+        <span class="stat-label">Out of 5.0</span>
+      </div>
+    </div>
+
+    <!-- Monthly Earnings -->
+    <div class="stat-card earnings">
+      <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+      <div class="stat-content">
+        <h3>Monthly Earnings</h3>
+        <p class="stat-value">${{ stats.monthlyEarnings | number }}</p>
+        <span class="stat-label">This Month</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Action Section -->
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="action-buttons">
+      <button class="action-btn primary">
+        <span class="btn-icon"><i class="fas fa-plus"></i></span>
+        <span class="btn-text">New Appointment</span>
+      </button>
+      <button class="action-btn secondary">
+        <span class="btn-icon"><i class="fas fa-user-plus"></i></span>
+        <span class="btn-text">Add Patient</span>
+      </button>
+      <button class="action-btn tertiary">
+        <span class="btn-icon"><i class="fas fa-file-medical"></i></span>
+        <span class="btn-text">Medical Records</span>
+      </button>
+      <button class="action-btn quaternary">
+        <span class="btn-icon"><i class="fas fa-envelope"></i></span>
+        <span class="btn-text">Send Message</span>
+      </button>
+    </div>
+  </div>
+</div>

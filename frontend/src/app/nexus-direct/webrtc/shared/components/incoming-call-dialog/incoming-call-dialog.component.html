@@ -1,0 +1,42 @@
+<div class="incoming-call-dialog" *ngIf="isVisible" [@fadeInOut]>
+  <div class="dialog-overlay" (click)="onOverlayClick()"></div>
+
+  <div class="dialog-content" [@slideIn]>
+    <!-- Caller avatar with animation -->
+    <div class="caller-avatar" [@ring]="ringCounter" (@ring.done)="triggerRing()">
+      <div *ngIf="callerAvatar" class="avatar-image" [style.backgroundImage]="'url(' + callerAvatar + ')'"></div>
+      <div *ngIf="!callerAvatar" class="avatar-placeholder">
+        {{ callerName.charAt(0).toUpperCase() }}
+      </div>
+    </div>
+
+    <!-- Caller info -->
+    <div class="caller-info">
+      <h2>{{ callerName }}</h2>
+      <p class="role">{{ callerRole }}</p>
+      <p class="ringing">Incoming call...</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn-reject"
+              (click)="onReject()"
+              title="Reject call (Esc)">
+        ☎️
+        <span>Reject</span>
+      </button>
+
+      <button class="btn-accept"
+              (click)="onAccept()"
+              title="Accept call (Enter)">
+        ☎️
+        <span>Accept</span>
+      </button>
+    </div>
+
+    <!-- Keyboard hints -->
+    <div class="keyboard-hints">
+      <small>Press <kbd>Enter</kbd> to accept or <kbd>Esc</kbd> to reject</small>
+    </div>
+  </div>
+</div>

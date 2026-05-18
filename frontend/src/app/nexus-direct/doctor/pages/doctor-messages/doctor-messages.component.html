@@ -1,0 +1,255 @@
+<div class="scrollable-wrapper">
+<div class="messages-container" [class.show-chat]="showChatView">
+  <!-- Chat View -->
+  <div *ngIf="showChatView && selectedPatient" class="chat-view">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <button type="button" class="back-btn" (click)="closeChat()"><i class="fas fa-arrow-left"></i> Back</button>
+      <div class="chat-title">
+        <h2>{{ selectedPatient.name }}</h2>
+        <span *ngIf="selectedPatient.isOnline" class="online-status"><i class="fas fa-circle"></i> Online</span>
+        <span *ngIf="!selectedPatient.isOnline && selectedPatient.lastSeen" class="last-seen-status"><i class="fas fa-circle"></i> Offline - Last seen {{ selectedPatient.lastSeen }}</span>
+      </div>
+    </div>
+
+    <!-- Online Status in Chat -->
+    <div class="chat-status-banner">
+      <span *ngIf="selectedPatient?.isOnline" class="status-online"><i class="fas fa-circle"></i> Online</span>
+      <span *ngIf="!selectedPatient?.isOnline" class="status-offline"><i class="fas fa-circle"></i> Offline</span>
+    </div>
+
+    <!-- Messages Area -->
+    <div class="messages-area">
+      <div *ngFor="let msg of messages" [ngClass]="'message ' + getMessageAlignmentClass(msg)">
+        <div class="message-bubble" [ngClass]="getMessageBubbleClass(msg)">
+          <p class="message-content">{{ msg.content }}</p>
+          <span class="message-timestamp">{{ msg.createdAt | date: 'short' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-area">
+      <input
+        type="text"
+        [(ngModel)]="messageInput"
+        placeholder="Type your message..."
+        (keyup.enter)="sendMessage()"
+        class="message-input"
+      />
+      <button type="button" (click)="sendMessage()" class="send-btn"><i class="fas fa-paper-plane"></i> Send</button>
+    </div>
+  </div>
+
+  <!-- Patient List View -->
+  <div *ngIf="!showChatView" class="patient-list-view">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-icon"><i class="fas fa-comments"></i></div>
+      <div class="header-text">
+        <h1>Messages</h1>
+        <p class="subtitle">Chat with your patients</p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading patients...</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div *ngIf="!loading && (patients.length > 0 || doctors.length > 0)" class="tab-navigation">
+      <button
+        type="button"
+        (click)="switchTab('patients')"
+        [class.active]="activeTab === 'patients'"
+        class="tab-btn"
+      >
+        <i class="fas fa-users"></i> Patients ({{ patients.length }})
+      </button>
+      <button
+        type="button"
+        (click)="switchTab('doctors')"
+        [class.active]="activeTab === 'doctors'"
+        class="tab-btn"
+      >
+        <i class="fas fa-user-md"></i> Doctors ({{ doctors.length }})
+      </button>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div *ngIf="!loading && ((activeTab === 'patients' && patients.length > 0) || (activeTab === 'doctors' && doctors.length > 0))" class="search-filter-container">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search by name or email..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange(searchQuery)"
+        class="search-input"
+      />
+      <span class="search-icon"><i class="fas fa-search"></i></span>
+    </div>
+
+    <div class="filter-controls">
+      <button
+        (click)="toggleAppointmentFilter()"
+        [class.active]="filterByAppointment"
+        class="filter-btn appointment-filter"
+        title="Show only patients with appointments"
+      >
+        <i class="fas fa-calendar-check"></i> Has Appointment{{ filterByAppointment ? ' ✓' : '' }}
+      </button>
+
+      <div class="status-filter-group">
+        <button
+          (click)="setStatusFilter('ALL')"
+          [class.active]="filterByStatus === 'ALL'"
+          class="filter-btn status-filter"
+        >
+          All
+        </button>
+        <button
+          (click)="setStatusFilter('SCHEDULED')"
+          [class.active]="filterByStatus === 'SCHEDULED'"
+          class="filter-btn status-filter scheduled"
+        >
+          Scheduled
+        </button>
+        <button
+          (click)="setStatusFilter('COMPLETED')"
+          [class.active]="filterByStatus === 'COMPLETED'"
+          class="filter-btn status-filter completed"
+        >
+          Completed
+        </button>
+        <button
+          (click)="setStatusFilter('CANCELLED')"
+          [class.active]="filterByStatus === 'CANCELLED'"
+          class="filter-btn status-filter cancelled"
+        >
+          Cancelled
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-info">
+      <p *ngIf="activeTab === 'patients'">
+        Showing {{ filteredPatients.length }} of {{ patients.length }} patients
+      </p>
+      <p *ngIf="activeTab === 'doctors'">
+        Showing {{ filteredDoctors.length }} of {{ doctors.length }} doctors
+      </p>
+    </div>
+  </div>
+
+  <!-- Patients List -->
+  <div *ngIf="!loading && activeTab === 'patients' && filteredPatients.length > 0" class="patients-list">
+    <div
+      *ngFor="let patient of filteredPatients"
+      class="patient-item"
+      [ngClass]="{'unread': patient.unreadCount && patient.unreadCount > 0}"
+      (click)="selectPatient(patient)"
+    >
+      <div class="patient-avatar">
+        <i class="fas fa-user"></i>
+        <span *ngIf="patient.isOnline" class="online-indicator" title="Online"></span>
+        <span *ngIf="patient.unreadCount && patient.unreadCount > 0" class="unread-badge">{{ patient.unreadCount }}</span>
+      </div>
+      <div class="patient-info">
+        <div class="patient-header">
+          <h3 [ngClass]="{'bold': patient.unreadCount && patient.unreadCount > 0}">{{ patient.name }}</h3>
+          <span *ngIf="patient.isOnline" class="online-badge">Online</span>
+          <span *ngIf="patient.hasAppointment && patient.appointmentStatus"
+                [ngClass]="'appointment-badge ' + (patient.appointmentStatus | lowercase)">
+            {{ patient.appointmentStatus }}
+          </span>
+        </div>
+        <p class="preview">{{ patient.email || 'No email' }}</p>
+        <p *ngIf="!patient.isOnline && patient.lastSeen" class="last-seen">
+          Last seen {{ patient.lastSeen }}
+        </p>
+        <p *ngIf="patient.hasAppointment && patient.appointmentDate" class="appointment-info">
+          <i class="fas fa-calendar-alt"></i> Appointment: {{ patient.appointmentDate }}
+        </p>
+      </div>
+      <div class="patient-meta">
+        <p class="timestamp" [ngClass]="{'online-text': patient.isOnline, 'offline-text': !patient.isOnline}">
+          <i class="fas fa-circle"></i> {{ patient.isOnline ? 'Online' : 'Offline' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+    <!-- Doctors List -->
+    <div *ngIf="!loading && activeTab === 'doctors' && filteredDoctors.length > 0" class="patients-list">
+      <div
+        *ngFor="let doctor of filteredDoctors"
+        class="patient-item"
+        [ngClass]="{'unread': doctor.unreadCount && doctor.unreadCount > 0}"
+        (click)="selectPatient(doctor)"
+      >
+        <div class="patient-avatar">
+          <i class="fas fa-user-md"></i>
+          <span *ngIf="doctor.isOnline" class="online-indicator" title="Online"></span>
+          <span *ngIf="doctor.unreadCount && doctor.unreadCount > 0" class="unread-badge">{{ doctor.unreadCount }}</span>
+        </div>
+        <div class="patient-info">
+          <div class="patient-header">
+            <h3 [ngClass]="{'bold': doctor.unreadCount && doctor.unreadCount > 0}">{{ doctor.name }}</h3>
+            <span *ngIf="doctor.isOnline" class="online-badge">Online</span>
+            <span *ngIf="doctor.specialization" class="specialization-badge">
+              {{ doctor.specialization }}
+            </span>
+          </div>
+          <p class="preview">{{ doctor.email || 'No email' }}</p>
+          <p *ngIf="!doctor.isOnline && doctor.lastSeen" class="last-seen">
+            Last seen {{ doctor.lastSeen }}
+          </p>
+        </div>
+        <div class="patient-meta">
+          <p class="timestamp" [ngClass]="{'online-text': doctor.isOnline, 'offline-text': !doctor.isOnline}">
+            <i class="fas fa-circle"></i> {{ doctor.isOnline ? 'Online' : 'Offline' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State - No Patients -->
+    <div *ngIf="!loading && patients.length === 0 && doctors.length === 0" class="empty-state">
+      <div class="empty-icon"><i class="fas fa-comments"></i></div>
+      <h2>No contacts available</h2>
+      <p>You can start a conversation with any patient or doctor</p>
+    </div>
+
+    <!-- Empty State - No Filtered Patients Results -->
+    <div *ngIf="!loading && activeTab === 'patients' && patients.length > 0 && filteredPatients.length === 0" class="empty-state">
+      <div class="empty-icon"><i class="fas fa-search"></i></div>
+      <h2>No matches found</h2>
+      <p *ngIf="searchQuery">
+        No patients match your search for "{{ searchQuery }}"
+      </p>
+      <p *ngIf="!searchQuery && (filterByAppointment || filterByStatus !== 'ALL')">
+        No patients match your filter criteria
+      </p>
+    </div>
+
+    <!-- Empty State - No Filtered Doctors Results -->
+    <div *ngIf="!loading && activeTab === 'doctors' && doctors.length > 0 && filteredDoctors.length === 0" class="empty-state">
+      <div class="empty-icon"><i class="fas fa-search"></i></div>
+      <h2>No matches found</h2>
+      <p *ngIf="searchQuery">
+        No doctors match your search for "{{ searchQuery }}"
+      </p>
+      <p *ngIf="!searchQuery">
+        No doctors available
+      </p>
+    </div>
+  </div>
+</div>
+</div>

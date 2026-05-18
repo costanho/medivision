@@ -1,0 +1,504 @@
+/**
+ * Messages Component with Read Receipts
+ * Styling for chat interface with read receipt indicators
+ */
+
+// ═══════════════════════════════════════════════════════════════
+// Variables
+// ═══════════════════════════════════════════════════════════════
+
+$primary-color: #007bff;
+$success-color: #28a745;
+$read-color: #1e90ff;
+$unread-color: #999;
+$own-message-bg: #e7f3ff;
+$other-message-bg: #f5f5f5;
+$border-radius: 12px;
+$spacing: 1rem;
+$transition: all 0.3s ease;
+
+// ═══════════════════════════════════════════════════════════════
+// Header
+// ═══════════════════════════════════════════════════════════════
+
+ion-header {
+  ion-toolbar {
+    --background: #fff;
+    --border-color: #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
+
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .participant-name {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .unread-badge {
+        font-size: 0.75rem;
+        color: #999;
+        font-weight: normal;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Conversations Panel
+// ═══════════════════════════════════════════════════════════════
+
+.conversations-panel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 300px;
+  height: 100vh;
+  background: #f9f9f9;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  padding: $spacing;
+  margin-top: 56px; // Account for header height
+
+  h3 {
+    margin: 0 0 $spacing 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .conversations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .conversation-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: $border-radius;
+      cursor: pointer;
+      transition: $transition;
+      position: relative;
+
+      &:hover {
+        background: rgba(0, 123, 255, 0.1);
+      }
+
+      &.selected {
+        background: $own-message-bg;
+        border-left: 3px solid $primary-color;
+        padding-left: calc(0.75rem - 3px);
+      }
+
+      .participant-avatar,
+      .avatar-placeholder {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        background: $primary-color;
+        color: white;
+      }
+
+      .conversation-info {
+        flex: 1;
+        min-width: 0;
+
+        .participant-name-header {
+          font-weight: 600;
+          color: #333;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .last-message-preview {
+          font-size: 0.85rem;
+          color: #999;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .unread-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: $primary-color;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Messages Container
+// ═══════════════════════════════════════════════════════════════
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: $spacing;
+  margin-left: 300px; // Account for conversations panel
+
+  .load-more-btn {
+    align-self: center;
+    margin-bottom: $spacing;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Message Bubble
+// ═══════════════════════════════════════════════════════════════
+
+.message {
+  display: flex;
+  margin-bottom: 0.75rem;
+  animation: messageEnter 0.3s ease-out;
+
+  &.own-message {
+    justify-content: flex-end;
+
+    .message-bubble {
+      background: $own-message-bg;
+      border: 1px solid #bfe1ff;
+    }
+  }
+
+  &:not(.own-message) {
+    justify-content: flex-start;
+
+    .message-bubble {
+      background: $other-message-bg;
+      border: 1px solid #e0e0e0;
+    }
+  }
+
+  .message-bubble {
+    max-width: 70%;
+    padding: 0.75rem 1rem;
+    border-radius: $border-radius;
+    word-wrap: break-word;
+    transition: $transition;
+
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-sender {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+
+      .sender-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      strong {
+        font-size: 0.85rem;
+        color: #666;
+      }
+    }
+
+    .message-text {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: #333;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .message-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: #999;
+
+      .message-time {
+        flex-shrink: 0;
+      }
+
+      .read-status {
+        font-weight: bold;
+        transition: $transition;
+
+        &.unread {
+          color: $unread-color;
+
+          .checkmark {
+            display: inline;
+          }
+
+          .checkmark.double {
+            display: none;
+          }
+        }
+
+        &.read {
+          color: $read-color;
+
+          .checkmark {
+            display: none;
+          }
+
+          .checkmark.double {
+            display: inline;
+          }
+        }
+      }
+    }
+
+    .read-time {
+      font-size: 0.7rem;
+      color: $read-color;
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Message Input Footer
+// ═══════════════════════════════════════════════════════════════
+
+ion-footer {
+  --background: #fff;
+  --border-color: #e0e0e0;
+  border-top: 1px solid var(--border-color);
+
+  .message-input-container {
+    padding: 0.5rem $spacing;
+
+    ion-item {
+      --padding-start: 0;
+      --padding-end: 0;
+      --border-color: #e0e0e0;
+    }
+
+    ion-input {
+      font-size: 0.95rem;
+    }
+
+    ion-button {
+      --padding-start: 0.5rem;
+      --padding-end: 0.5rem;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// States
+// ═══════════════════════════════════════════════════════════════
+
+.error-card {
+  margin: $spacing;
+  --background: #fff5f5;
+  --border-color: #ffb3b3;
+  border: 1px solid var(--border-color);
+  border-radius: $border-radius;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: $spacing;
+
+  ion-spinner {
+    --color: $primary-color;
+  }
+
+  p {
+    color: #999;
+    font-size: 0.95rem;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: $spacing;
+
+  ion-icon {
+    font-size: 3rem;
+    color: #999;
+  }
+
+  h2 {
+    margin: 0;
+    color: #666;
+  }
+
+  p {
+    color: #999;
+    font-size: 0.95rem;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Animations
+// ═══════════════════════════════════════════════════════════════
+
+@keyframes messageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes readStatusChange {
+  0% {
+    background: #fffacd;
+  }
+  100% {
+    background: inherit;
+  }
+}
+
+// Highlight when message is read
+.message:has(.read-status.read) {
+  animation: readStatusChange 0.5s ease-in;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Responsive
+// ═══════════════════════════════════════════════════════════════
+
+@media (max-width: 768px) {
+  .conversations-panel {
+    display: none;
+  }
+
+  .messages-container {
+    margin-left: 0;
+  }
+
+  .message {
+    .message-bubble {
+      max-width: 85%;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Dark Mode Support
+// ═══════════════════════════════════════════════════════════════
+
+@media (prefers-color-scheme: dark) {
+  ion-header {
+    ion-toolbar {
+      --background: #2b2b2b;
+      --color: #fff;
+      --border-color: #444;
+    }
+  }
+
+  .conversations-panel {
+    background: #2b2b2b;
+    border-right-color: #444;
+
+    h3 {
+      color: #fff;
+    }
+
+    .conversation-item {
+      &:hover {
+        background: rgba(0, 123, 255, 0.15);
+      }
+
+      &.selected {
+        background: rgba(0, 123, 255, 0.2);
+      }
+
+      .participant-name-header {
+        color: #fff;
+      }
+
+      .last-message-preview {
+        color: #aaa;
+      }
+    }
+  }
+
+  .message {
+    &.own-message {
+      .message-bubble {
+        background: rgba(0, 123, 255, 0.2);
+        border-color: rgba(0, 123, 255, 0.4);
+      }
+    }
+
+    &:not(.own-message) {
+      .message-bubble {
+        background: #3a3a3a;
+        border-color: #444;
+      }
+    }
+
+    .message-bubble {
+      .message-text {
+        color: #e0e0e0;
+      }
+
+      .message-sender {
+        strong {
+          color: #aaa;
+        }
+      }
+    }
+  }
+
+  ion-footer {
+    --background: #2b2b2b;
+    --border-color: #444;
+  }
+
+  .error-card {
+    --background: #4a2626;
+    --border-color: #8b4545;
+  }
+
+  .empty-state {
+    ion-icon {
+      color: #666;
+    }
+
+    h2 {
+      color: #aaa;
+    }
+
+    p {
+      color: #999;
+    }
+  }
+}

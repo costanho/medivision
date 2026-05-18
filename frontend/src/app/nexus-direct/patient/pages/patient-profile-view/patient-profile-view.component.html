@@ -1,0 +1,23 @@
+<!-- CONTAINER WITH HEADER AND SIDEBAR (Fixed Layout) -->
+<div class="profile-view-container">
+  <!-- TOP NAVBAR (Fixed) -->
+  <app-top-navbar
+    [currentUser]="currentUser"
+    (menuClick)="toggleSidebar()">
+  </app-top-navbar>
+
+  <!-- MAIN WRAPPER -->
+  <div class="profile-view-wrapper">
+    <!-- SIDEBAR (Fixed) -->
+    <app-dashboard-sidebar
+      [currentUser]="currentUser"
+      [showDrawer]="sidebarOpen"
+      (closeDrawer)="closeSidebar()">
+    </app-dashboard-sidebar>
+
+    <!-- PROFILE CONTENT (Scrollable) -->
+    <main class="profile-view-content">
+      <app-profile></app-profile>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,210 @@
+<div class="reports-wrapper">
+<div class="reports-container">
+  <!-- Header -->
+  <div class="reports-header">
+    <h1><i class="fas fa-file-chart-line"></i> Health Reports</h1>
+    <p class="subtitle">View and download your comprehensive health reports</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="success" class="alert alert-success">
+    <i class="fas fa-check-circle"></i> {{ success }}
+  </div>
+  <div *ngIf="error" class="alert alert-error">
+    <i class="fas fa-exclamation-circle"></i> {{ error }}
+  </div>
+
+  <!-- Section Navigation -->
+  <div class="section-nav">
+    <button
+      class="nav-btn"
+      [class.active]="activeSection === 'health_summary'"
+      (click)="selectSection('health_summary')">
+      <i class="fas fa-heart-pulse"></i> Health Summary
+    </button>
+    <button
+      class="nav-btn"
+      [class.active]="activeSection === 'appointments'"
+      (click)="selectSection('appointments')">
+      <i class="fas fa-calendar-check"></i> Appointments
+    </button>
+    <button
+      class="nav-btn"
+      [class.active]="activeSection === 'medical'"
+      (click)="selectSection('medical')">
+      <i class="fas fa-file-medical"></i> Medical
+    </button>
+    <button
+      class="nav-btn"
+      [class.active]="activeSection === 'billing'"
+      (click)="selectSection('billing')">
+      <i class="fas fa-receipt"></i> Billing
+    </button>
+  </div>
+
+  <!-- Health Summary Section -->
+  <div *ngIf="activeSection === 'health_summary'" class="section-content">
+    <h2>Health Summary</h2>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fas fa-heartbeat"></i></div>
+        <div class="metric-info">
+          <span class="metric-label">Blood Pressure</span>
+          <span class="metric-value">{{ healthMetrics.avgBloodPressure }}</span>
+          <span class="metric-date">Average</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fas fa-pulse"></i></div>
+        <div class="metric-info">
+          <span class="metric-label">Heart Rate</span>
+          <span class="metric-value">{{ healthMetrics.avgHeartRate }}</span>
+          <span class="metric-date">Average</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fas fa-calendar"></i></div>
+        <div class="metric-info">
+          <span class="metric-label">Last Checkup</span>
+          <span class="metric-value">{{ healthMetrics.lastCheckup }}</span>
+          <span class="metric-date">Scheduled</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-section">
+      <h3>Generate Reports</h3>
+      <div class="action-buttons">
+        <button class="btn-action" (click)="generateNewReport('Health Summary')">
+          <i class="fas fa-plus"></i> Generate Health Report
+        </button>
+        <button class="btn-action" (click)="generateNewReport('Medical Summary')">
+          <i class="fas fa-plus"></i> Generate Medical Summary
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointments Section -->
+  <div *ngIf="activeSection === 'appointments'" class="section-content">
+    <h2>Appointment Reports</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Appointments</span>
+        <span class="stat-value">{{ appointmentStats.totalAppointments }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">On-Time Rate</span>
+        <span class="stat-value">{{ appointmentStats.onTimePercentage }}%</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Upcoming</span>
+        <span class="stat-value">{{ healthMetrics.appointmentsScheduled }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Average Wait Time</span>
+        <span class="stat-value">{{ appointmentStats.averageWaitTime }}</span>
+      </div>
+    </div>
+
+    <div class="action-section">
+      <button class="btn-action" (click)="generateNewReport('Appointment Report')">
+        <i class="fas fa-plus"></i> Generate Appointment Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Medical Section -->
+  <div *ngIf="activeSection === 'medical'" class="section-content">
+    <h2>Medical Records & History</h2>
+    <div class="info-box">
+      <p>Access your complete medical history, diagnoses, treatments, and procedures.</p>
+    </div>
+    <div class="action-section">
+      <button class="btn-action" (click)="generateNewReport('Medical History Report')">
+        <i class="fas fa-plus"></i> Generate Medical History
+      </button>
+    </div>
+  </div>
+
+  <!-- Billing Section -->
+  <div *ngIf="activeSection === 'billing'" class="section-content">
+    <h2>Billing Summary</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Billed</span>
+        <span class="stat-value">{{ formatCurrency(billingStats.totalBilled) }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Paid</span>
+        <span class="stat-value">{{ formatCurrency(billingStats.totalPaid) }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Outstanding</span>
+        <span class="stat-value">{{ formatCurrency(billingStats.outstanding) }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">On-Time Payment</span>
+        <span class="stat-value">{{ billingStats.onTimePaymentRate }}%</span>
+      </div>
+    </div>
+    <div class="action-section">
+      <button class="btn-action" (click)="generateNewReport('Billing Report')">
+        <i class="fas fa-plus"></i> Generate Billing Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent Reports -->
+  <div class="recent-reports">
+    <h2>Recent Reports</h2>
+    <div class="filter-bar">
+      <label>Filter by Type:</label>
+      <select [(ngModel)]="selectedReportType" (change)="filterReportsByType(selectedReportType)">
+        <option value="all">All Reports</option>
+        <option value="health_summary">Health Summary</option>
+        <option value="appointment">Appointments</option>
+        <option value="medical">Medical</option>
+        <option value="billing">Billing</option>
+      </select>
+    </div>
+
+    <div class="reports-list">
+      <div *ngFor="let report of getFilteredReports()" class="report-card">
+        <div class="report-icon">
+          <i [class]="getReportIcon(report.type)"></i>
+        </div>
+        <div class="report-info">
+          <h3>{{ report.title }}</h3>
+          <p class="report-description">{{ report.description }}</p>
+          <div class="report-meta">
+            <span class="report-type">{{ getReportTypeLabel(report.type) }}</span>
+            <span class="report-date">{{ report.generatedDate }}</span>
+            <span class="report-period">{{ report.period }}</span>
+          </div>
+        </div>
+        <div class="report-actions">
+          <button class="btn-icon" (click)="downloadReport(report.id)" title="Download">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn-icon" (click)="printReport(report.id)" title="Print">
+            <i class="fas fa-print"></i>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="getFilteredReports().length === 0" class="empty-state">
+        <i class="fas fa-file-medical"></i>
+        <p>No reports found</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner"></i> Generating report...
+    </div>
+  </div>
+</div>
+</div>

@@ -1,0 +1,55 @@
+<div class="scrollable-wrapper">
+<!-- HEADER SECTION -->
+<div class="service-selection-header">
+  <div class="header-content">
+    <h1>Welcome to CareNexus</h1>
+    <p>Hello <strong>{{ currentUser?.fullName }}</strong>! Choose a service to get started</p>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="service-selection-container">
+  <div class="services-wrapper">
+    <!-- SERVICES GRID -->
+    <div class="services-grid">
+      <div *ngFor="let service of availableServices"
+           class="service-card"
+           (click)="selectService(service)">
+
+        <!-- Card Header with Icon -->
+        <div class="card-header">
+          <span class="service-icon">{{ service.icon }}</span>
+          <h2>{{ service.name }}</h2>
+        </div>
+
+        <!-- Card Description -->
+        <p class="service-description">
+          {{ service.description }}
+        </p>
+
+        <!-- Card Features List -->
+        <div class="service-features">
+          <ul>
+            <li *ngFor="let feature of service.features">
+              <span class="feature-check">✓</span>
+              {{ feature }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Card Action Button -->
+        <div class="card-footer">
+          <button class="btn-select">
+            Get Started →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER INFO -->
+<div class="service-selection-footer">
+  <p>You can switch between services anytime from the main menu</p>
+</div>
+</div>

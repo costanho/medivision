@@ -1,0 +1,924 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// SIMPLIFIED PATIENT DASHBOARD - CARENEXUS (Turbinee Style)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Color Variables
+$primary-color: #667eea;
+$primary-dark: #5568d3;
+$secondary-color: #764ba2;
+$accent-color: #f093fb;
+$success-color: #4caf50;
+$warning-color: #ff9800;
+$danger-color: #f5576c;
+$info-color: #00bcd4;
+
+$text-dark: #1a1a1a;
+$text-main: #333;
+$text-light: #666;
+$text-lighter: #999;
+$text-white: #fff;
+
+$bg-white: #fff;
+$bg-light: #f8f9fa;
+$bg-lighter: #f3f4f7;
+$border-color: #e0e0e0;
+$border-light: #f0f0f0;
+
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 15px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+// Layout
+$sidebar-width: 240px;
+$main-content-padding: 30px;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+$gradient-warm: linear-gradient(135deg, #f5a962 0%, #f093fb 50%, $primary-color 100%);
+
+// ─────────────────────────────────────────────────────────────────────────
+// GLOBAL STYLES
+// ─────────────────────────────────────────────────────────────────────────
+
+* {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// TOP NAVIGATION BAR
+// ─────────────────────────────────────────────────────────────────────────
+
+.top-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  backdrop-filter: blur(15px);
+  border-bottom: none;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  gap: 30px;
+
+  .navbar-left {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: scale(1.08);
+      }
+
+      .brand-logo-img {
+        height: 60px;
+        width: 60px;
+        object-fit: contain;
+        transition: filter 0.3s ease;
+        filter: brightness(1.1);
+      }
+
+      &:hover .brand-logo-img {
+        filter: brightness(1.3) drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+      }
+
+      .brand-text {
+        font-size: 28px;
+        font-weight: 800;
+        color: white;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.5px;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .navbar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+
+      &:focus-within {
+        border-color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .search-icon {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        color: white;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+    }
+  }
+
+  .navbar-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding-right: 20px;
+
+    .notification-badges {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .icon-btn {
+        position: relative;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          transform: translateY(-2px);
+        }
+
+        .icon {
+          font-size: 24px;
+        }
+
+        .label {
+          white-space: nowrap;
+          font-size: 16px;
+          font-weight: 600;
+        }
+
+        .badge {
+          position: absolute;
+          top: -8px;
+          right: 2px;
+          background: $danger-color;
+          color: $text-white;
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 5px;
+          border-radius: 10px;
+          min-width: 18px;
+          text-align: center;
+        }
+
+        &.notification {
+          color: white;
+        }
+      }
+    }
+
+    .user-profile-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $text-white;
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .user-name {
+          font-size: 13px;
+          font-weight: 600;
+          color: white;
+          margin: 0;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-role {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// DASHBOARD CONTAINER
+// ─────────────────────────────────────────────────────────────────────────
+
+.dashboard-container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// LEFT SIDEBAR - SIMPLIFIED NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────
+
+.sidebar-left {
+  width: $sidebar-width;
+  background: $bg-white;
+  border-right: 1px solid $border-light;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px 0;
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 0;
+
+    .nav-section {
+      padding: 0;
+      margin-bottom: 5px;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .nav-divider {
+      height: 1px;
+      background: $border-light;
+      margin: 15px 0;
+    }
+
+    .nav-label-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: $text-lighter;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      cursor: pointer;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      color: $text-main;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      border-left: 3px solid transparent;
+      margin: 0 10px;
+      border-radius: 6px;
+
+      .nav-icon {
+        font-size: 18px;
+        min-width: 20px;
+      }
+
+      .nav-label {
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.3;
+      }
+
+      &:hover {
+        background: $bg-lighter;
+        color: $primary-color;
+      }
+
+      &.active {
+        background: $bg-lighter;
+        color: $primary-color;
+        border-left-color: $primary-color;
+      }
+
+      &.expandable {
+        cursor: pointer;
+
+        .expand-icon {
+          margin-left: auto;
+          transition: transform 0.3s ease;
+          font-size: 12px;
+
+          &.open {
+            transform: rotate(90deg);
+          }
+        }
+      }
+    }
+
+    .nav-submenu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+
+      &.visible {
+        max-height: 500px;
+      }
+
+      .sub-item {
+        padding-left: 40px;
+        margin: 5px 10px;
+        font-size: 12px;
+        background: rgba(102, 126, 234, 0.05);
+        border-left-color: $primary-color;
+
+        &:hover {
+          background: $bg-lighter;
+        }
+      }
+    }
+  }
+
+  .chat-btn {
+    margin: 20px 10px;
+    padding: 12px 15px;
+    background: $gradient-primary;
+    color: $text-white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// MAIN CONTENT
+// ─────────────────────────────────────────────────────────────────────────
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  background: $bg-light;
+  display: flex;
+  flex-direction: column;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// WELCOME BANNER
+// ─────────────────────────────────────────────────────────────────────────
+
+.welcome-banner {
+  background: $gradient-warm;
+  padding: 40px $main-content-padding;
+  margin: 30px $main-content-padding 0 $main-content-padding;
+  color: $text-white;
+  position: relative;
+  border-radius: 12px;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+
+    .banner-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+
+      .banner-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $text-white;
+        font-weight: 700;
+        font-size: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        flex-shrink: 0;
+      }
+
+      .banner-text {
+        flex: 1;
+
+        h1 {
+          font-size: 24px;
+          font-weight: 700;
+          margin: 0 0 8px 0;
+          color: $text-white;
+        }
+
+        p {
+          font-size: 14px;
+          margin: 0;
+          color: rgba(255, 255, 255, 0.9);
+        }
+      }
+    }
+
+    .banner-stats {
+      display: flex;
+      gap: 15px;
+      flex-shrink: 0;
+
+      .stat-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 16px 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        min-width: 100px;
+
+        .stat-number {
+          font-size: 24px;
+          font-weight: 700;
+          color: $text-white;
+        }
+
+        .stat-label {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.8);
+          text-transform: uppercase;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+        }
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// CAROUSEL SECTION
+// ─────────────────────────────────────────────────────────────────────────
+
+.carousel-section {
+  padding: $main-content-padding;
+  background: $bg-light;
+
+  .carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+
+    .carousel-slide {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+
+      .carousel-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .carousel-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 70%);
+      }
+
+      .carousel-label {
+        position: relative;
+        z-index: 2;
+        padding: 30px;
+        color: $text-white;
+
+        h3 {
+          font-size: 28px;
+          font-weight: 700;
+          margin: 0 0 8px 0;
+        }
+
+        p {
+          font-size: 14px;
+          margin: 0;
+          color: rgba(255, 255, 255, 0.9);
+        }
+      }
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: $text-white;
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      &.prev {
+        left: 20px;
+      }
+
+      &.next {
+        right: 20px;
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// SERVICES SECTION
+// ─────────────────────────────────────────────────────────────────────────
+
+.services-section {
+  padding: 0 $main-content-padding $main-content-padding $main-content-padding;
+  margin-top: 40px;
+  background: $bg-light;
+
+  .section-header {
+    margin-bottom: 30px;
+
+    h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: $text-light;
+      margin: 0;
+    }
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+
+    .service-card {
+      background: $bg-white;
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid $border-light;
+      display: flex;
+      flex-direction: column;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: $shadow-lg;
+        border-color: $primary-color;
+      }
+
+      .card-header-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+
+        .service-icon {
+          font-size: 32px;
+        }
+
+        h3 {
+          font-size: 16px;
+          font-weight: 700;
+          color: $text-dark;
+          margin: 0;
+        }
+      }
+
+      .service-description {
+        font-size: 13px;
+        color: $text-light;
+        margin: 0 0 16px 0;
+        line-height: 1.5;
+      }
+
+      .service-features {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+
+        .feature-tag {
+          font-size: 12px;
+          color: $success-color;
+          font-weight: 500;
+        }
+      }
+
+      .btn-details {
+        align-self: flex-start;
+        padding: 8px 16px;
+        background: $primary-color;
+        color: $text-white;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: $primary-dark;
+        }
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// RESPONSIVE DESIGN
+// ─────────────────────────────────────────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .sidebar-left {
+    width: 200px;
+  }
+
+  .welcome-banner .banner-content {
+    gap: 24px;
+
+    .banner-left {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .banner-stats {
+      width: 100%;
+      flex-direction: row;
+    }
+  }
+
+  .carousel-section {
+    padding: $main-content-padding;
+
+    .carousel-wrapper {
+      height: 250px;
+
+      .carousel-label {
+        padding: 20px;
+
+        h3 {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .sidebar-left {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid $border-light;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px 0;
+    height: auto;
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      padding: 0 20px;
+
+      .nav-section {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 0;
+
+        .nav-item {
+          white-space: nowrap;
+          padding: 8px 12px;
+          font-size: 12px;
+          margin: 0;
+        }
+      }
+
+      .nav-divider {
+        width: 1px;
+        height: 30px;
+        margin: 0 10px;
+      }
+    }
+
+    .chat-btn {
+      display: none;
+    }
+  }
+
+  .main-content {
+    flex: 1;
+  }
+
+  .welcome-banner {
+    padding: 30px 20px;
+
+    .banner-content {
+      flex-direction: column;
+      gap: 20px;
+
+      .banner-left {
+        gap: 15px;
+      }
+
+      .banner-stats {
+        flex-direction: row;
+        width: 100%;
+        gap: 10px;
+
+        .stat-box {
+          flex: 1;
+          padding: 12px;
+
+          .stat-number {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+
+  .carousel-section {
+    padding: 20px;
+
+    .carousel-wrapper {
+      height: 200px;
+
+      .carousel-label {
+        padding: 15px;
+
+        h3 {
+          font-size: 18px;
+        }
+
+        p {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  .services-section {
+    padding: 0 20px 20px 20px;
+
+    .services-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .top-navbar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+
+    .navbar-left,
+    .navbar-right {
+      width: 100%;
+    }
+
+    .navbar-center {
+      flex: 1;
+
+      .search-box {
+        max-width: 100%;
+      }
+    }
+
+    .user-profile-header {
+      width: 100%;
+    }
+  }
+
+  .welcome-banner {
+    padding: 20px;
+
+    .banner-content {
+      flex-direction: column;
+
+      .banner-stats {
+        gap: 8px;
+
+        .stat-box {
+          flex: 1;
+          padding: 10px;
+          font-size: 11px;
+
+          .stat-number {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+  }
+
+  .carousel-section {
+    padding: 15px;
+
+    .carousel-wrapper {
+      height: 150px;
+    }
+  }
+
+  .services-section {
+    padding: 0 15px 15px 15px;
+
+    .section-header {
+      h2 {
+        font-size: 22px;
+      }
+    }
+
+    .services-grid {
+      gap: 16px;
+    }
+  }
+}

@@ -1,0 +1,271 @@
+<div class="scrollable-wrapper">
+  <div class="schedule-container">
+    <!-- Header with Title and Action Button -->
+    <div class="section-header">
+      <h1><i class="fas fa-calendar-alt"></i> Doctor Schedule</h1>
+      <button class="btn-primary" (click)="openSlotModal()">
+        <i class="fas fa-plus"></i> Add Time Slot
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ error }}</span>
+      <button class="close-btn" (click)="clearError()">×</button>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="alert-success">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading schedule...</p>
+    </div>
+
+    <div *ngIf="!loading">
+      <!-- View Type Tabs -->
+      <div class="view-tabs">
+        <button
+          class="tab-btn"
+          [class.active]="viewType === 'weekly'"
+          (click)="viewType = 'weekly'">
+          <i class="fas fa-calendar-week"></i> Weekly View
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="viewType === 'monthly'"
+          (click)="viewType = 'monthly'">
+          <i class="fas fa-calendar"></i> Monthly View
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="viewType === 'list'"
+          (click)="viewType = 'list'">
+          <i class="fas fa-list"></i> List View
+        </button>
+      </div>
+
+      <!-- Date Selection (Weekly View) -->
+      <div *ngIf="viewType === 'weekly'" class="date-selection">
+        <div class="date-cards">
+          <div
+            *ngFor="let schedule of schedules"
+            class="date-card"
+            [class.selected]="selectedDate === schedule.date"
+            (click)="selectDate(schedule.date)">
+            <div class="date-card-day">{{ schedule.dayName }}</div>
+            <div class="date-card-date">{{ schedule.date | date: 'MMM d' }}</div>
+            <div class="date-card-stats">
+              <span class="stat-available">{{ schedule.availableSlots }} Available</span>
+              <span class="stat-booked">{{ schedule.bookedSlots }} Booked</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="filter-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Search by patient name or time..."
+            [(ngModel)]="searchQuery">
+        </div>
+
+        <div class="filter-controls">
+          <button
+            class="filter-btn"
+            [class.active]="filterStatus === 'all'"
+            (click)="filterStatus = 'all'">
+            All Slots ({{ selectedDateSchedule?.totalSlots || 0 }})
+          </button>
+          <button
+            class="filter-btn available"
+            [class.active]="filterStatus === 'available'"
+            (click)="filterStatus = 'available'">
+            Available ({{ selectedDateSchedule?.availableSlots || 0 }})
+          </button>
+          <button
+            class="filter-btn booked"
+            [class.active]="filterStatus === 'booked'"
+            (click)="filterStatus = 'booked'">
+            Booked ({{ selectedDateSchedule?.bookedSlots || 0 }})
+          </button>
+          <button
+            class="filter-btn cancelled"
+            [class.active]="filterStatus === 'cancelled'"
+            (click)="filterStatus = 'cancelled'">
+            Cancelled
+          </button>
+        </div>
+      </div>
+
+      <!-- Time Slots Grid (Weekly/List View) -->
+      <div *ngIf="(viewType === 'weekly' || viewType === 'list') && selectedDateSchedule && !loading" class="slots-container">
+        <div class="slots-header">
+          <h3>{{ selectedDateSchedule.date | date: 'EEEE, MMMM d, yyyy' }}</h3>
+          <div class="slots-summary">
+            <span class="summary-stat available">
+              <i class="fas fa-check-circle"></i> {{ selectedDateSchedule.availableSlots }} Available
+            </span>
+            <span class="summary-stat booked">
+              <i class="fas fa-clock"></i> {{ selectedDateSchedule.bookedSlots }} Booked
+            </span>
+            <span class="summary-stat total">
+              <i class="fas fa-layer-group"></i> {{ selectedDateSchedule.totalSlots }} Total
+            </span>
+          </div>
+        </div>
+
+        <!-- Time Slots Grid -->
+        <div class="time-slots-grid">
+          <div
+            *ngFor="let slot of getFilteredSlots()"
+            class="time-slot"
+            [ngClass]="getSlotStatusClass(slot)">
+
+            <div class="slot-time">
+              <strong>{{ slot.time }}</strong>
+            </div>
+
+            <div class="slot-duration">
+              {{ slot.startTime }} - {{ slot.endTime }}
+            </div>
+
+            <div *ngIf="slot.isAvailable" class="slot-status available">
+              <i class="fas fa-check"></i> Available
+            </div>
+
+            <div *ngIf="!slot.isAvailable" class="slot-info">
+              <div class="patient-name">👤 {{ slot.patientName }}</div>
+              <div class="patient-email">{{ slot.patientEmail }}</div>
+              <div class="appointment-status" [ngClass]="(slot.appointmentStatus || 'scheduled') | lowercase">
+                {{ slot.appointmentStatus || 'scheduled' | uppercase }}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="slot-actions">
+              <button
+                *ngIf="slot.isAvailable"
+                class="action-btn edit"
+                (click)="openSlotModal(slot)"
+                title="Edit Slot">
+                <i class="fas fa-edit"></i>
+              </button>
+
+              <button
+                *ngIf="!slot.isAvailable && slot.appointmentStatus !== 'cancelled'"
+                class="action-btn confirm"
+                (click)="updateSlotStatus(slot, 'confirmed')"
+                title="Confirm Appointment">
+                <i class="fas fa-check"></i>
+              </button>
+
+              <button
+                *ngIf="!slot.isAvailable"
+                class="action-btn release"
+                (click)="releaseSlot(slot)"
+                title="Release Slot">
+                <i class="fas fa-undo"></i>
+              </button>
+
+              <button
+                class="action-btn delete"
+                (click)="deleteSlot(slot)"
+                title="Delete Slot">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="getFilteredSlots().length === 0" class="empty-state">
+          <div class="empty-icon">📅</div>
+          <h3>No slots match your filters</h3>
+          <p>Try adjusting your search or filter criteria</p>
+        </div>
+      </div>
+
+      <!-- Monthly Calendar View -->
+      <div *ngIf="viewType === 'monthly'" class="monthly-view">
+        <div class="calendar-placeholder">
+          <div class="empty-icon">📆</div>
+          <h3>Monthly Calendar View</h3>
+          <p>Calendar visualization coming soon</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Time Slot Modal -->
+    <div *ngIf="showSlotModal" class="modal-overlay" (click)="closeSlotModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ selectedSlot ? 'Edit Time Slot' : 'Add New Time Slot' }}</h2>
+          <button class="close-btn" (click)="closeSlotModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+          <form (ngSubmit)="createTimeSlot()">
+            <div class="form-group">
+              <label for="slotDate">Date *</label>
+              <input
+                id="slotDate"
+                type="date"
+                [(ngModel)]="newSlotForm.date"
+                name="date"
+                required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="startTime">Start Time *</label>
+                <input
+                  id="startTime"
+                  type="time"
+                  [(ngModel)]="newSlotForm.startTime"
+                  name="startTime"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label for="endTime">End Time *</label>
+                <input
+                  id="endTime"
+                  type="time"
+                  [(ngModel)]="newSlotForm.endTime"
+                  name="endTime"
+                  required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="slotCount">Number of Slots</label>
+              <input
+                id="slotCount"
+                type="number"
+                [(ngModel)]="newSlotForm.slotCount"
+                name="slotCount"
+                min="1"
+                max="10">
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-secondary" (click)="closeSlotModal()">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> {{ selectedSlot ? 'Update Slot' : 'Create Slots' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

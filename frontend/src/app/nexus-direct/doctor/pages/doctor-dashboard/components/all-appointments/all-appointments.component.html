@@ -1,0 +1,87 @@
+<div class="appointments-wrapper">
+  <!-- Header -->
+  <div class="content-header">
+    <h2><i class="fas fa-calendar-check"></i> All Appointments</h2>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="success" class="success-message">{{ success }}</div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label>Status</label>
+      <select [(ngModel)]="filterStatus" (change)="onFilterStatusChange()" class="filter-select">
+        <option value="ALL">All Status</option>
+        <option value="SCHEDULED">Scheduled</option>
+        <option value="COMPLETED">Completed</option>
+        <option value="CANCELLED">Cancelled</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Search Patient</label>
+      <input
+        type="text"
+        [(ngModel)]="searchPatient"
+        (input)="onSearchChange()"
+        placeholder="Enter patient name..."
+        class="filter-input"
+      />
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <p>Loading appointments...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredAppointments.length === 0" class="empty-state">
+    <p>No appointments found</p>
+  </div>
+
+  <!-- Appointments Table -->
+  <div *ngIf="!loading && filteredAppointments.length > 0" class="appointments-table">
+    <div class="table-header">
+      <div class="col-id">ID</div>
+      <div class="col-patient">Patient Name</div>
+      <div class="col-doctor">Doctor Name</div>
+      <div class="col-specialty">Specialty</div>
+      <div class="col-datetime">Appointment Date/Time</div>
+      <div class="col-reason">Reason</div>
+      <div class="col-status">Status</div>
+    </div>
+
+    <div *ngFor="let appointment of filteredAppointments" class="table-row" [class]="getStatusClass(appointment.status)">
+      <div class="col-id">{{ appointment.id }}</div>
+      <div class="col-patient">{{ appointment.patientName || '—' }}</div>
+      <div class="col-doctor">{{ appointment.doctorName || '—' }}</div>
+      <div class="col-specialty">{{ appointment.specialty || '—' }}</div>
+      <div class="col-datetime">{{ formatTime(appointment.appointmentTime) }}</div>
+      <div class="col-reason">{{ appointment.reason || '—' }}</div>
+      <div class="col-status">
+        <span [class]="'status-badge ' + getStatusClass(appointment.status)">
+          {{ getStatusIcon(appointment.status) }} {{ appointment.status }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="pagination">
+    <button (click)="previousPage()" [disabled]="currentPage === 0" class="btn-pagination">
+      <i class="fas fa-chevron-left"></i> Previous
+    </button>
+    <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages - 1" class="btn-pagination">
+      Next <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Info Footer -->
+  <div *ngIf="!loading && filteredAppointments.length > 0" class="info-footer">
+    <span>Showing {{ filteredAppointments.length }} of {{ totalElements }} appointments</span>
+  </div>
+</div>

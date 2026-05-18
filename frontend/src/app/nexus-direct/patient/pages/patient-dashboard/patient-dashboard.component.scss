@@ -1,0 +1,113 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// PATIENT DASHBOARD - MAIN CONTENT STYLES
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Color Variables
+$bg-light: #f8f9fa;
+$mobile: 768px;
+$tablet: 1024px;
+
+// ─────────────────────────────────────────────────────────────────────────
+// DASHBOARD CONTAINER
+// ─────────────────────────────────────────────────────────────────────────
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+
+  app-top-navbar {
+    flex-shrink: 0;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// DASHBOARD WRAPPER (Sidebar + Content)
+// ─────────────────────────────────────────────────────────────────────────
+
+.dashboard-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  width: 100%;
+  background: $bg-light;
+  position: relative;
+
+  app-dashboard-sidebar {
+    flex-shrink: 0;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// MAIN CONTENT
+// ─────────────────────────────────────────────────────────────────────────
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: $bg-light;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  > app-profile {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  > app-billing,
+  > app-settings,
+  > app-reports,
+  > app-messages,
+  > app-appointments,
+  > app-doctor-list,
+  > app-medical-records {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  > app-quick-stats,
+  > app-recent-activity {
+    padding: 30px 20px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: $mobile) {
+    > app-quick-stats,
+    > app-recent-activity {
+      padding: 20px 15px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// RESPONSIVE - MOBILE
+// ─────────────────────────────────────────────────────────────────────────
+
+@media (max-width: $mobile) {
+  .dashboard-container {
+    height: 100vh;
+  }
+
+  .dashboard-wrapper {
+    // Keep flex-direction as row so sidebar is positioned absolutely/fixed
+    // and main-content fills the screen on mobile
+    flex-direction: row;
+    position: relative;
+
+    app-dashboard-sidebar {
+      // Sidebar is already fixed positioned in its own SCSS
+      flex-shrink: 0;
+    }
+  }
+
+  .main-content {
+    padding: 15px 12px;
+    width: 100%;
+    flex: 1;
+  }
+}

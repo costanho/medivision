@@ -1,0 +1,162 @@
+<div class="scrollable-wrapper">
+<!-- HEADER SECTION -->
+<div class="header">
+  <div class="header-content">
+    <div>
+      <button class="back-btn" (click)="backToProfile()">← Back</button>
+      <h1>Nexus Companion - Your Health Assistant</h1>
+      <p>24/7 AI-powered health guidance and support</p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <!-- TAB NAVIGATION -->
+  <div class="tab-nav">
+    <button [class.active]="activeTab === 'chat'" (click)="switchTab('chat')">
+      💬 Chat with Assistant
+    </button>
+    <button [class.active]="activeTab === 'health-tips'" (click)="switchTab('health-tips')">
+      💡 Health Tips
+    </button>
+    <button [class.active]="activeTab === 'medications'" (click)="switchTab('medications')">
+      💊 Medications ({{ medications.length }})
+    </button>
+    <button [class.active]="activeTab === 'articles'" (click)="switchTab('articles')">
+      📚 Health Articles
+    </button>
+  </div>
+
+  <!-- CHAT TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'chat'">
+    <div class="chat-wrapper">
+      <!-- Chat Messages -->
+      <div class="chat-container" #chatContainer>
+        <div *ngFor="let message of chatMessages" class="chat-message" [class.user]="message.sender === 'user'">
+          <div class="message-content">
+            <div class="message-avatar" *ngIf="message.sender === 'assistant'">🤖</div>
+            <div class="message-bubble">
+              <p>{{ message.message }}</p>
+              <span class="timestamp">{{ message.timestamp | date:'short' }}</span>
+            </div>
+            <div class="message-avatar user-avatar" *ngIf="message.sender === 'user'">👤</div>
+          </div>
+        </div>
+        <div class="loading-indicator" *ngIf="isLoading">
+          <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Suggestions -->
+      <div class="quick-suggestions" *ngIf="chatMessages.length <= 2">
+        <p>Quick actions:</p>
+        <div class="suggestions-grid">
+          <button *ngFor="let suggestion of quickSuggestions"
+                  class="suggestion-btn"
+                  (click)="selectQuickSuggestion(suggestion)">
+            <span class="icon">{{ suggestion.icon }}</span>
+            <span class="text">{{ suggestion.text }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="chat-input-section">
+        <div class="input-wrapper">
+          <textarea
+            [(ngModel)]="userInput"
+            (keyup.enter)="sendMessage()"
+            placeholder="Ask me anything about your health..."
+            rows="3">
+          </textarea>
+          <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isLoading">
+            <span *ngIf="!isLoading">Send ➤</span>
+            <span *ngIf="isLoading">Sending...</span>
+          </button>
+        </div>
+        <p class="disclaimer">💡 Disclaimer: I provide general health information, not medical diagnosis. Always consult healthcare professionals for medical advice.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEALTH TIPS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'health-tips'">
+    <div class="section-header">
+      <h2>Wellness Tips</h2>
+      <p>Daily recommendations for better health</p>
+    </div>
+
+    <div class="tips-grid">
+      <div *ngFor="let tip of healthTips" class="tip-card">
+        <div class="tip-icon">{{ tip.icon }}</div>
+        <div class="tip-content">
+          <h3>{{ tip.title }}</h3>
+          <p>{{ tip.description }}</p>
+          <span class="tip-category">{{ tip.category }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDICATIONS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'medications'">
+    <div class="section-header">
+      <h2>Your Medications</h2>
+      <p>Medication reminders and tracking</p>
+    </div>
+
+    <div class="medications-list">
+      <div *ngFor="let med of medications" class="medication-card">
+        <div class="med-header">
+          <div class="med-icon">{{ med.icon }}</div>
+          <div class="med-info">
+            <h3>{{ med.name }}</h3>
+            <p class="dosage">{{ med.dosage }} • {{ med.frequency }}</p>
+          </div>
+        </div>
+
+        <div class="med-details">
+          <div class="detail-item">
+            <span class="label">Next Due:</span>
+            <span class="value">{{ med.nextDue }}</span>
+          </div>
+        </div>
+
+        <div class="med-actions">
+          <button class="btn-primary" (click)="trackMedication(med)">✓ Mark as Taken</button>
+          <button class="btn-secondary">Set Reminder</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEALTH ARTICLES TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'articles'">
+    <div class="section-header">
+      <h2>Health Articles</h2>
+      <p>Educational content to improve your health</p>
+    </div>
+
+    <div class="articles-grid">
+      <div *ngFor="let article of healthArticles" class="article-card">
+        <div class="article-header">
+          <div class="article-icon">{{ article.icon }}</div>
+          <span class="article-category">{{ article.category }}</span>
+        </div>
+
+        <div class="article-content">
+          <h3>{{ article.title }}</h3>
+          <p>{{ article.excerpt }}</p>
+        </div>
+
+        <button class="btn-primary" (click)="viewArticle(article)">Read More →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
