@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:15
+    container_name: carenexus-postgres_db
+    environment:
+      POSTGRES_USER: user_postgress
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: carenexus_posgress_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - carenexus-data:/var/lib/postgresql/data
+      - ./docker/init-schemas.sh:/docker-entrypoint-initdb.d/01-init-schemas.sh
+    networks:
+      - carenexus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_postgress"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: carenexus-ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - carenexus-network
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_KEEP_ALIVE: "5m"
+      OLLAMA_FLASH_ATTN: "1"
+    mem_limit: 6g
+    command: serve
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carenexus-backend
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    environment:
+      DATABASE_HOST: carenexus-postgres_db
+      DATABASE_PORT: 5432
+      DATABASE_USER: user_postgress
+      DATABASE_PASSWORD: mypassword
+      DATABASE_NAME: carenexus_posgress_db
+      DATABASE_URL: postgresql://user_postgress:mypassword@carenexus-postgres_db:5432/carenexus_posgress_db
+      OLLAMA_HOST: http://carenexus-ollama:11434
+    ports:
+      - "8000:8000"
+    networks:
+      - carenexus-network
+    volumes:
+      - .:/app
+      - /Users/cosy/Documents/Data_2/knowledge_base:/data/chroma
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  carenexus-data:
+  ollama-models:
+
+networks:
+  carenexus-network:
+    driver: bridge

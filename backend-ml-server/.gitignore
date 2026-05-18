@@ -1,0 +1,99 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Directories - Data & Models
+data/
+weights/
+models/
+*.pth
+*.pt
+!app/models/.gitkeep
+/data/chroma/
+/data/xrays/
+/data/gradcam/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+env.bak/
+venv.bak/
+
+# IDE & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.eclipse
+.pydevproject
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+.hypothesis/
+*.cover
+
+# Security & Credentials
+*.pem
+*.key
+*.cert
+docker-compose.override.yml
+secrets.yaml
+credentials.json
+.aws/
+
+# OS & Temporary
+.DS_Store
+Thumbs.db
+.env.local.*
+*.log
+*.pot
+*.mo
+
+# Development
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.ruff_cache/
+
+# Docker
+.dockerignore
+docker-compose.local.yml
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup
+*.bak
+*.backup
+*~
+.#*

@@ -1,0 +1,234 @@
+# Production Docker Compose Configuration
+# For deployment to staging/production environments
+
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: carenexus-postgres-prod
+    environment:
+      POSTGRES_USER: ${DB_USER:-carenexus_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
+      POSTGRES_DB: ${DB_NAME:-carenexus_db}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-carenexus_user} -d ${DB_NAME:-carenexus_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - carenexus-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: carenexus-ollama-prod
+    ports:
+      - "11434:11434"
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - carenexus-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Production: limit resources
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: carenexus-chromadb-prod
+    ports:
+      - "8001:8000"
+    environment:
+      CHROMA_DB_IMPL: "duckdb+parquet"
+      PERSIST_DIRECTORY: "/chroma/data"
+      ANONYMIZED_TELEMETRY: "false"
+    volumes:
+      - chromadb_data:/chroma/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - carenexus-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - postgres_db
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PYTHON_VERSION=3.11
+    container_name: carenexus-backend-prod
+    environment:
+      # Application settings
+      APP_ENV: production
+      LOG_LEVEL: INFO
+
+      # Database
+      DATABASE_URL: postgresql://${DB_USER:-carenexus_user}:${DB_PASSWORD:-secure_password_change_me}@postgres_db:5432/${DB_NAME:-carenexus_db}
+
+      # Ollama
+      OLLAMA_HOST: http://ollama:11434
+
+      # ChromaDB
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: 8000
+
+      # Security
+      CORS_ORIGINS: ${CORS_ORIGINS:-"https://yourdomain.com"}
+      SECRET_KEY: ${SECRET_KEY:-change_me_in_production}
+
+      # File storage
+      XRAY_STORAGE_PATH: /data/xrays
+      MODEL_PATH: /data/models
+
+      # Timeouts (in seconds)
+      REQUEST_TIMEOUT: 300
+      VISION_TIMEOUT: 60
+      RAG_TIMEOUT: 60
+      LLM_TIMEOUT: 120
+
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - xray_data:/data/xrays
+      - models_data:/data/models
+      - knowledge_base:/data/knowledge_base
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - carenexus-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+  # Nginx reverse proxy for production
+  nginx:
+    image: nginx:alpine
+    container_name: carenexus-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./logs:/var/log/nginx
+    depends_on:
+      - backend
+    networks:
+      - carenexus-network
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: carenexus-prometheus-prod
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    depends_on:
+      - backend
+    networks:
+      - carenexus-network
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+    driver: local
+  ollama_models:
+    driver: local
+  chromadb_data:
+    driver: local
+  xray_data:
+    driver: local
+  models_data:
+    driver: local
+  knowledge_base:
+    driver: local
+  prometheus_data:
+    driver: local
+
+networks:
+  carenexus-network:
+    driver: bridge
